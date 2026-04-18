@@ -15,8 +15,6 @@ interface Props {
   initialQrCodes: QrCodeType[]
 }
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
-
 export function QrCodesClient({ restaurantId, restaurantSubdomain, initialQrCodes }: Props) {
   const [qrCodes, setQrCodes] = useState(initialQrCodes)
   const [tableCount, setTableCount] = useState("")
@@ -29,8 +27,9 @@ export function QrCodesClient({ restaurantId, restaurantSubdomain, initialQrCode
   useEffect(() => {
     async function generateAll() {
       const urls: Record<number, string> = {}
+      const baseUrl = window.location.origin
       for (const qr of qrCodes) {
-        const url = `${APP_URL}/${restaurantSubdomain}/table/${qr.table_number}`
+        const url = `${baseUrl}/${restaurantSubdomain}/table/${qr.table_number}`
         try {
           urls[qr.table_number] = await QRCode.toDataURL(url, {
             width: 300,
@@ -148,7 +147,7 @@ export function QrCodesClient({ restaurantId, restaurantSubdomain, initialQrCode
         <p>
           Customer menu URL pattern:{" "}
           <code className="font-mono bg-amber-100 px-1.5 py-0.5 rounded text-xs">
-            {APP_URL}/{restaurantSubdomain}/table/[number]
+            {typeof window !== "undefined" ? window.location.origin : ""}/{restaurantSubdomain}/table/[number]
           </code>
         </p>
       </div>
