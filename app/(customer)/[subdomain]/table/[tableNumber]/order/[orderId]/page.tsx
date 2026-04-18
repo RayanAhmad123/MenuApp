@@ -9,11 +9,11 @@ import { formatPrice, timeAgo } from "@/lib/utils"
 import type { OrderWithItems } from "@/types/database"
 
 const ORDER_STEPS = [
-  { key: "pending", label: "Order Received", icon: Clock },
-  { key: "confirmed", label: "Confirmed", icon: CheckCircle2 },
-  { key: "preparing", label: "Preparing", icon: ChefHat },
-  { key: "ready", label: "Ready", icon: CheckCheck },
-  { key: "delivered", label: "Delivered", icon: Truck },
+  { key: "pending", label: "Beställning mottagen", icon: Clock },
+  { key: "confirmed", label: "Bekräftad", icon: CheckCircle2 },
+  { key: "preparing", label: "Tillagas", icon: ChefHat },
+  { key: "ready", label: "Klar", icon: CheckCheck },
+  { key: "delivered", label: "Levererad", icon: Truck },
 ] as const
 
 const stepIndex = (status: string) =>
@@ -65,7 +65,7 @@ export default function OrderStatusPage() {
       <div className="menu-page min-h-screen flex items-center justify-center">
         <div className="text-stone-400 text-center">
           <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p>Loading order...</p>
+          <p>Laddar beställning...</p>
         </div>
       </div>
     )
@@ -74,7 +74,7 @@ export default function OrderStatusPage() {
   if (!order) {
     return (
       <div className="menu-page min-h-screen flex items-center justify-center p-8 text-center">
-        <p className="text-stone-400">Order not found.</p>
+        <p className="text-stone-400">Beställningen hittades inte.</p>
       </div>
     )
   }
@@ -90,7 +90,7 @@ export default function OrderStatusPage() {
               <ArrowLeft className="h-5 w-5" />
             </Button>
           </Link>
-          <h1 className="font-serif text-xl text-stone-50">Order Status</h1>
+          <h1 className="font-serif text-xl text-stone-50">Beställningsstatus</h1>
         </div>
       </header>
 
@@ -104,13 +104,13 @@ export default function OrderStatusPage() {
               ? "bg-blue-950 text-blue-400 border border-blue-800"
               : "bg-amber-950 text-amber-400 border border-amber-800"
           }`}>
-            {order.status === "delivered" ? "Enjoy your meal!" :
-             order.status === "ready" ? "Your order is ready!" :
-             order.status === "preparing" ? "Being prepared..." :
-             order.status === "confirmed" ? "Order confirmed!" :
-             "Waiting for confirmation"}
+            {order.status === "delivered" ? "Smaklig måltid!" :
+             order.status === "ready" ? "Din beställning är klar!" :
+             order.status === "preparing" ? "Tillagas..." :
+             order.status === "confirmed" ? "Beställning bekräftad!" :
+             "Väntar på bekräftelse"}
           </div>
-          <p className="text-stone-500 text-sm">Table {tableNumber} · {timeAgo(order.created_at)}</p>
+          <p className="text-stone-500 text-sm">Bord {tableNumber} · {timeAgo(order.created_at)}</p>
         </div>
 
         {/* Progress steps */}
@@ -149,7 +149,7 @@ export default function OrderStatusPage() {
         {/* Order items */}
         <div className="bg-stone-900 border border-stone-800 rounded-2xl overflow-hidden">
           <div className="p-4 border-b border-stone-800">
-            <h2 className="font-serif text-stone-100 font-medium">Order Summary</h2>
+            <h2 className="font-serif text-stone-100 font-medium">Beställningsöversikt</h2>
           </div>
           <div className="divide-y divide-stone-800">
             {order.order_items.map(item => (
@@ -175,7 +175,7 @@ export default function OrderStatusPage() {
             ))}
           </div>
           <div className="p-4 border-t border-stone-800 flex justify-between">
-            <span className="text-stone-400 text-sm">Total</span>
+            <span className="text-stone-400 text-sm">Totalt</span>
             <span className="text-amber-400 font-semibold">{formatPrice(order.total_cents)}</span>
           </div>
         </div>
@@ -190,7 +190,7 @@ export default function OrderStatusPage() {
           }}
         >
           <Bell className="h-4 w-4 mr-2" />
-          Ping Waiter
+          Tillkalla servitör
         </Button>
       </main>
     </div>

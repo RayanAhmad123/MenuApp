@@ -75,7 +75,7 @@ export function KitchenClient({ restaurantId, initialOrders }: Props) {
     const { error } = await updateOrderStatus(orderId, "preparing")
     setUpdatingId(null)
     if (error) {
-      toast({ title: "Failed to update order", variant: "destructive" })
+      toast({ title: "Kunde inte uppdatera beställning", variant: "destructive" })
     } else {
       setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: "preparing" } : o))
     }
@@ -86,10 +86,10 @@ export function KitchenClient({ restaurantId, initialOrders }: Props) {
     const { error } = await updateOrderStatus(orderId, "ready")
     setUpdatingId(null)
     if (error) {
-      toast({ title: "Failed to update order", variant: "destructive" })
+      toast({ title: "Kunde inte uppdatera beställning", variant: "destructive" })
     } else {
       setOrders(prev => prev.filter(o => o.id !== orderId))
-      toast({ title: "Order marked ready — waiter notified" })
+      toast({ title: "Beställning markerad klar — servitören notifierad" })
     }
   }
 
@@ -105,9 +105,9 @@ export function KitchenClient({ restaurantId, initialOrders }: Props) {
           <ChefHat className="h-5 w-5 text-stone-900" />
         </div>
         <div>
-          <h1 className="font-serif text-xl text-stone-50 font-semibold">Kitchen Display</h1>
+          <h1 className="font-serif text-xl text-stone-50 font-semibold">Köksskärm</h1>
           <p className="text-xs text-stone-500">
-            {orders.length} active order{orders.length !== 1 ? "s" : ""}
+            {orders.length} aktiv{orders.length !== 1 ? "a" : ""} beställning{orders.length !== 1 ? "ar" : ""}
           </p>
         </div>
         <div className="ml-auto text-xs text-stone-600 font-mono">
@@ -118,8 +118,8 @@ export function KitchenClient({ restaurantId, initialOrders }: Props) {
       {orders.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-32 text-stone-600">
           <ChefHat className="h-16 w-16 mb-4 text-stone-700" />
-          <p className="text-lg font-medium">All clear!</p>
-          <p className="text-sm mt-1">No active orders right now.</p>
+          <p className="text-lg font-medium">Allt klart!</p>
+          <p className="text-sm mt-1">Inga aktiva beställningar just nu.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -144,7 +144,7 @@ export function KitchenClient({ restaurantId, initialOrders }: Props) {
                 {/* Order header */}
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xl font-bold text-stone-50">Table {order.table_number}</p>
+                    <p className="text-xl font-bold text-stone-50">Bord {order.table_number}</p>
                     <div className="flex items-center gap-1.5 mt-0.5">
                       <Clock className={`h-3 w-3 ${isCritical ? "text-red-400" : isUrgent ? "text-amber-400" : "text-stone-500"}`} />
                       <span className={`text-xs font-medium ${isCritical ? "text-red-400" : isUrgent ? "text-amber-400" : "text-stone-500"}`}>
@@ -192,7 +192,7 @@ export function KitchenClient({ restaurantId, initialOrders }: Props) {
                       disabled={updatingId === order.id}
                       className="w-full py-2.5 rounded-xl bg-amber-500 text-stone-900 font-semibold text-sm hover:bg-amber-400 transition-colors disabled:opacity-50"
                     >
-                      {updatingId === order.id ? "Updating…" : "Start Preparing"}
+                      {updatingId === order.id ? "Uppdaterar…" : "Börja tillaga"}
                     </button>
                   )}
                   {order.status === "preparing" && (
@@ -202,7 +202,7 @@ export function KitchenClient({ restaurantId, initialOrders }: Props) {
                       className="w-full py-2.5 rounded-xl bg-emerald-500 text-white font-semibold text-sm hover:bg-emerald-400 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                     >
                       <CheckCircle2 className="h-4 w-4" />
-                      {updatingId === order.id ? "Updating…" : "Mark Ready"}
+                      {updatingId === order.id ? "Uppdaterar…" : "Markera klar"}
                     </button>
                   )}
                 </div>

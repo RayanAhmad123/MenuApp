@@ -34,7 +34,7 @@ export default function CartPage() {
       const res = await fetch(`/api/restaurants/${subdomain}/menu`)
       const { restaurant } = await res.json()
       if (!restaurant) {
-        toast({ title: "Restaurant not found", variant: "destructive" })
+        toast({ title: "Restaurangen hittades inte", variant: "destructive" })
         return
       }
       const result = await placeOrder({
@@ -46,7 +46,7 @@ export default function CartPage() {
         specialNotes,
       })
       if (result.error) {
-        toast({ title: result.error, variant: "destructive" })
+        toast({ title: result.error ?? "Något gick fel", variant: "destructive" })
         return
       }
       if (!restaurant.payment_enabled) {
@@ -58,7 +58,7 @@ export default function CartPage() {
       setClientSecret(result.clientSecret)
       setOrderId(result.orderId)
     } catch {
-      toast({ title: "Something went wrong", variant: "destructive" })
+      toast({ title: "Något gick fel", variant: "destructive" })
     } finally {
       setIsPlacingOrder(false)
     }
@@ -68,10 +68,10 @@ export default function CartPage() {
     return (
       <div className="menu-page min-h-screen flex flex-col items-center justify-center p-8 text-center">
         <ShoppingBag className="h-16 w-16 text-stone-600 mb-4" />
-        <h2 className="font-serif text-2xl text-stone-300 mb-2">Your cart is empty</h2>
-        <p className="text-stone-500 mb-6">Add some items from the menu to get started.</p>
+        <h2 className="font-serif text-2xl text-stone-300 mb-2">Din varukorg är tom</h2>
+        <p className="text-stone-500 mb-6">Lägg till rätter från menyn för att börja.</p>
         <Link href={`/${subdomain}/table/${tableNumber}`}>
-          <Button variant="amber">Browse Menu</Button>
+          <Button variant="amber">Bläddra i menyn</Button>
         </Link>
       </div>
     )
@@ -86,7 +86,7 @@ export default function CartPage() {
               <ArrowLeft className="h-5 w-5" />
             </Button>
           </Link>
-          <h1 className="font-serif text-xl text-stone-50">Your Order</h1>
+          <h1 className="font-serif text-xl text-stone-50">Din beställning</h1>
         </div>
       </header>
 
@@ -154,11 +154,11 @@ export default function CartPage() {
 
             {/* Special notes */}
             <div className="bg-stone-900 border border-stone-800 rounded-xl p-4">
-              <label className="text-sm text-stone-400 block mb-2">Notes for the kitchen</label>
+              <label className="text-sm text-stone-400 block mb-2">Anteckningar till köket</label>
               <textarea
                 value={specialNotes}
                 onChange={e => setSpecialNotes(e.target.value)}
-                placeholder="Any special requests for the whole order..."
+                placeholder="Önskemål för hela beställningen..."
                 rows={2}
                 className="w-full bg-stone-800 border border-stone-700 rounded-lg px-3 py-2 text-sm text-stone-200 placeholder-stone-500 focus:outline-none focus:ring-1 focus:ring-amber-500 resize-none"
               />
@@ -167,11 +167,11 @@ export default function CartPage() {
             {/* Total */}
             <div className="bg-stone-900 border border-stone-800 rounded-xl p-4 space-y-2">
               <div className="flex justify-between text-stone-400 text-sm">
-                <span>Subtotal</span>
+                <span>Delsumma</span>
                 <span>{formatPrice(totalCents)}</span>
               </div>
               <div className="flex justify-between text-stone-200 font-semibold border-t border-stone-700 pt-2">
-                <span>Total</span>
+                <span>Totalt</span>
                 <span className="text-amber-400 text-lg">{formatPrice(totalCents)}</span>
               </div>
             </div>
@@ -183,7 +183,7 @@ export default function CartPage() {
               onClick={handlePlaceOrder}
               disabled={isPlacingOrder}
             >
-              {isPlacingOrder ? "Processing..." : `Place Order · ${formatPrice(totalCents)}`}
+              {isPlacingOrder ? "Bearbetar..." : `Beställ · ${formatPrice(totalCents)}`}
             </Button>
           </>
         ) : (
@@ -238,7 +238,7 @@ function CheckoutForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="bg-stone-900 border border-stone-800 rounded-xl p-4">
-        <h2 className="font-serif text-stone-100 text-lg mb-4">Payment</h2>
+        <h2 className="font-serif text-stone-100 text-lg mb-4">Betalning</h2>
         <PaymentElement />
       </div>
       <Button
@@ -248,7 +248,7 @@ function CheckoutForm({
         className="w-full"
         disabled={!stripe || isSubmitting}
       >
-        {isSubmitting ? "Processing Payment..." : "Pay Now"}
+        {isSubmitting ? "Bearbetar betalning..." : "Betala nu"}
       </Button>
     </form>
   )

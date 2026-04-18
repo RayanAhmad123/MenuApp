@@ -6,14 +6,16 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatPrice(cents: number): string {
-  return new Intl.NumberFormat("en-GB", {
+  return new Intl.NumberFormat("sv-SE", {
     style: "currency",
-    currency: "GBP",
+    currency: "SEK",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
   }).format(cents / 100)
 }
 
 export function formatDate(dateString: string): string {
-  return new Intl.DateTimeFormat("en-GB", {
+  return new Intl.DateTimeFormat("sv-SE", {
     day: "numeric",
     month: "short",
     year: "numeric",

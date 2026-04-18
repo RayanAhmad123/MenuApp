@@ -42,9 +42,9 @@ export function CustomerMenuClient({ restaurant, subdomain, categories, menuItem
   async function handlePingWaiter() {
     const { error } = await createTablePing(restaurant.id, tableNumber, "assistance")
     if (error) {
-      toast({ title: "Failed to ping waiter", variant: "destructive" })
+      toast({ title: "Kunde inte tillkalla servitör", variant: "destructive" })
     } else {
-      toast({ title: "Waiter notified", description: "Someone will be with you shortly." })
+      toast({ title: "Servitör tillkallad", description: "Någon kommer strax." })
     }
   }
 
@@ -65,7 +65,7 @@ export function CustomerMenuClient({ restaurant, subdomain, categories, menuItem
             )}
             <div>
               <h1 className="font-serif text-xl text-stone-50 font-semibold">{restaurant.name}</h1>
-              <p className="text-xs text-stone-400">Table {tableNumber}</p>
+              <p className="text-xs text-stone-400">Bord {tableNumber}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -76,7 +76,7 @@ export function CustomerMenuClient({ restaurant, subdomain, categories, menuItem
               className="text-amber-400 hover:text-amber-300 hover:bg-stone-800"
             >
               <Bell className="h-4 w-4 mr-1" />
-              <span className="hidden sm:inline">Waiter</span>
+              <span className="hidden sm:inline">Servitör</span>
             </Button>
             <Link href={`/${subdomain}/table/${tableNumber}/cart`}>
               <Button
@@ -85,7 +85,7 @@ export function CustomerMenuClient({ restaurant, subdomain, categories, menuItem
                 className="relative"
               >
                 <ShoppingCart className="h-4 w-4 mr-1" />
-                Cart
+                Varukorg
                 {itemCount > 0 && (
                   <span className="absolute -top-2 -right-2 bg-stone-900 text-amber-400 text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold border border-amber-500">
                     {itemCount}
@@ -131,7 +131,7 @@ export function CustomerMenuClient({ restaurant, subdomain, categories, menuItem
         </div>
         {filteredItems.length === 0 && (
           <p className="text-center text-stone-500 py-12 font-serif italic">
-            No items available in this category.
+            Inga rätter tillgängliga i denna kategori.
           </p>
         )}
       </main>
@@ -144,7 +144,7 @@ export function CustomerMenuClient({ restaurant, subdomain, categories, menuItem
           onAddToCart={(cartItem) => {
             addItem(cartItem)
             setSelectedItem(null)
-            toast({ title: `${selectedItem.name} added to cart` })
+            toast({ title: `${selectedItem.name} lagd i varukorgen` })
           }}
         />
       )}
@@ -155,7 +155,7 @@ export function CustomerMenuClient({ restaurant, subdomain, categories, menuItem
           <Link href={`/${subdomain}/table/${tableNumber}/cart`}>
             <Button variant="amber" size="xl" className="shadow-2xl shadow-amber-900/50 px-8">
               <ShoppingCart className="h-5 w-5 mr-2" />
-              View Cart · {itemCount} {itemCount === 1 ? "item" : "items"}
+              Visa varukorg · {itemCount} {itemCount === 1 ? "rätt" : "rätter"}
             </Button>
           </Link>
         </div>
@@ -186,12 +186,12 @@ function MenuItemCard({ item, onSelect }: { item: MenuItemWithDetails; onSelect:
           <div className="flex flex-wrap gap-1.5">
             {item.is_vegan && (
               <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800">
-                <Leaf className="h-3 w-3" />Vegan
+                <Leaf className="h-3 w-3" />Vegansk
               </span>
             )}
             {item.is_vegetarian && !item.is_vegan && (
               <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-green-950 text-green-400 border border-green-800">
-                <Heart className="h-3 w-3" />Veggie
+                <Heart className="h-3 w-3" />Vegetarisk
               </span>
             )}
             {item.is_gluten_free && (
@@ -299,15 +299,15 @@ function ItemDetailModal({
 
           {/* Dietary badges */}
           <div className="flex flex-wrap gap-1.5 mt-3">
-            {item.is_vegan && <Badge className="bg-emerald-950 text-emerald-400 border-emerald-800">Vegan</Badge>}
-            {item.is_vegetarian && !item.is_vegan && <Badge className="bg-green-950 text-green-400 border-green-800">Vegetarian</Badge>}
-            {item.is_gluten_free && <Badge className="bg-amber-950 text-amber-400 border-amber-800">Gluten Free</Badge>}
+            {item.is_vegan && <Badge className="bg-emerald-950 text-emerald-400 border-emerald-800">Vegansk</Badge>}
+            {item.is_vegetarian && !item.is_vegan && <Badge className="bg-green-950 text-green-400 border-green-800">Vegetarisk</Badge>}
+            {item.is_gluten_free && <Badge className="bg-amber-950 text-amber-400 border-amber-800">Glutenfritt</Badge>}
           </div>
 
           {/* Allergens */}
           {item.item_allergens.length > 0 && (
             <div className="mt-4">
-              <p className="text-xs text-stone-500 uppercase tracking-wider mb-2">Contains</p>
+              <p className="text-xs text-stone-500 uppercase tracking-wider mb-2">Innehåller</p>
               <div className="flex flex-wrap gap-1">
                 {item.item_allergens.map(ia =>
                   ia.allergens ? (
@@ -326,7 +326,7 @@ function ItemDetailModal({
               <div className="flex items-center justify-between mb-2">
                 <p className="font-medium text-stone-200">{group.name}</p>
                 {group.is_required && (
-                  <span className="text-xs text-amber-500 bg-amber-950 px-2 py-0.5 rounded-full">Required</span>
+                  <span className="text-xs text-amber-500 bg-amber-950 px-2 py-0.5 rounded-full">Obligatorisk</span>
                 )}
               </div>
               <div className="space-y-2">
@@ -355,11 +355,11 @@ function ItemDetailModal({
 
           {/* Special requests */}
           <div className="mt-5">
-            <p className="text-xs text-stone-500 uppercase tracking-wider mb-2">Special Requests</p>
+            <p className="text-xs text-stone-500 uppercase tracking-wider mb-2">Önskemål</p>
             <textarea
               value={specialRequests}
               onChange={e => setSpecialRequests(e.target.value)}
-              placeholder="Allergies, preferences..."
+              placeholder="Allergier, preferenser..."
               rows={2}
               className="w-full bg-stone-800 border border-stone-700 rounded-lg px-3 py-2 text-sm text-stone-200 placeholder-stone-500 focus:outline-none focus:ring-1 focus:ring-amber-500 resize-none"
             />
@@ -397,7 +397,7 @@ function ItemDetailModal({
                 })
               }
             >
-              Add to Cart · {formatPrice(totalPerItem * quantity)}
+              Lägg i varukorg · {formatPrice(totalPerItem * quantity)}
             </Button>
           </div>
         </div>

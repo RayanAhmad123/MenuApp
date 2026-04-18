@@ -30,9 +30,9 @@ export function SettingsClient({ restaurant }: { restaurant: Restaurant }) {
   async function onSubmit(data: z.infer<typeof SettingsSchema>) {
     const { error } = await updateRestaurant(restaurant.id, { name: data.name, address: data.address })
     if (error) {
-      toast({ title: "Failed to update settings", variant: "destructive" })
+      toast({ title: "Kunde inte uppdatera inställningar", variant: "destructive" })
     } else {
-      toast({ title: "Settings saved" })
+      toast({ title: "Inställningar sparade" })
     }
   }
 
@@ -40,10 +40,10 @@ export function SettingsClient({ restaurant }: { restaurant: Restaurant }) {
     setSavingPayment(true)
     const { error } = await updateRestaurant(restaurant.id, { paymentEnabled: enabled })
     if (error) {
-      toast({ title: "Failed to update payment setting", variant: "destructive" })
+      toast({ title: "Kunde inte uppdatera betalningsinställning", variant: "destructive" })
     } else {
       setPaymentEnabled(enabled)
-      toast({ title: enabled ? "Payment enabled" : "Payment disabled", description: enabled ? "Customers will pay online when ordering." : "Customers can order without paying upfront." })
+      toast({ title: enabled ? "Betalning aktiverad" : "Betalning inaktiverad", description: enabled ? "Kunder betalar online vid beställning." : "Kunder kan beställa utan att betala direkt." })
     }
     setSavingPayment(false)
   }
@@ -52,27 +52,27 @@ export function SettingsClient({ restaurant }: { restaurant: Restaurant }) {
     <div className="space-y-6">
       <Card className="border-stone-200">
         <CardHeader>
-          <CardTitle className="text-stone-800">Restaurant Profile</CardTitle>
+          <CardTitle className="text-stone-800">Restaurangprofil</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <div className="space-y-1.5">
-              <Label>Restaurant Name</Label>
-              <Input {...register("name")} placeholder="My Restaurant" />
+              <Label>Restaurangnamn</Label>
+              <Input {...register("name")} placeholder="Min restaurang" />
             </div>
             <div className="space-y-1.5">
-              <Label>Address</Label>
-              <Input {...register("address")} placeholder="123 Main St, City" />
+              <Label>Adress</Label>
+              <Input {...register("address")} placeholder="Storgatan 1, Stockholm" />
             </div>
             <div className="space-y-1.5">
-              <Label>Subdomain</Label>
+              <Label>Subdomän</Label>
               <Input value={restaurant.subdomain} disabled className="bg-stone-50 text-stone-500" />
               <p className="text-xs text-stone-500">
-                Your menu URL: <span className="font-mono">{typeof window !== "undefined" ? window.location.origin : ""}/{restaurant.subdomain}/table/1</span>
+                Din meny-URL: <span className="font-mono">{typeof window !== "undefined" ? window.location.origin : ""}/{restaurant.subdomain}/table/1</span>
               </p>
             </div>
             <Button type="submit" variant="amber" disabled={isSubmitting}>
-              {isSubmitting ? "Saving..." : "Save Changes"}
+              {isSubmitting ? "Sparar..." : "Spara ändringar"}
             </Button>
           </form>
         </CardContent>
@@ -80,16 +80,16 @@ export function SettingsClient({ restaurant }: { restaurant: Restaurant }) {
 
       <Card className="border-stone-200">
         <CardHeader>
-          <CardTitle className="text-stone-800">Payment Settings</CardTitle>
+          <CardTitle className="text-stone-800">Betalningsinställningar</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium text-stone-800">Require payment on order</p>
+              <p className="font-medium text-stone-800">Kräv betalning vid beställning</p>
               <p className="text-sm text-stone-500 mt-0.5">
                 {paymentEnabled
-                  ? "Customers must pay online via Stripe before the order is confirmed."
-                  : "Customers can place orders without paying upfront. Payment is handled separately."}
+                  ? "Kunder måste betala online via Stripe innan beställningen bekräftas."
+                  : "Kunder kan beställa utan att betala direkt. Betalning hanteras separat."}
               </p>
             </div>
             <Switch

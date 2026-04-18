@@ -29,9 +29,9 @@ const PING_ICONS: Record<string, React.ElementType> = {
 }
 
 const PING_LABELS: Record<string, string> = {
-  assistance: "Needs Assistance",
-  refill: "Refill Request",
-  payment: "Requesting Bill",
+  assistance: "Behöver hjälp",
+  refill: "Påfyllning begärd",
+  payment: "Begär notan",
 }
 
 const PING_COLORS: Record<string, string> = {
@@ -115,10 +115,10 @@ export function WaiterClient({ restaurantId, staffName, initialPings, initialRea
     const { error } = await updateOrderStatus(orderId, "delivered")
     setUpdatingOrderId(null)
     if (error) {
-      toast({ title: "Failed to mark delivered", variant: "destructive" })
+      toast({ title: "Kunde inte markera som levererad", variant: "destructive" })
     } else {
       setReadyOrders(prev => prev.filter(o => o.id !== orderId))
-      toast({ title: "Order marked as delivered" })
+      toast({ title: "Beställning markerad som levererad" })
     }
   }
 
@@ -136,18 +136,18 @@ export function WaiterClient({ restaurantId, staffName, initialPings, initialRea
           <Bell className="h-4 w-4 text-stone-900" />
         </div>
         <div>
-          <h1 className="font-serif text-lg font-semibold">Waiter View</h1>
-          <p className="text-xs text-stone-400">Hi, {staffName}</p>
+          <h1 className="font-serif text-lg font-semibold">Servitörsvy</h1>
+          <p className="text-xs text-stone-400">Hej, {staffName}</p>
         </div>
         <div className="ml-auto flex items-center gap-3">
           {pings.length > 0 && (
             <span className="px-2.5 py-1 bg-red-500 text-white text-xs font-bold rounded-full">
-              {pings.length} ping{pings.length !== 1 ? "s" : ""}
+              {pings.length} anrop
             </span>
           )}
           {readyOrders.length > 0 && (
             <span className="px-2.5 py-1 bg-emerald-500 text-white text-xs font-bold rounded-full">
-              {readyOrders.length} ready
+              {readyOrders.length} klar{readyOrders.length !== 1 ? "a" : ""}
             </span>
           )}
         </div>
@@ -156,7 +156,7 @@ export function WaiterClient({ restaurantId, staffName, initialPings, initialRea
       <div className="p-4 space-y-6 max-w-2xl mx-auto">
         {pings.length > 0 && (
           <section>
-            <h2 className="text-sm font-semibold text-stone-500 uppercase tracking-wide mb-3">Table Requests</h2>
+            <h2 className="text-sm font-semibold text-stone-500 uppercase tracking-wide mb-3">Bordsförfrågningar</h2>
             <div className="space-y-2">
               {pings.map(ping => {
                 const Icon = PING_ICONS[ping.ping_type] ?? AlertCircle
@@ -164,16 +164,16 @@ export function WaiterClient({ restaurantId, staffName, initialPings, initialRea
                   <div key={ping.id} className={`flex items-center gap-4 p-4 rounded-xl border ${PING_COLORS[ping.ping_type] ?? "bg-stone-50 border-stone-200"}`}>
                     <Icon className={`h-6 w-6 flex-shrink-0 ${PING_ICON_COLORS[ping.ping_type] ?? "text-stone-500"}`} />
                     <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-stone-800">Table {ping.table_number}</p>
+                      <p className="font-semibold text-stone-800">Bord {ping.table_number}</p>
                       <p className="text-sm text-stone-600">{PING_LABELS[ping.ping_type] ?? ping.ping_type}</p>
                       <p className="text-xs text-stone-400 mt-0.5">{elapsed(ping.created_at)}</p>
                     </div>
                     <div className="flex flex-col gap-1">
                       <button onClick={() => handleAcknowledgePing(ping.id)} className="px-3 py-1.5 bg-stone-200 text-stone-700 text-xs font-medium rounded-lg hover:bg-stone-300 transition-colors">
-                        On my way
+                        På väg
                       </button>
                       <button onClick={() => handleResolvePing(ping.id)} className="px-3 py-1.5 bg-stone-900 text-stone-100 text-xs font-medium rounded-lg hover:bg-stone-800 transition-colors">
-                        Resolved
+                        Löst
                       </button>
                     </div>
                   </div>
@@ -185,15 +185,15 @@ export function WaiterClient({ restaurantId, staffName, initialPings, initialRea
 
         {readyOrders.length > 0 && (
           <section>
-            <h2 className="text-sm font-semibold text-stone-500 uppercase tracking-wide mb-3">Ready to Serve</h2>
+            <h2 className="text-sm font-semibold text-stone-500 uppercase tracking-wide mb-3">Redo att serveras</h2>
             <div className="space-y-2">
               {readyOrders.map(order => (
                 <div key={order.id} className="bg-white border border-emerald-200 rounded-xl p-4">
                   <div className="flex items-start justify-between gap-3 mb-3">
                     <div>
                       <div className="flex items-center gap-2">
-                        <p className="font-bold text-stone-800 text-lg">Table {order.table_number}</p>
-                        <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-medium">Ready</span>
+                        <p className="font-bold text-stone-800 text-lg">Bord {order.table_number}</p>
+                        <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-medium">Klar</span>
                       </div>
                       <p className="text-xs text-stone-400 mt-0.5">{elapsed(order.created_at)}</p>
                     </div>
@@ -212,7 +212,7 @@ export function WaiterClient({ restaurantId, staffName, initialPings, initialRea
                     className="w-full py-2.5 bg-emerald-500 text-white font-semibold text-sm rounded-xl hover:bg-emerald-400 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                   >
                     <CheckCircle2 className="h-4 w-4" />
-                    {updatingOrderId === order.id ? "Updating…" : "Mark Delivered"}
+                    {updatingOrderId === order.id ? "Uppdaterar…" : "Markera levererad"}
                   </button>
                 </div>
               ))}
@@ -223,8 +223,8 @@ export function WaiterClient({ restaurantId, staffName, initialPings, initialRea
         {!hasTasks && (
           <div className="flex flex-col items-center justify-center py-32 text-stone-400">
             <UtensilsCrossed className="h-14 w-14 mb-4 text-stone-300" />
-            <p className="text-lg font-medium text-stone-500">All clear!</p>
-            <p className="text-sm mt-1">No table requests or ready orders.</p>
+            <p className="text-lg font-medium text-stone-500">Allt klart!</p>
+            <p className="text-sm mt-1">Inga bordsförfrågningar eller klara beställningar.</p>
           </div>
         )}
       </div>

@@ -48,7 +48,7 @@ export async function placeOrder(data: z.infer<typeof PlaceOrderSchema>) {
     try {
       const paymentIntent = await stripe.paymentIntents.create({
         amount: totalCents,
-        currency: "gbp",
+        currency: "sek",
         automatic_payment_methods: { enabled: true },
         metadata: { restaurantId, tableNumber: String(tableNumber), sessionId },
       })
