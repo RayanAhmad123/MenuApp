@@ -1,5 +1,5 @@
 "use server"
-import { createServerSupabaseClient } from "@/lib/supabase/server"
+import { createAdminSupabaseClient, createServerSupabaseClient } from "@/lib/supabase/server"
 import { stripe } from "@/lib/stripe"
 import type { CartItem } from "@/types/database"
 import { z } from "zod"
@@ -39,7 +39,7 @@ export async function placeOrder(data: z.infer<typeof PlaceOrderSchema>) {
     return sum + (item.priceCents + modTotal) * item.quantity
   }, 0)
 
-  const supabase = await createServerSupabaseClient()
+  const supabase = await createAdminSupabaseClient()
 
   let stripePaymentIntentId: string | null = null
   let clientSecret: string | null = null
