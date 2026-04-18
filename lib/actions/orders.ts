@@ -166,6 +166,37 @@ export async function markOrdersPaid(orderIds: string[]) {
   return { error: error?.message ?? null }
 }
 
+export async function markItemsPaid(orderItemIds: string[]) {
+  const supabase = await createAdminSupabaseClient()
+
+  const { error } = await supabase
+    .from("order_items")
+    .update({ payment_status: "paid" })
+    .in("id", orderItemIds)
+  if (error) return { error: error.message }
+
+  // Find which orders were affected
+  const { data: affected } = await supabase
+    .from("order_items")
+    .select("order_id")
+    .in("id", orderItemIds)
+
+  if (affected) {
+    const orderIds = [...new Set(affected.map(i => i.order_id))]
+    for (const orderId of orderIds) {
+      const { data: allItems } = await supabase
+        .from("order_items")
+        .select("payment_status")
+        .eq("order_id", orderId)
+      if (allItems?.every(i => i.payment_status === "paid")) {
+        await supabase.from("orders").update({ payment_status: "paid" }).eq("id", orderId)
+      }
+    }
+  }
+
+  return { error: null }
+}
+
 export async function createTablePing(
   restaurantId: string,
   tableNumber: number,

@@ -1,8 +1,8 @@
 "use client"
 import { useState, useEffect, useCallback, useMemo } from "react"
-import { Bell, CheckCircle2, UtensilsCrossed, AlertCircle, Coffee, CreditCard, ChevronRight, X } from "lucide-react"
+import { Bell, CheckCircle2, UtensilsCrossed, AlertCircle, Coffee, CreditCard, ChevronRight } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
-import { updateOrderStatus, markOrdersPaid } from "@/lib/actions/orders"
+import { updateOrderStatus, markItemsPaid } from "@/lib/actions/orders"
 import { formatPrice } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -16,6 +16,14 @@ interface ReadyOrder {
   order_items: Array<{ id: string; quantity: number; menu_items: { name: string } }>
 }
 
+interface BillingItem {
+  id: string
+  quantity: number
+  item_price_cents: number
+  payment_status: "unpaid" | "paid"
+  menu_items: { name: string }
+}
+
 interface TableBillingOrder {
   id: string
   table_number: number
@@ -23,7 +31,7 @@ interface TableBillingOrder {
   status: string
   payment_status: "unpaid" | "paid"
   created_at: string
-  order_items: Array<{ id: string; quantity: number; item_price_cents: number; menu_items: { name: string } }>
+  order_items: BillingItem[]
 }
 
 interface Props {
@@ -39,19 +47,16 @@ const PING_ICONS: Record<string, React.ElementType> = {
   refill: Coffee,
   payment: CreditCard,
 }
-
 const PING_LABELS: Record<string, string> = {
   assistance: "Behöver hjälp",
   refill: "Påfyllning begärd",
   payment: "Begär notan",
 }
-
 const PING_COLORS: Record<string, string> = {
   assistance: "bg-red-50 border-red-200",
   refill: "bg-blue-50 border-blue-200",
   payment: "bg-emerald-50 border-emerald-200",
 }
-
 const PING_ICON_COLORS: Record<string, string> = {
   assistance: "text-red-500",
   refill: "text-blue-500",
@@ -64,17 +69,15 @@ export function WaiterClient({ restaurantId, staffName, initialPings, initialRea
   const [tableOrders, setTableOrders] = useState<TableBillingOrder[]>(initialTableOrders)
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null)
   const [viewTable, setViewTable] = useState<number | null>(null)
-  const [selectedOrderIds, setSelectedOrderIds] = useState<Set<string>>(new Set())
+  const [selectedItemIds, setSelectedItemIds] = useState<Set<string>>(new Set())
   const [markingPaid, setMarkingPaid] = useState(false)
   const { toast } = useToast()
   const supabase = useMemo(() => createClient(), [])
 
   const fetchPings = useCallback(async () => {
     const { data } = await supabase
-      .from("table_pings")
-      .select("*")
-      .eq("restaurant_id", restaurantId)
-      .eq("status", "pending")
+      .from("table_pings").select("*")
+      .eq("restaurant_id", restaurantId).eq("status", "pending")
       .order("created_at", { ascending: true })
     if (data) setPings(data)
   }, [supabase, restaurantId])
@@ -84,10 +87,8 @@ export function WaiterClient({ restaurantId, staffName, initialPings, initialRea
     const { data } = await supabase
       .from("orders")
       .select("id, table_number, total_cents, created_at, order_items(id, quantity, menu_items(name))")
-      .eq("restaurant_id", restaurantId)
-      .eq("status", "ready")
-      .gte("created_at", `${today}T00:00:00`)
-      .order("created_at", { ascending: true })
+      .eq("restaurant_id", restaurantId).eq("status", "ready")
+      .gte("created_at", `${today}T00:00:00`).order("created_at", { ascending: true })
     if (data) setReadyOrders(data)
   }, [supabase, restaurantId])
 
@@ -95,12 +96,10 @@ export function WaiterClient({ restaurantId, staffName, initialPings, initialRea
     const today = new Date().toISOString().split("T")[0]
     const { data } = await supabase
       .from("orders")
-      .select("id, table_number, total_cents, status, payment_status, created_at, order_items(id, quantity, item_price_cents, menu_items(name))")
-      .eq("restaurant_id", restaurantId)
-      .neq("status", "cancelled")
+      .select("id, table_number, total_cents, status, payment_status, created_at, order_items(id, quantity, item_price_cents, payment_status, menu_items(name))")
+      .eq("restaurant_id", restaurantId).neq("status", "cancelled")
       .gte("created_at", `${today}T00:00:00`)
-      .order("table_number", { ascending: true })
-      .order("created_at", { ascending: true })
+      .order("table_number", { ascending: true }).order("created_at", { ascending: true })
     if (data) setTableOrders(data as TableBillingOrder[])
   }, [supabase, restaurantId])
 
@@ -119,9 +118,7 @@ export function WaiterClient({ restaurantId, staffName, initialPings, initialRea
       .subscribe()
 
     const interval = setInterval(() => {
-      fetchPings()
-      fetchReadyOrders()
-      fetchTableOrders()
+      fetchPings(); fetchReadyOrders(); fetchTableOrders()
     }, 5000)
 
     return () => {
@@ -131,7 +128,7 @@ export function WaiterClient({ restaurantId, staffName, initialPings, initialRea
     }
   }, [supabase, restaurantId, fetchPings, fetchReadyOrders, fetchTableOrders])
 
-  // Computed table summaries
+  // Table summaries — only tables with at least one unpaid item (cleared once fully paid)
   const tableSummaries = useMemo(() => {
     const map = new Map<number, TableBillingOrder[]>()
     for (const order of tableOrders) {
@@ -140,19 +137,48 @@ export function WaiterClient({ restaurantId, staffName, initialPings, initialRea
       map.set(order.table_number, arr)
     }
     return Array.from(map.entries())
-      .map(([table_number, orders]) => ({
-        table_number,
-        orders,
-        totalCents: orders.reduce((s, o) => s + o.total_cents, 0),
-        paidCents: orders.filter(o => o.payment_status === "paid").reduce((s, o) => s + o.total_cents, 0),
-      }))
+      .map(([table_number, orders]) => {
+        const allItems = orders.flatMap(o => o.order_items)
+        const totalCents = allItems.reduce((s, i) => s + i.item_price_cents * i.quantity, 0)
+        const paidCents = allItems.filter(i => i.payment_status === "paid").reduce((s, i) => s + i.item_price_cents * i.quantity, 0)
+        return { table_number, orders, totalCents, paidCents }
+      })
+      .filter(t => t.paidCents < t.totalCents)
       .sort((a, b) => a.table_number - b.table_number)
   }, [tableOrders])
+
+  // Close modal when table becomes fully paid
+  useEffect(() => {
+    if (viewTable !== null && !tableSummaries.find(t => t.table_number === viewTable)) {
+      setViewTable(null)
+      toast({ title: `Bord ${viewTable} är nu fullt betalt` })
+    }
+  }, [tableSummaries, viewTable, toast])
 
   const viewTableOrders = useMemo(
     () => tableOrders.filter(o => o.table_number === viewTable),
     [tableOrders, viewTable]
   )
+
+  // Running total for selected items
+  const selectedTotal = useMemo(() => {
+    let total = 0
+    for (const order of viewTableOrders) {
+      for (const item of order.order_items) {
+        if (selectedItemIds.has(item.id)) total += item.item_price_cents * item.quantity
+      }
+    }
+    return total
+  }, [viewTableOrders, selectedItemIds])
+
+  function toggleItem(itemId: string) {
+    setSelectedItemIds(prev => {
+      const next = new Set(prev)
+      if (next.has(itemId)) next.delete(itemId)
+      else next.add(itemId)
+      return next
+    })
+  }
 
   async function handleAcknowledgePing(pingId: string) {
     await supabase.from("table_pings").update({ status: "acknowledged" }).eq("id", pingId)
@@ -176,20 +202,26 @@ export function WaiterClient({ restaurantId, staffName, initialPings, initialRea
     }
   }
 
-  async function handleMarkPaid(orderIds: string[]) {
-    if (orderIds.length === 0) return
+  async function handleMarkItemsPaid(itemIds: string[]) {
+    if (itemIds.length === 0) return
     setMarkingPaid(true)
-    const { error } = await markOrdersPaid(orderIds)
+    const { error } = await markItemsPaid(itemIds)
     setMarkingPaid(false)
     if (error) {
       toast({ title: "Kunde inte markera som betald", variant: "destructive" })
-    } else {
-      setTableOrders(prev => prev.map(o =>
-        orderIds.includes(o.id) ? { ...o, payment_status: "paid" as const } : o
-      ))
-      setSelectedOrderIds(new Set())
-      toast({ title: `${orderIds.length === 1 ? "Beställning" : `${orderIds.length} beställningar`} markerad${orderIds.length !== 1 ? "e" : ""} som betald${orderIds.length !== 1 ? "a" : ""}` })
+      return
     }
+    // Update local state optimistically
+    const paidSet = new Set(itemIds)
+    setTableOrders(prev => prev.map(order => {
+      const updatedItems = order.order_items.map(item =>
+        paidSet.has(item.id) ? { ...item, payment_status: "paid" as const } : item
+      )
+      const allPaid = updatedItems.every(i => i.payment_status === "paid")
+      return { ...order, order_items: updatedItems, payment_status: allPaid ? "paid" as const : order.payment_status }
+    }))
+    setSelectedItemIds(new Set())
+    toast({ title: `${itemIds.length} ${itemIds.length === 1 ? "artikel" : "artiklar"} markerad${itemIds.length !== 1 ? "e" : ""} som betald${itemIds.length !== 1 ? "a" : ""}` })
   }
 
   function elapsed(createdAt: string) {
@@ -202,7 +234,7 @@ export function WaiterClient({ restaurantId, staffName, initialPings, initialRea
   return (
     <div className="min-h-screen bg-stone-50 flex flex-col">
       {/* Header */}
-      <div className="bg-stone-900 text-stone-50 px-6 py-4 flex items-center gap-3">
+      <div className="bg-stone-900 text-stone-50 px-6 py-4 flex items-center gap-3 flex-shrink-0">
         <div className="w-9 h-9 rounded-xl bg-amber-500 flex items-center justify-center">
           <Bell className="h-4 w-4 text-stone-900" />
         </div>
@@ -224,7 +256,7 @@ export function WaiterClient({ restaurantId, staffName, initialPings, initialRea
         </div>
       </div>
 
-      {/* Body: main content + billing sidebar */}
+      {/* Body */}
       <div className="flex flex-1 overflow-hidden">
 
         {/* Left: pings + ready orders */}
@@ -315,12 +347,11 @@ export function WaiterClient({ restaurantId, staffName, initialPings, initialRea
             ) : (
               <div className="divide-y divide-stone-100">
                 {tableSummaries.map(({ table_number, totalCents, paidCents, orders }) => {
-                  const allPaid = paidCents >= totalCents
-                  const somePaid = paidCents > 0 && !allPaid
+                  const somePaid = paidCents > 0
                   return (
                     <button
                       key={table_number}
-                      onClick={() => { setViewTable(table_number); setSelectedOrderIds(new Set()) }}
+                      onClick={() => { setViewTable(table_number); setSelectedItemIds(new Set()) }}
                       className="w-full flex items-center justify-between px-4 py-3 hover:bg-stone-50 transition-colors text-left"
                     >
                       <div>
@@ -329,18 +360,12 @@ export function WaiterClient({ restaurantId, staffName, initialPings, initialRea
                           {orders.length} beställning{orders.length !== 1 ? "ar" : ""}
                         </p>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1.5">
                         <div className="text-right">
                           <p className="text-sm font-semibold text-stone-800">{formatPrice(totalCents)}</p>
-                          <span className={`text-xs font-medium px-1.5 py-0.5 rounded-full ${
-                            allPaid
-                              ? "bg-emerald-100 text-emerald-700"
-                              : somePaid
-                              ? "bg-amber-100 text-amber-700"
-                              : "bg-stone-100 text-stone-500"
-                          }`}>
-                            {allPaid ? "Betalt" : somePaid ? "Delvis" : "Obetalt"}
-                          </span>
+                          {somePaid && (
+                            <p className="text-xs text-emerald-600">{formatPrice(paidCents)} betalt</p>
+                          )}
                         </div>
                         <ChevronRight className="h-4 w-4 text-stone-300 flex-shrink-0" />
                       </div>
@@ -354,112 +379,119 @@ export function WaiterClient({ restaurantId, staffName, initialPings, initialRea
       </div>
 
       {/* Table billing modal */}
-      <Dialog open={viewTable !== null} onOpenChange={open => { if (!open) setViewTable(null) }}>
-        <DialogContent className="max-w-lg max-h-[85vh] flex flex-col p-0">
-          <DialogHeader className="px-6 pt-6 pb-4 border-b border-stone-100 flex-shrink-0">
+      <Dialog open={viewTable !== null} onOpenChange={open => { if (!open) { setViewTable(null); setSelectedItemIds(new Set()) } }}>
+        <DialogContent className="max-w-lg max-h-[85vh] flex flex-col p-0 gap-0">
+          <DialogHeader className="px-6 pt-5 pb-4 border-b border-stone-100 flex-shrink-0">
             <DialogTitle className="text-stone-800 text-xl">Bord {viewTable}</DialogTitle>
             {viewTable !== null && (() => {
               const summary = tableSummaries.find(t => t.table_number === viewTable)
               if (!summary) return null
+              const remaining = summary.totalCents - summary.paidCents
               return (
-                <div className="flex items-center gap-3 mt-1">
-                  <span className="text-sm text-stone-500">Totalt: <span className="font-semibold text-stone-800">{formatPrice(summary.totalCents)}</span></span>
-                  {summary.paidCents > 0 && (
-                    <span className="text-sm text-emerald-600">Betalt: <span className="font-semibold">{formatPrice(summary.paidCents)}</span></span>
-                  )}
-                  {summary.totalCents - summary.paidCents > 0 && (
-                    <span className="text-sm text-amber-600">Kvar: <span className="font-semibold">{formatPrice(summary.totalCents - summary.paidCents)}</span></span>
-                  )}
+                <div className="flex items-center gap-4 mt-1 text-sm">
+                  <span className="text-stone-500">Totalt: <span className="font-semibold text-stone-800">{formatPrice(summary.totalCents)}</span></span>
+                  {summary.paidCents > 0 && <span className="text-emerald-600">Betalt: <span className="font-semibold">{formatPrice(summary.paidCents)}</span></span>}
+                  {remaining > 0 && <span className="text-amber-600">Kvar: <span className="font-semibold">{formatPrice(remaining)}</span></span>}
                 </div>
               )
             })()}
           </DialogHeader>
 
-          <div className="flex-1 overflow-y-auto px-6 py-4 space-y-3">
-            {viewTableOrders.map(order => {
-              const isPaid = order.payment_status === "paid"
-              const isSelected = selectedOrderIds.has(order.id)
-              return (
-                <div
-                  key={order.id}
-                  onClick={() => {
-                    if (isPaid) return
-                    setSelectedOrderIds(prev => {
-                      const next = new Set(prev)
-                      if (next.has(order.id)) next.delete(order.id)
-                      else next.add(order.id)
-                      return next
-                    })
-                  }}
-                  className={`rounded-xl border p-4 transition-all ${
-                    isPaid
-                      ? "bg-stone-50 border-stone-200 opacity-60 cursor-default"
-                      : isSelected
-                      ? "bg-amber-50 border-amber-300 cursor-pointer"
-                      : "bg-white border-stone-200 cursor-pointer hover:border-stone-300"
-                  }`}
-                >
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      {!isPaid && (
-                        <div className={`w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 ${
-                          isSelected ? "bg-amber-500 border-amber-500" : "border-stone-300"
-                        }`}>
-                          {isSelected && <span className="text-white text-xs leading-none">✓</span>}
-                        </div>
-                      )}
-                      {isPaid && (
-                        <CheckCircle2 className="h-4 w-4 text-emerald-500 flex-shrink-0" />
-                      )}
-                      <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-                        order.status === "delivered" ? "bg-stone-100 text-stone-500" :
-                        order.status === "ready" ? "bg-emerald-100 text-emerald-700" :
-                        order.status === "preparing" ? "bg-amber-100 text-amber-700" :
-                        "bg-blue-100 text-blue-700"
-                      }`}>
-                        {order.status === "delivered" ? "Levererad" :
-                         order.status === "ready" ? "Klar" :
-                         order.status === "preparing" ? "Tillagas" : "Bekräftad"}
-                      </span>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-semibold text-stone-800">{formatPrice(order.total_cents)}</p>
-                      {isPaid && <p className="text-xs text-emerald-600 font-medium">Betald</p>}
-                    </div>
-                  </div>
-                  <div className="space-y-0.5 ml-6">
-                    {order.order_items.map(item => (
-                      <p key={item.id} className="text-sm text-stone-600">
-                        <span className="text-amber-600 font-medium">{item.quantity}×</span>{" "}{item.menu_items.name}
-                      </p>
-                    ))}
-                  </div>
+          {/* Item list */}
+          <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
+            {viewTableOrders.map(order => (
+              <div key={order.id}>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                    order.status === "delivered" ? "bg-stone-100 text-stone-500" :
+                    order.status === "ready" ? "bg-emerald-100 text-emerald-700" :
+                    order.status === "preparing" ? "bg-amber-100 text-amber-700" :
+                    "bg-blue-100 text-blue-700"
+                  }`}>
+                    {order.status === "delivered" ? "Levererad" :
+                     order.status === "ready" ? "Klar" :
+                     order.status === "preparing" ? "Tillagas" : "Bekräftad"}
+                  </span>
+                  <span className="text-xs text-stone-400">{elapsed(order.created_at)}</span>
                 </div>
-              )
-            })}
+                <div className="space-y-1">
+                  {order.order_items.map(item => {
+                    const isPaid = item.payment_status === "paid"
+                    const isSelected = selectedItemIds.has(item.id)
+                    const lineTotal = item.item_price_cents * item.quantity
+                    return (
+                      <button
+                        key={item.id}
+                        disabled={isPaid}
+                        onClick={() => toggleItem(item.id)}
+                        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-left ${
+                          isPaid
+                            ? "opacity-40 cursor-default bg-stone-50"
+                            : isSelected
+                            ? "bg-amber-50 border border-amber-300"
+                            : "bg-white border border-stone-200 hover:border-stone-300"
+                        }`}
+                      >
+                        {/* Checkbox */}
+                        {isPaid ? (
+                          <CheckCircle2 className="h-4 w-4 text-emerald-500 flex-shrink-0" />
+                        ) : (
+                          <div className={`w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 ${
+                            isSelected ? "bg-amber-500 border-amber-500" : "border-stone-300"
+                          }`}>
+                            {isSelected && <span className="text-white text-xs leading-none font-bold">✓</span>}
+                          </div>
+                        )}
+                        <span className={`flex-1 text-sm ${isPaid ? "line-through text-stone-400" : "text-stone-800"}`}>
+                          <span className="font-medium text-amber-600 mr-1">{item.quantity}×</span>
+                          {item.menu_items.name}
+                        </span>
+                        <span className={`text-sm font-semibold flex-shrink-0 ${isPaid ? "text-stone-400" : isSelected ? "text-amber-700" : "text-stone-700"}`}>
+                          {formatPrice(lineTotal)}
+                        </span>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            ))}
           </div>
 
-          {/* Action buttons */}
-          {viewTableOrders.some(o => o.payment_status === "unpaid") && (
-            <div className="px-6 py-4 border-t border-stone-100 flex-shrink-0 space-y-2">
-              {selectedOrderIds.size > 0 && (
+          {/* Footer: running total + action buttons */}
+          <div className="px-6 py-4 border-t border-stone-100 flex-shrink-0 space-y-3">
+            {/* Running total */}
+            {selectedItemIds.size > 0 && (
+              <div className="flex items-center justify-between bg-amber-50 border border-amber-200 rounded-xl px-4 py-2.5">
+                <span className="text-sm text-amber-700 font-medium">
+                  {selectedItemIds.size} artikel{selectedItemIds.size !== 1 ? "ar" : ""} vald{selectedItemIds.size !== 1 ? "a" : ""}
+                </span>
+                <span className="text-lg font-bold text-amber-800">{formatPrice(selectedTotal)}</span>
+              </div>
+            )}
+
+            {viewTableOrders.some(o => o.order_items.some(i => i.payment_status === "unpaid")) && (
+              <div className="space-y-2">
+                {selectedItemIds.size > 0 && (
+                  <button
+                    onClick={() => handleMarkItemsPaid(Array.from(selectedItemIds))}
+                    disabled={markingPaid}
+                    className="w-full py-2.5 bg-amber-500 text-stone-900 font-semibold text-sm rounded-xl hover:bg-amber-400 transition-colors disabled:opacity-50"
+                  >
+                    {markingPaid ? "Uppdaterar…" : `Betala valda · ${formatPrice(selectedTotal)}`}
+                  </button>
+                )}
                 <button
-                  onClick={() => handleMarkPaid(Array.from(selectedOrderIds))}
+                  onClick={() => handleMarkItemsPaid(
+                    viewTableOrders.flatMap(o => o.order_items.filter(i => i.payment_status === "unpaid").map(i => i.id))
+                  )}
                   disabled={markingPaid}
-                  className="w-full py-2.5 bg-amber-500 text-stone-900 font-semibold text-sm rounded-xl hover:bg-amber-400 transition-colors disabled:opacity-50"
+                  className="w-full py-2.5 bg-emerald-500 text-white font-semibold text-sm rounded-xl hover:bg-emerald-400 transition-colors disabled:opacity-50"
                 >
-                  {markingPaid ? "Uppdaterar…" : `Markera ${selectedOrderIds.size} vald${selectedOrderIds.size !== 1 ? "a" : ""} som betald${selectedOrderIds.size !== 1 ? "a" : ""}`}
+                  {markingPaid ? "Uppdaterar…" : "Betala hela bordet"}
                 </button>
-              )}
-              <button
-                onClick={() => handleMarkPaid(viewTableOrders.filter(o => o.payment_status === "unpaid").map(o => o.id))}
-                disabled={markingPaid}
-                className="w-full py-2.5 bg-emerald-500 text-white font-semibold text-sm rounded-xl hover:bg-emerald-400 transition-colors disabled:opacity-50"
-              >
-                {markingPaid ? "Uppdaterar…" : "Markera alla som betalda"}
-              </button>
-            </div>
-          )}
+              </div>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
     </div>

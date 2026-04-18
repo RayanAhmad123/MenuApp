@@ -334,6 +334,7 @@ export type Database = {
           item_price_cents: number
           special_requests: string | null
           item_status: "pending" | "preparing" | "ready"
+          payment_status: "unpaid" | "paid"
         }
         Insert: {
           id?: string
@@ -343,6 +344,7 @@ export type Database = {
           item_price_cents: number
           special_requests?: string | null
           item_status?: "pending" | "preparing" | "ready"
+          payment_status?: "unpaid" | "paid"
         }
         Update: {
           id?: string
@@ -352,6 +354,7 @@ export type Database = {
           item_price_cents?: number
           special_requests?: string | null
           item_status?: "pending" | "preparing" | "ready"
+          payment_status?: "unpaid" | "paid"
         }
         Relationships: []
       }

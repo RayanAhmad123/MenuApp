@@ -38,7 +38,7 @@ export default async function WaiterPage() {
       .order("created_at", { ascending: true }),
     supabase
       .from("orders")
-      .select("id, table_number, total_cents, status, payment_status, created_at, order_items(id, quantity, item_price_cents, menu_items(name))")
+      .select("id, table_number, total_cents, status, payment_status, created_at, order_items(id, quantity, item_price_cents, payment_status, menu_items(name))")
       .eq("restaurant_id", staff.restaurant_id)
       .neq("status", "cancelled")
       .gte("created_at", `${today}T00:00:00`)
