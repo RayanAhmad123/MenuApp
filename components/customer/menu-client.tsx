@@ -25,12 +25,13 @@ interface MenuItemWithDetails extends MenuItem {
 
 interface Props {
   restaurant: { id: string; name: string; logo_url: string | null; address: string | null }
+  subdomain: string
   categories: Category[]
   menuItems: MenuItemWithDetails[]
   tableNumber: number
 }
 
-export function CustomerMenuClient({ restaurant, categories, menuItems, tableNumber }: Props) {
+export function CustomerMenuClient({ restaurant, subdomain, categories, menuItems, tableNumber }: Props) {
   const [activeCategory, setActiveCategory] = useState<string>(categories[0]?.id ?? "")
   const [selectedItem, setSelectedItem] = useState<MenuItemWithDetails | null>(null)
   const { items, addItem, itemCount } = useCart()
@@ -77,7 +78,7 @@ export function CustomerMenuClient({ restaurant, categories, menuItems, tableNum
               <Bell className="h-4 w-4 mr-1" />
               <span className="hidden sm:inline">Waiter</span>
             </Button>
-            <Link href={`/${restaurant.id}/table/${tableNumber}/cart`}>
+            <Link href={`/${subdomain}/table/${tableNumber}/cart`}>
               <Button
                 variant="amber"
                 size="sm"
@@ -151,7 +152,7 @@ export function CustomerMenuClient({ restaurant, categories, menuItems, tableNum
       {/* Floating cart bar */}
       {itemCount > 0 && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-slide-up">
-          <Link href={`/${restaurant.id}/table/${tableNumber}/cart`}>
+          <Link href={`/${subdomain}/table/${tableNumber}/cart`}>
             <Button variant="amber" size="xl" className="shadow-2xl shadow-amber-900/50 px-8">
               <ShoppingCart className="h-5 w-5 mr-2" />
               View Cart · {itemCount} {itemCount === 1 ? "item" : "items"}

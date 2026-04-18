@@ -60,6 +60,7 @@ export default async function MenuPage({ params }: PageProps) {
   return (
     <CustomerMenuClient
       restaurant={restaurant}
+      subdomain={params.subdomain}
       categories={categories ?? []}
       menuItems={menuItems ?? []}
       tableNumber={tableNumber}
