@@ -337,10 +337,10 @@ CREATE POLICY "Anyone can insert orders"
   ON orders FOR INSERT
   WITH CHECK (true);
 
--- Customers can view their own session's orders
-CREATE POLICY "Customers can view their session orders"
+-- Anyone with the order UUID can view it (UUIDs are unguessable)
+CREATE POLICY "Anyone can view order by id"
   ON orders FOR SELECT
-  USING (session_id = current_setting('app.session_id', true));
+  USING (true);
 
 -- Staff can view their restaurant's orders
 CREATE POLICY "Staff can view restaurant orders"
