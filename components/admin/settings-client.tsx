@@ -21,6 +21,9 @@ export function SettingsClient({ restaurant }: { restaurant: Restaurant }) {
   const { toast } = useToast()
   const [paymentEnabled, setPaymentEnabled] = useState(restaurant.payment_enabled)
   const [savingPayment, setSavingPayment] = useState(false)
+  const [yellowThreshold, setYellowThreshold] = useState(restaurant.yellow_threshold_minutes)
+  const [redThreshold, setRedThreshold] = useState(restaurant.red_threshold_minutes)
+  const [savingThresholds, setSavingThresholds] = useState(false)
 
   const { register, handleSubmit, formState: { isSubmitting } } = useForm<z.infer<typeof SettingsSchema>>({
     resolver: zodResolver(SettingsSchema),
@@ -98,6 +101,64 @@ export function SettingsClient({ restaurant }: { restaurant: Restaurant }) {
               disabled={savingPayment}
             />
           </div>
+        </CardContent>
+      </Card>
+
+      <Card className="border-stone-200">
+        <CardHeader>
+          <CardTitle className="text-stone-800">Köksinställningar</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-stone-500">
+            Färgkoda beställningar på köksskärmen baserat på väntetid.
+          </p>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label className="flex items-center gap-2">
+                <span className="inline-block w-3 h-3 rounded-full bg-amber-400" />
+                Gul varning (min)
+              </Label>
+              <Input
+                type="number"
+                min={1}
+                value={yellowThreshold}
+                onChange={e => setYellowThreshold(Number(e.target.value))}
+                className="w-full"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="flex items-center gap-2">
+                <span className="inline-block w-3 h-3 rounded-full bg-red-500" />
+                Röd varning (min)
+              </Label>
+              <Input
+                type="number"
+                min={1}
+                value={redThreshold}
+                onChange={e => setRedThreshold(Number(e.target.value))}
+                className="w-full"
+              />
+            </div>
+          </div>
+          <Button
+            variant="amber"
+            disabled={savingThresholds}
+            onClick={async () => {
+              setSavingThresholds(true)
+              const { error } = await updateRestaurant(restaurant.id, {
+                yellowThreshold,
+                redThreshold,
+              })
+              setSavingThresholds(false)
+              if (error) {
+                toast({ title: "Kunde inte spara trösklar", variant: "destructive" })
+              } else {
+                toast({ title: "Trösklar sparade" })
+              }
+            }}
+          >
+            {savingThresholds ? "Sparar..." : "Spara trösklar"}
+          </Button>
         </CardContent>
       </Card>
     </div>

@@ -1,0 +1,3 @@
+ALTER TABLE restaurants
+  ADD COLUMN IF NOT EXISTS yellow_threshold_minutes INT NOT NULL DEFAULT 10,
+  ADD COLUMN IF NOT EXISTS red_threshold_minutes INT NOT NULL DEFAULT 20;

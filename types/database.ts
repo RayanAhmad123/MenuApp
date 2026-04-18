@@ -20,6 +20,8 @@ export type Database = {
           subscription_tier: "free" | "pro" | "enterprise"
           is_active: boolean
           payment_enabled: boolean
+          yellow_threshold_minutes: number
+          red_threshold_minutes: number
           created_at: string
         }
         Insert: {
@@ -32,6 +34,8 @@ export type Database = {
           subscription_tier?: "free" | "pro" | "enterprise"
           is_active?: boolean
           payment_enabled?: boolean
+          yellow_threshold_minutes?: number
+          red_threshold_minutes?: number
           created_at?: string
         }
         Update: {
@@ -44,6 +48,8 @@ export type Database = {
           subscription_tier?: "free" | "pro" | "enterprise"
           is_active?: boolean
           payment_enabled?: boolean
+          yellow_threshold_minutes?: number
+          red_threshold_minutes?: number
           created_at?: string
         }
         Relationships: []

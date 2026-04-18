@@ -22,24 +22,33 @@ export default async function KitchenPage() {
 
   const today = new Date().toISOString().split("T")[0]
 
-  const { data: orders } = await supabase
-    .from("orders")
-    .select(`
-      id, table_number, status, special_notes, created_at,
-      order_items (
-        id, quantity, special_requests, item_status,
-        menu_items ( id, name )
-      )
-    `)
-    .eq("restaurant_id", staff.restaurant_id)
-    .in("status", ["confirmed", "preparing"])
-    .gte("created_at", `${today}T00:00:00`)
-    .order("created_at", { ascending: true })
+  const [{ data: orders }, { data: restaurant }] = await Promise.all([
+    supabase
+      .from("orders")
+      .select(`
+        id, table_number, status, special_notes, created_at,
+        order_items (
+          id, quantity, special_requests, item_status,
+          menu_items ( id, name )
+        )
+      `)
+      .eq("restaurant_id", staff.restaurant_id)
+      .in("status", ["confirmed", "preparing"])
+      .gte("created_at", `${today}T00:00:00`)
+      .order("created_at", { ascending: true }),
+    supabase
+      .from("restaurants")
+      .select("yellow_threshold_minutes, red_threshold_minutes")
+      .eq("id", staff.restaurant_id)
+      .single(),
+  ])
 
   return (
     <KitchenClient
       restaurantId={staff.restaurant_id}
       initialOrders={orders ?? []}
+      yellowThreshold={restaurant?.yellow_threshold_minutes ?? 10}
+      redThreshold={restaurant?.red_threshold_minutes ?? 20}
     />
   )
 }

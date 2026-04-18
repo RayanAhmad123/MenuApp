@@ -25,9 +25,11 @@ interface KitchenOrder {
 interface Props {
   restaurantId: string
   initialOrders: KitchenOrder[]
+  yellowThreshold: number
+  redThreshold: number
 }
 
-export function KitchenClient({ restaurantId, initialOrders }: Props) {
+export function KitchenClient({ restaurantId, initialOrders, yellowThreshold, redThreshold }: Props) {
   const [orders, setOrders] = useState<KitchenOrder[]>(initialOrders)
   const [updatingId, setUpdatingId] = useState<string | null>(null)
   const { toast } = useToast()
@@ -125,20 +127,18 @@ export function KitchenClient({ restaurantId, initialOrders }: Props) {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {orders.map(order => {
             const elapsed = elapsedMinutes(order.created_at)
-            const isUrgent = elapsed > 15
-            const isCritical = elapsed > 25
+            const isYellow = elapsed >= yellowThreshold && elapsed < redThreshold
+            const isRed = elapsed >= redThreshold
 
             return (
               <div
                 key={order.id}
                 className={`rounded-2xl border p-4 flex flex-col gap-3 ${
-                  isCritical
+                  isRed
                     ? "bg-red-950 border-red-700"
-                    : isUrgent
+                    : isYellow
                     ? "bg-amber-950 border-amber-700"
-                    : order.status === "preparing"
-                    ? "bg-stone-900 border-stone-700"
-                    : "bg-stone-900 border-stone-800"
+                    : "bg-stone-900 border-stone-700"
                 }`}
               >
                 {/* Order header */}
@@ -146,9 +146,9 @@ export function KitchenClient({ restaurantId, initialOrders }: Props) {
                   <div>
                     <p className="text-xl font-bold text-stone-50">Bord {order.table_number}</p>
                     <div className="flex items-center gap-1.5 mt-0.5">
-                      <Clock className={`h-3 w-3 ${isCritical ? "text-red-400" : isUrgent ? "text-amber-400" : "text-stone-500"}`} />
-                      <span className={`text-xs font-medium ${isCritical ? "text-red-400" : isUrgent ? "text-amber-400" : "text-stone-500"}`}>
-                        {elapsed}m ago
+                      <Clock className={`h-3 w-3 ${isRed ? "text-red-400" : isYellow ? "text-amber-400" : "text-stone-500"}`} />
+                      <span className={`text-xs font-medium ${isRed ? "text-red-400" : isYellow ? "text-amber-400" : "text-stone-500"}`}>
+                        {elapsed}m sedan
                       </span>
                     </div>
                   </div>
@@ -157,7 +157,7 @@ export function KitchenClient({ restaurantId, initialOrders }: Props) {
                       ? "bg-amber-500/20 text-amber-400"
                       : "bg-blue-500/20 text-blue-400"
                   }`}>
-                    {order.status}
+                    {order.status === "preparing" ? "Tillagas" : "Bekräftad"}
                   </span>
                 </div>
 
