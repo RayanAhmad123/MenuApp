@@ -409,3 +409,8 @@ CREATE POLICY "Anyone can view active QR codes"
 CREATE POLICY "Admin can manage QR codes"
   ON qr_codes FOR ALL
   USING (restaurant_id = get_my_restaurant_id() AND get_my_role() = 'admin');
+
+-- =============================================
+-- REALTIME
+-- =============================================
+ALTER PUBLICATION supabase_realtime ADD TABLE orders, order_items, table_pings;
