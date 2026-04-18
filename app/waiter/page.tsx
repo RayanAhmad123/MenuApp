@@ -41,6 +41,7 @@ export default async function WaiterPage() {
       .select("id, table_number, total_cents, status, payment_status, created_at, order_items(id, quantity, item_price_cents, payment_status, menu_items(name))")
       .eq("restaurant_id", staff.restaurant_id)
       .neq("status", "cancelled")
+      .eq("payment_status", "unpaid")
       .gte("created_at", `${today}T00:00:00`)
       .order("table_number", { ascending: true })
       .order("created_at", { ascending: true }),

@@ -98,6 +98,7 @@ export function WaiterClient({ restaurantId, staffName, initialPings, initialRea
       .from("orders")
       .select("id, table_number, total_cents, status, payment_status, created_at, order_items(id, quantity, item_price_cents, payment_status, menu_items(name))")
       .eq("restaurant_id", restaurantId).neq("status", "cancelled")
+      .eq("payment_status", "unpaid")
       .gte("created_at", `${today}T00:00:00`)
       .order("table_number", { ascending: true }).order("created_at", { ascending: true })
     if (data) setTableOrders(data as TableBillingOrder[])
