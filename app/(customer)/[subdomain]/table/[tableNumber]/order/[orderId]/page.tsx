@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback, useMemo } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
 import { CheckCircle2, Clock, ChefHat, CheckCheck, Truck, Bell, ArrowLeft } from "lucide-react"
@@ -27,35 +27,38 @@ export default function OrderStatusPage() {
 
   const [order, setOrder] = useState<OrderWithItems | null>(null)
   const [loading, setLoading] = useState(true)
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
+
+  const fetchOrder = useCallback(async () => {
+    const { data } = await supabase
+      .from("orders")
+      .select(`*, order_items(*, menu_items(name, image_url), order_item_modifiers(*, modifiers(name)))`)
+      .eq("id", orderId)
+      .single()
+    if (data) setOrder(data as unknown as OrderWithItems)
+    setLoading(false)
+  }, [supabase, orderId])
 
   useEffect(() => {
-    async function fetchOrder() {
-      const { data } = await supabase
-        .from("orders")
-        .select(`*, order_items(*, menu_items(name, image_url), order_item_modifiers(*, modifiers(name)))`)
-        .eq("id", orderId)
-        .single()
-      if (data) setOrder(data as unknown as OrderWithItems)
-      setLoading(false)
-    }
     fetchOrder()
 
-    // Subscribe to realtime updates
     const channel = supabase
-      .channel(`order:${orderId}`)
+      .channel(`order-status-${orderId}`)
       .on("postgres_changes", {
         event: "UPDATE",
         schema: "public",
         table: "orders",
         filter: `id=eq.${orderId}`,
-      }, payload => {
-        setOrder(prev => prev ? { ...prev, ...payload.new } : prev)
-      })
+      }, fetchOrder)
       .subscribe()
 
-    return () => { supabase.removeChannel(channel) }
-  }, [orderId, supabase])
+    const interval = setInterval(fetchOrder, 5000)
+
+    return () => {
+      supabase.removeChannel(channel)
+      clearInterval(interval)
+    }
+  }, [supabase, orderId, fetchOrder])
 
   if (loading) {
     return (

@@ -1,5 +1,5 @@
 "use client"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
 import { ChefHat, Clock, CheckCircle2 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { updateOrderStatus } from "@/lib/actions/orders"
@@ -31,31 +31,9 @@ export function KitchenClient({ restaurantId, initialOrders }: Props) {
   const [orders, setOrders] = useState<KitchenOrder[]>(initialOrders)
   const [updatingId, setUpdatingId] = useState<string | null>(null)
   const { toast } = useToast()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
-  // Real-time subscription
-  useEffect(() => {
-    const channel = supabase
-      .channel("kitchen-orders")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "orders",
-          filter: `restaurant_id=eq.${restaurantId}`,
-        },
-        () => {
-          // Refetch active orders on any change
-          fetchOrders()
-        }
-      )
-      .subscribe()
-
-    return () => { supabase.removeChannel(channel) }
-  }, [restaurantId]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  async function fetchOrders() {
+  const fetchOrders = useCallback(async () => {
     const today = new Date().toISOString().split("T")[0]
     const { data } = await supabase
       .from("orders")
@@ -71,7 +49,26 @@ export function KitchenClient({ restaurantId, initialOrders }: Props) {
       .gte("created_at", `${today}T00:00:00`)
       .order("created_at", { ascending: true })
     if (data) setOrders(data)
-  }
+  }, [supabase, restaurantId])
+
+  useEffect(() => {
+    const channel = supabase
+      .channel(`kitchen-orders-${restaurantId}`)
+      .on("postgres_changes", {
+        event: "*",
+        schema: "public",
+        table: "orders",
+        filter: `restaurant_id=eq.${restaurantId}`,
+      }, fetchOrders)
+      .subscribe()
+
+    const interval = setInterval(fetchOrders, 5000)
+
+    return () => {
+      supabase.removeChannel(channel)
+      clearInterval(interval)
+    }
+  }, [supabase, restaurantId, fetchOrders])
 
   async function handleMarkPreparing(orderId: string) {
     setUpdatingId(orderId)
