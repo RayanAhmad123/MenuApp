@@ -274,7 +274,7 @@ function ItemDetailModal({
 
   return (
     <Dialog open onOpenChange={onClose}>
-      <DialogContent className="max-w-md bg-stone-900 border-stone-700 text-stone-50 max-h-[90vh] overflow-y-auto p-0">
+      <DialogContent className="max-w-md bg-stone-900 border-stone-700 text-stone-50 max-h-[90vh] overflow-y-auto p-0" onOpenAutoFocus={e => e.preventDefault()}>
         {item.image_url && (
           <div className="w-full h-48 relative">
             <Image src={item.image_url} alt={item.name} fill className="object-cover" />
