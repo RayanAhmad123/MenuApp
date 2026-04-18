@@ -120,7 +120,7 @@ export function CustomerMenuClient({ restaurant, subdomain, categories, menuItem
 
       {/* Menu items grid */}
       <main className="max-w-2xl mx-auto px-4 py-6">
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3">
           {filteredItems.map(item => (
             <MenuItemCard
               key={item.id}
