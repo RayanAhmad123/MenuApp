@@ -209,6 +209,10 @@ $$ LANGUAGE SQL SECURITY DEFINER STABLE;
 -- =============================================
 -- RESTAURANTS POLICIES
 -- =============================================
+CREATE POLICY "Anyone can view active restaurants"
+  ON restaurants FOR SELECT
+  USING (is_active = true);
+
 CREATE POLICY "Staff can view their own restaurant"
   ON restaurants FOR SELECT
   USING (id = get_my_restaurant_id());
