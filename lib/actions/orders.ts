@@ -68,7 +68,7 @@ export async function placeOrder(data: z.infer<typeof PlaceOrderSchema>) {
       session_id: sessionId,
       total_cents: totalCents,
       status: paymentEnabled ? "pending" : "confirmed",
-      payment_status: paymentEnabled ? "unpaid" : "paid",
+      payment_status: "unpaid",
       stripe_payment_intent_id: stripePaymentIntentId,
       special_notes: specialNotes ?? null,
     })

@@ -46,7 +46,7 @@ export function SettingsClient({ restaurant }: { restaurant: Restaurant }) {
       toast({ title: "Kunde inte uppdatera betalningsinställning", variant: "destructive" })
     } else {
       setPaymentEnabled(enabled)
-      toast({ title: enabled ? "Betalning aktiverad" : "Betalning inaktiverad", description: enabled ? "Kunder betalar online vid beställning." : "Kunder kan beställa utan att betala direkt." })
+      toast({ title: enabled ? "Online-betalning aktiverad" : "Online-betalning inaktiverad", description: enabled ? "Kunder betalar via Stripe när de beställer." : "Kunder betalar i kassan eller via servitören." })
     }
     setSavingPayment(false)
   }
@@ -88,11 +88,11 @@ export function SettingsClient({ restaurant }: { restaurant: Restaurant }) {
         <CardContent>
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium text-stone-800">Kräv betalning vid beställning</p>
+              <p className="font-medium text-stone-800">Online-betalning via Stripe</p>
               <p className="text-sm text-stone-500 mt-0.5">
                 {paymentEnabled
-                  ? "Kunder måste betala online via Stripe innan beställningen bekräftas."
-                  : "Kunder kan beställa utan att betala direkt. Betalning hanteras separat."}
+                  ? "Kunder betalar online via Stripe när de beställer."
+                  : "Kunder betalar i kassan eller via servitören med kortläsare."}
               </p>
             </div>
             <Switch
