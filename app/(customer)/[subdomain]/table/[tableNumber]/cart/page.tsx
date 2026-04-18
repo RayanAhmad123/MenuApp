@@ -16,7 +16,7 @@ const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
 
 export default function CartPage() {
   const params = useParams()
-  const { items, removeItem, updateQuantity, totalCents, itemCount, sessionId } = useCart()
+  const { items, removeItem, updateQuantity, totalCents, itemCount, sessionId, clearCart } = useCart()
   const [specialNotes, setSpecialNotes] = useState("")
   const [clientSecret, setClientSecret] = useState<string | null>(null)
   const [orderId, setOrderId] = useState<string | null>(null)
@@ -31,7 +31,6 @@ export default function CartPage() {
     if (items.length === 0) return
     setIsPlacingOrder(true)
     try {
-      // We need the restaurant ID — fetch it
       const res = await fetch(`/api/restaurants/${subdomain}/menu`)
       const { restaurant } = await res.json()
       if (!restaurant) {
@@ -42,11 +41,18 @@ export default function CartPage() {
         restaurantId: restaurant.id,
         tableNumber,
         sessionId,
+        paymentEnabled: restaurant.payment_enabled,
         items,
         specialNotes,
       })
-      if (result.error || !result.clientSecret) {
-        toast({ title: result.error ?? "Failed to place order", variant: "destructive" })
+      if (result.error) {
+        toast({ title: result.error, variant: "destructive" })
+        return
+      }
+      if (!restaurant.payment_enabled) {
+        // No payment needed — go straight to order confirmation
+        clearCart()
+        router.push(`/${subdomain}/table/${tableNumber}/order/${result.orderId}`)
         return
       }
       setClientSecret(result.clientSecret)

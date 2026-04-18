@@ -10,6 +10,7 @@ const RestaurantUpdateSchema = z.object({
   name: z.string().min(1).optional(),
   address: z.string().optional(),
   logoUrl: z.string().url().optional().nullable(),
+  paymentEnabled: z.boolean().optional(),
 })
 
 export async function updateRestaurant(restaurantId: string, data: z.infer<typeof RestaurantUpdateSchema>) {
@@ -21,6 +22,7 @@ export async function updateRestaurant(restaurantId: string, data: z.infer<typeo
   if (parsed.data.name) update.name = parsed.data.name
   if (parsed.data.address !== undefined) update.address = parsed.data.address
   if (parsed.data.logoUrl !== undefined) update.logo_url = parsed.data.logoUrl
+  if (parsed.data.paymentEnabled !== undefined) update.payment_enabled = parsed.data.paymentEnabled
 
   const { error } = await supabase.from("restaurants").update(update).eq("id", restaurantId)
   revalidatePath("/admin/settings")

@@ -9,7 +9,7 @@ export async function GET(
 
   const { data: restaurant, error: restError } = await supabase
     .from("restaurants")
-    .select("id, name, logo_url, address, is_active")
+    .select("id, name, logo_url, address, is_active, payment_enabled")
     .eq("subdomain", params.subdomain)
     .single()
 

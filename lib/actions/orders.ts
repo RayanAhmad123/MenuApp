@@ -8,6 +8,7 @@ const PlaceOrderSchema = z.object({
   restaurantId: z.string().uuid(),
   tableNumber: z.number().int().positive(),
   sessionId: z.string().min(1),
+  paymentEnabled: z.boolean(),
   items: z.array(z.object({
     cartItemId: z.string(),
     menuItemId: z.string().uuid(),
@@ -31,7 +32,7 @@ export async function placeOrder(data: z.infer<typeof PlaceOrderSchema>) {
     return { error: "Invalid order data", orderId: null, clientSecret: null }
   }
 
-  const { restaurantId, tableNumber, sessionId, items, specialNotes } = parsed.data
+  const { restaurantId, tableNumber, sessionId, paymentEnabled, items, specialNotes } = parsed.data
 
   const totalCents = items.reduce((sum, item) => {
     const modTotal = item.selectedModifiers.reduce((s, m) => s + m.priceAdjustmentCents, 0)
@@ -40,17 +41,22 @@ export async function placeOrder(data: z.infer<typeof PlaceOrderSchema>) {
 
   const supabase = await createServerSupabaseClient()
 
-  // Create Stripe payment intent
-  let paymentIntent
-  try {
-    paymentIntent = await stripe.paymentIntents.create({
-      amount: totalCents,
-      currency: "gbp",
-      automatic_payment_methods: { enabled: true },
-      metadata: { restaurantId, tableNumber: String(tableNumber), sessionId },
-    })
-  } catch {
-    return { error: "Payment initialization failed", orderId: null, clientSecret: null }
+  let stripePaymentIntentId: string | null = null
+  let clientSecret: string | null = null
+
+  if (paymentEnabled) {
+    try {
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: totalCents,
+        currency: "gbp",
+        automatic_payment_methods: { enabled: true },
+        metadata: { restaurantId, tableNumber: String(tableNumber), sessionId },
+      })
+      stripePaymentIntentId = paymentIntent.id
+      clientSecret = paymentIntent.client_secret
+    } catch {
+      return { error: "Payment initialization failed", orderId: null, clientSecret: null }
+    }
   }
 
   // Insert order
@@ -61,9 +67,9 @@ export async function placeOrder(data: z.infer<typeof PlaceOrderSchema>) {
       table_number: tableNumber,
       session_id: sessionId,
       total_cents: totalCents,
-      status: "pending",
-      payment_status: "unpaid",
-      stripe_payment_intent_id: paymentIntent.id,
+      status: paymentEnabled ? "pending" : "confirmed",
+      payment_status: paymentEnabled ? "unpaid" : "paid",
+      stripe_payment_intent_id: stripePaymentIntentId,
       special_notes: specialNotes ?? null,
     })
     .select("id")
@@ -104,7 +110,7 @@ export async function placeOrder(data: z.infer<typeof PlaceOrderSchema>) {
 
   return {
     orderId: order.id,
-    clientSecret: paymentIntent.client_secret,
+    clientSecret,
     error: null,
   }
 }
