@@ -182,7 +182,7 @@ export async function markItemsPaid(orderItemIds: string[]) {
     .in("id", orderItemIds)
 
   if (affected) {
-    const orderIds = [...new Set(affected.map(i => i.order_id))]
+    const orderIds = Array.from(new Set(affected.map(i => i.order_id)))
     for (const orderId of orderIds) {
       const { data: allItems } = await supabase
         .from("order_items")
