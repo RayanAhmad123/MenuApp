@@ -157,6 +157,15 @@ export async function resolvePing(pingId: string) {
   return { error: error?.message ?? null }
 }
 
+export async function markOrdersPaid(orderIds: string[]) {
+  const supabase = await createServerSupabaseClient()
+  const { error } = await supabase
+    .from("orders")
+    .update({ payment_status: "paid" })
+    .in("id", orderIds)
+  return { error: error?.message ?? null }
+}
+
 export async function createTablePing(
   restaurantId: string,
   tableNumber: number,
