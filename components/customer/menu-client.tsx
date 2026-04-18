@@ -2,7 +2,7 @@
 import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { ShoppingCart, Bell, Leaf, Wheat, Heart } from "lucide-react"
+import { ShoppingCart, Bell, Leaf, Wheat, Heart, UtensilsCrossed } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -120,7 +120,7 @@ export function CustomerMenuClient({ restaurant, subdomain, categories, menuItem
 
       {/* Menu items grid */}
       <main className="max-w-2xl mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 gap-4">
+        <div className="grid grid-cols-2 gap-3">
           {filteredItems.map(item => (
             <MenuItemCard
               key={item.id}
@@ -168,57 +168,51 @@ function MenuItemCard({ item, onSelect }: { item: MenuItemWithDetails; onSelect:
   return (
     <button
       onClick={onSelect}
-      className="w-full text-left bg-stone-900 border border-stone-800 rounded-2xl overflow-hidden hover:border-amber-700/50 transition-all duration-200 hover:shadow-lg hover:shadow-amber-900/20 group"
+      className="w-full text-left bg-stone-900 border border-stone-800 rounded-2xl overflow-hidden hover:border-amber-700/50 transition-all duration-200 hover:shadow-lg hover:shadow-amber-900/20 group flex flex-col aspect-square"
     >
-      <div className="flex gap-4 p-4">
-        <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-2 mb-1">
-            <h3 className="font-serif text-lg text-stone-50 font-medium group-hover:text-amber-300 transition-colors">
-              {item.name}
-            </h3>
-            <span className="flex-shrink-0 font-semibold text-amber-400">
-              {formatPrice(item.price_cents)}
-            </span>
-          </div>
-          {item.description && (
-            <p className="text-sm text-stone-400 line-clamp-2 mb-3">{item.description}</p>
-          )}
-          <div className="flex flex-wrap gap-1.5">
-            {item.is_vegan && (
-              <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800">
-                <Leaf className="h-3 w-3" />Vegansk
-              </span>
-            )}
-            {item.is_vegetarian && !item.is_vegan && (
-              <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-green-950 text-green-400 border border-green-800">
-                <Heart className="h-3 w-3" />Vegetarisk
-              </span>
-            )}
-            {item.is_gluten_free && (
-              <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-amber-950 text-amber-400 border border-amber-800">
-                <Wheat className="h-3 w-3" />GF
-              </span>
-            )}
-            {item.item_allergens?.map(ia =>
-              ia.allergens ? (
-                <span key={ia.allergen_id} className="text-xs px-2 py-0.5 rounded-full bg-stone-800 text-stone-400 border border-stone-700">
-                  {ia.allergens.name}
-                </span>
-              ) : null
-            )}
-          </div>
-        </div>
-        {item.image_url && (
-          <div className="flex-shrink-0 w-24 h-24 rounded-xl overflow-hidden">
-            <Image
-              src={item.image_url}
-              alt={item.name}
-              width={96}
-              height={96}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            />
+      {/* Image — top portion */}
+      <div className="relative flex-1 min-h-0 bg-stone-800">
+        {item.image_url ? (
+          <Image
+            src={item.image_url}
+            alt={item.name}
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <UtensilsCrossed className="h-8 w-8 text-stone-700" />
           </div>
         )}
+      </div>
+
+      {/* Info — bottom portion */}
+      <div className="p-3 flex-shrink-0">
+        <div className="flex items-start justify-between gap-1 mb-1.5">
+          <h3 className="font-serif text-stone-50 font-medium text-sm leading-tight group-hover:text-amber-300 transition-colors line-clamp-2">
+            {item.name}
+          </h3>
+          <span className="flex-shrink-0 font-semibold text-amber-400 text-sm ml-1">
+            {formatPrice(item.price_cents)}
+          </span>
+        </div>
+        <div className="flex flex-wrap gap-1">
+          {item.is_vegan && (
+            <span className="inline-flex items-center gap-0.5 text-xs px-1.5 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800">
+              <Leaf className="h-2.5 w-2.5" />
+            </span>
+          )}
+          {item.is_vegetarian && !item.is_vegan && (
+            <span className="inline-flex items-center gap-0.5 text-xs px-1.5 py-0.5 rounded-full bg-green-950 text-green-400 border border-green-800">
+              <Heart className="h-2.5 w-2.5" />
+            </span>
+          )}
+          {item.is_gluten_free && (
+            <span className="text-xs px-1.5 py-0.5 rounded-full bg-amber-950 text-amber-400 border border-amber-800 leading-none">
+              GF
+            </span>
+          )}
+        </div>
       </div>
     </button>
   )
