@@ -1,12 +1,23 @@
 "use client"
 import { useState, useEffect, useCallback, useMemo } from "react"
-import { Bell, CheckCircle2, UtensilsCrossed, AlertCircle, Coffee, CreditCard, ChevronRight } from "lucide-react"
+import { Bell, CheckCircle2, UtensilsCrossed, AlertCircle, Coffee, CreditCard, ChevronRight, Clock, ChefHat } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { updateOrderStatus, markItemsPaid } from "@/lib/actions/orders"
 import { formatPrice } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import type { TablePing } from "@/types/database"
+
+// ── Types ────────────────────────────────────────────────────────────────────
+
+interface KitchenOrder {
+  id: string
+  table_number: number
+  status: string
+  special_notes: string | null
+  created_at: string
+  order_items: Array<{ id: string; quantity: number; special_requests: string | null; menu_items: { name: string } }>
+}
 
 interface ReadyOrder {
   id: string
@@ -38,54 +49,67 @@ interface Props {
   restaurantId: string
   staffName: string
   initialPings: TablePing[]
+  initialKitchenOrders: KitchenOrder[]
   initialReadyOrders: ReadyOrder[]
   initialTableOrders: TableBillingOrder[]
+  yellowThreshold: number
+  redThreshold: number
 }
+
+// ── Constants ────────────────────────────────────────────────────────────────
 
 const PING_ICONS: Record<string, React.ElementType> = {
-  assistance: AlertCircle,
-  refill: Coffee,
-  payment: CreditCard,
+  assistance: AlertCircle, refill: Coffee, payment: CreditCard,
 }
 const PING_LABELS: Record<string, string> = {
-  assistance: "Behöver hjälp",
-  refill: "Påfyllning begärd",
-  payment: "Begär notan",
+  assistance: "Behöver hjälp", refill: "Påfyllning begärd", payment: "Begär notan",
 }
 const PING_COLORS: Record<string, string> = {
-  assistance: "bg-red-50 border-red-200",
-  refill: "bg-blue-50 border-blue-200",
-  payment: "bg-emerald-50 border-emerald-200",
+  assistance: "bg-red-50 border-red-200", refill: "bg-blue-50 border-blue-200", payment: "bg-emerald-50 border-emerald-200",
 }
 const PING_ICON_COLORS: Record<string, string> = {
-  assistance: "text-red-500",
-  refill: "text-blue-500",
-  payment: "text-emerald-500",
+  assistance: "text-red-500", refill: "text-blue-500", payment: "text-emerald-500",
 }
 
-export function WaiterClient({ restaurantId, staffName, initialPings, initialReadyOrders, initialTableOrders }: Props) {
+// ── Component ────────────────────────────────────────────────────────────────
+
+export function StaffClient({
+  restaurantId, staffName,
+  initialPings, initialKitchenOrders, initialReadyOrders, initialTableOrders,
+  yellowThreshold, redThreshold,
+}: Props) {
   const [pings, setPings] = useState<TablePing[]>(initialPings)
+  const [kitchenOrders, setKitchenOrders] = useState<KitchenOrder[]>(initialKitchenOrders)
   const [readyOrders, setReadyOrders] = useState<ReadyOrder[]>(initialReadyOrders)
   const [tableOrders, setTableOrders] = useState<TableBillingOrder[]>(initialTableOrders)
-  const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null)
+  const [updatingId, setUpdatingId] = useState<string | null>(null)
   const [viewTable, setViewTable] = useState<number | null>(null)
   const [selectedItemIds, setSelectedItemIds] = useState<Set<string>>(new Set())
   const [markingPaid, setMarkingPaid] = useState(false)
   const { toast } = useToast()
   const supabase = useMemo(() => createClient(), [])
 
+  // ── Fetchers ───────────────────────────────────────────────────────────────
+
   const fetchPings = useCallback(async () => {
-    const { data } = await supabase
-      .from("table_pings").select("*")
+    const { data } = await supabase.from("table_pings").select("*")
       .eq("restaurant_id", restaurantId).eq("status", "pending")
       .order("created_at", { ascending: true })
     if (data) setPings(data)
   }, [supabase, restaurantId])
 
+  const fetchKitchenOrders = useCallback(async () => {
+    const today = new Date().toISOString().split("T")[0]
+    const { data } = await supabase.from("orders")
+      .select("id, table_number, status, special_notes, created_at, order_items(id, quantity, special_requests, menu_items(name))")
+      .eq("restaurant_id", restaurantId).in("status", ["confirmed", "preparing"])
+      .gte("created_at", `${today}T00:00:00`).order("created_at", { ascending: true })
+    if (data) setKitchenOrders(data)
+  }, [supabase, restaurantId])
+
   const fetchReadyOrders = useCallback(async () => {
     const today = new Date().toISOString().split("T")[0]
-    const { data } = await supabase
-      .from("orders")
+    const { data } = await supabase.from("orders")
       .select("id, table_number, total_cents, created_at, order_items(id, quantity, menu_items(name))")
       .eq("restaurant_id", restaurantId).eq("status", "ready")
       .gte("created_at", `${today}T00:00:00`).order("created_at", { ascending: true })
@@ -94,32 +118,29 @@ export function WaiterClient({ restaurantId, staffName, initialPings, initialRea
 
   const fetchTableOrders = useCallback(async () => {
     const today = new Date().toISOString().split("T")[0]
-    const { data } = await supabase
-      .from("orders")
+    const { data } = await supabase.from("orders")
       .select("id, table_number, total_cents, status, payment_status, created_at, order_items(id, quantity, item_price_cents, payment_status, menu_items(name))")
-      .eq("restaurant_id", restaurantId).neq("status", "cancelled")
-      .eq("payment_status", "unpaid")
+      .eq("restaurant_id", restaurantId).neq("status", "cancelled").eq("payment_status", "unpaid")
       .gte("created_at", `${today}T00:00:00`)
       .order("table_number", { ascending: true }).order("created_at", { ascending: true })
     if (data) setTableOrders(data as TableBillingOrder[])
   }, [supabase, restaurantId])
 
+  // ── Realtime + polling ─────────────────────────────────────────────────────
+
   useEffect(() => {
-    const pingsChannel = supabase
-      .channel(`waiter-pings-${restaurantId}`)
+    const pingsChannel = supabase.channel(`staff-pings-${restaurantId}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "table_pings", filter: `restaurant_id=eq.${restaurantId}` }, fetchPings)
       .subscribe()
 
-    const ordersChannel = supabase
-      .channel(`waiter-orders-${restaurantId}`)
+    const ordersChannel = supabase.channel(`staff-orders-${restaurantId}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "orders", filter: `restaurant_id=eq.${restaurantId}` }, () => {
-        fetchReadyOrders()
-        fetchTableOrders()
+        fetchKitchenOrders(); fetchReadyOrders(); fetchTableOrders()
       })
       .subscribe()
 
     const interval = setInterval(() => {
-      fetchPings(); fetchReadyOrders(); fetchTableOrders()
+      fetchPings(); fetchKitchenOrders(); fetchReadyOrders(); fetchTableOrders()
     }, 5000)
 
     return () => {
@@ -127,9 +148,10 @@ export function WaiterClient({ restaurantId, staffName, initialPings, initialRea
       supabase.removeChannel(ordersChannel)
       clearInterval(interval)
     }
-  }, [supabase, restaurantId, fetchPings, fetchReadyOrders, fetchTableOrders])
+  }, [supabase, restaurantId, fetchPings, fetchKitchenOrders, fetchReadyOrders, fetchTableOrders])
 
-  // Table summaries — only tables with at least one unpaid item (cleared once fully paid)
+  // ── Billing sidebar data ───────────────────────────────────────────────────
+
   const tableSummaries = useMemo(() => {
     const map = new Map<number, TableBillingOrder[]>()
     for (const order of tableOrders) {
@@ -148,7 +170,6 @@ export function WaiterClient({ restaurantId, staffName, initialPings, initialRea
       .sort((a, b) => a.table_number - b.table_number)
   }, [tableOrders])
 
-  // Close modal when table becomes fully paid
   useEffect(() => {
     if (viewTable !== null && !tableSummaries.find(t => t.table_number === viewTable)) {
       setViewTable(null)
@@ -161,25 +182,34 @@ export function WaiterClient({ restaurantId, staffName, initialPings, initialRea
     [tableOrders, viewTable]
   )
 
-  // Running total for selected items
   const selectedTotal = useMemo(() => {
     let total = 0
-    for (const order of viewTableOrders) {
-      for (const item of order.order_items) {
+    for (const order of viewTableOrders)
+      for (const item of order.order_items)
         if (selectedItemIds.has(item.id)) total += item.item_price_cents * item.quantity
-      }
-    }
     return total
   }, [viewTableOrders, selectedItemIds])
+
+  // ── Helpers ────────────────────────────────────────────────────────────────
+
+  function elapsed(createdAt: string) {
+    const m = Math.floor((Date.now() - new Date(createdAt).getTime()) / 60000)
+    return m < 1 ? "just nu" : `${m}m sedan`
+  }
+
+  function elapsedMinutes(createdAt: string) {
+    return Math.floor((Date.now() - new Date(createdAt).getTime()) / 60000)
+  }
 
   function toggleItem(itemId: string) {
     setSelectedItemIds(prev => {
       const next = new Set(prev)
-      if (next.has(itemId)) next.delete(itemId)
-      else next.add(itemId)
+      if (next.has(itemId)) next.delete(itemId); else next.add(itemId)
       return next
     })
   }
+
+  // ── Actions ────────────────────────────────────────────────────────────────
 
   async function handleAcknowledgePing(pingId: string) {
     await supabase.from("table_pings").update({ status: "acknowledged" }).eq("id", pingId)
@@ -191,16 +221,30 @@ export function WaiterClient({ restaurantId, staffName, initialPings, initialRea
     setPings(prev => prev.filter(p => p.id !== pingId))
   }
 
+  async function handleMarkPreparing(orderId: string) {
+    setUpdatingId(orderId)
+    const { error } = await updateOrderStatus(orderId, "preparing")
+    setUpdatingId(null)
+    if (error) { toast({ title: "Kunde inte uppdatera beställning", variant: "destructive" }); return }
+    setKitchenOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: "preparing" } : o))
+  }
+
+  async function handleMarkReady(orderId: string) {
+    setUpdatingId(orderId)
+    const { error } = await updateOrderStatus(orderId, "ready")
+    setUpdatingId(null)
+    if (error) { toast({ title: "Kunde inte uppdatera beställning", variant: "destructive" }); return }
+    setKitchenOrders(prev => prev.filter(o => o.id !== orderId))
+    toast({ title: "Beställning markerad klar — servitören notifierad" })
+  }
+
   async function handleDeliver(orderId: string) {
-    setUpdatingOrderId(orderId)
+    setUpdatingId(orderId)
     const { error } = await updateOrderStatus(orderId, "delivered")
-    setUpdatingOrderId(null)
-    if (error) {
-      toast({ title: "Kunde inte markera som levererad", variant: "destructive" })
-    } else {
-      setReadyOrders(prev => prev.filter(o => o.id !== orderId))
-      toast({ title: "Beställning markerad som levererad" })
-    }
+    setUpdatingId(null)
+    if (error) { toast({ title: "Kunde inte markera som levererad", variant: "destructive" }); return }
+    setReadyOrders(prev => prev.filter(o => o.id !== orderId))
+    toast({ title: "Beställning markerad som levererad" })
   }
 
   async function handleMarkItemsPaid(itemIds: string[]) {
@@ -208,11 +252,7 @@ export function WaiterClient({ restaurantId, staffName, initialPings, initialRea
     setMarkingPaid(true)
     const { error } = await markItemsPaid(itemIds)
     setMarkingPaid(false)
-    if (error) {
-      toast({ title: "Kunde inte markera som betald", variant: "destructive" })
-      return
-    }
-    // Update local state optimistically
+    if (error) { toast({ title: "Kunde inte markera som betald", variant: "destructive" }); return }
     const paidSet = new Set(itemIds)
     setTableOrders(prev => prev.map(order => {
       const updatedItems = order.order_items.map(item =>
@@ -225,34 +265,30 @@ export function WaiterClient({ restaurantId, staffName, initialPings, initialRea
     toast({ title: `${itemIds.length} ${itemIds.length === 1 ? "artikel" : "artiklar"} markerad${itemIds.length !== 1 ? "e" : ""} som betald${itemIds.length !== 1 ? "a" : ""}` })
   }
 
-  function elapsed(createdAt: string) {
-    const m = Math.floor((Date.now() - new Date(createdAt).getTime()) / 60000)
-    return m < 1 ? "just nu" : `${m}m sedan`
-  }
+  const hasActivity = pings.length > 0 || kitchenOrders.length > 0 || readyOrders.length > 0
 
-  const hasTasks = pings.length > 0 || readyOrders.length > 0
+  // ── Render ─────────────────────────────────────────────────────────────────
 
   return (
     <div className="min-h-screen bg-stone-50 flex flex-col">
       {/* Header */}
       <div className="bg-stone-900 text-stone-50 px-6 py-4 flex items-center gap-3 flex-shrink-0">
         <div className="w-9 h-9 rounded-xl bg-amber-500 flex items-center justify-center">
-          <Bell className="h-4 w-4 text-stone-900" />
+          <ChefHat className="h-4 w-4 text-stone-900" />
         </div>
         <div>
-          <h1 className="font-serif text-lg font-semibold">Servitörsvy</h1>
+          <h1 className="font-serif text-lg font-semibold">Personalsvy</h1>
           <p className="text-xs text-stone-400">Hej, {staffName}</p>
         </div>
         <div className="ml-auto flex items-center gap-3">
           {pings.length > 0 && (
-            <span className="px-2.5 py-1 bg-red-500 text-white text-xs font-bold rounded-full">
-              {pings.length} anrop
-            </span>
+            <span className="px-2.5 py-1 bg-red-500 text-white text-xs font-bold rounded-full">{pings.length} anrop</span>
+          )}
+          {kitchenOrders.length > 0 && (
+            <span className="px-2.5 py-1 bg-amber-500 text-stone-900 text-xs font-bold rounded-full">{kitchenOrders.length} tillagas</span>
           )}
           {readyOrders.length > 0 && (
-            <span className="px-2.5 py-1 bg-emerald-500 text-white text-xs font-bold rounded-full">
-              {readyOrders.length} klar{readyOrders.length !== 1 ? "a" : ""}
-            </span>
+            <span className="px-2.5 py-1 bg-emerald-500 text-white text-xs font-bold rounded-full">{readyOrders.length} klar{readyOrders.length !== 1 ? "a" : ""}</span>
           )}
         </div>
       </div>
@@ -260,17 +296,19 @@ export function WaiterClient({ restaurantId, staffName, initialPings, initialRea
       {/* Body */}
       <div className="flex flex-1 overflow-hidden">
 
-        {/* Left: pings + ready orders */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-6 max-w-xl">
+        {/* Main content */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-6">
+
+          {/* Pings */}
           {pings.length > 0 && (
             <section>
-              <h2 className="text-sm font-semibold text-stone-500 uppercase tracking-wide mb-3">Bordsförfrågningar</h2>
+              <h2 className="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-3">Bordsförfrågningar</h2>
               <div className="space-y-2">
                 {pings.map(ping => {
                   const Icon = PING_ICONS[ping.ping_type] ?? AlertCircle
                   return (
                     <div key={ping.id} className={`flex items-center gap-4 p-4 rounded-xl border ${PING_COLORS[ping.ping_type] ?? "bg-stone-50 border-stone-200"}`}>
-                      <Icon className={`h-6 w-6 flex-shrink-0 ${PING_ICON_COLORS[ping.ping_type] ?? "text-stone-500"}`} />
+                      <Icon className={`h-5 w-5 flex-shrink-0 ${PING_ICON_COLORS[ping.ping_type] ?? "text-stone-500"}`} />
                       <div className="flex-1 min-w-0">
                         <p className="font-semibold text-stone-800">Bord {ping.table_number}</p>
                         <p className="text-sm text-stone-600">{PING_LABELS[ping.ping_type] ?? ping.ping_type}</p>
@@ -291,9 +329,84 @@ export function WaiterClient({ restaurantId, staffName, initialPings, initialRea
             </section>
           )}
 
+          {/* Kitchen orders */}
+          {kitchenOrders.length > 0 && (
+            <section>
+              <h2 className="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-3">Att tillaga</h2>
+              <div className="space-y-2">
+                {kitchenOrders.map(order => {
+                  const mins = elapsedMinutes(order.created_at)
+                  const isRed = mins >= redThreshold
+                  const isYellow = mins >= yellowThreshold && !isRed
+                  return (
+                    <div key={order.id} className={`rounded-xl border p-4 ${
+                      isRed ? "bg-red-50 border-red-300" : isYellow ? "bg-amber-50 border-amber-300" : "bg-white border-stone-200"
+                    }`}>
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          <p className="font-bold text-stone-800 text-lg">Bord {order.table_number}</p>
+                          <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                            order.status === "preparing" ? "bg-amber-100 text-amber-700" : "bg-blue-100 text-blue-700"
+                          }`}>
+                            {order.status === "preparing" ? "Tillagas" : "Bekräftad"}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <Clock className={`h-3.5 w-3.5 ${isRed ? "text-red-500" : isYellow ? "text-amber-500" : "text-stone-400"}`} />
+                          <span className={`text-xs font-medium ${isRed ? "text-red-600" : isYellow ? "text-amber-600" : "text-stone-400"}`}>
+                            {mins}m sedan
+                          </span>
+                        </div>
+                      </div>
+                      <div className="space-y-1 mb-3">
+                        {order.order_items.map(item => (
+                          <div key={item.id}>
+                            <p className="text-sm text-stone-700">
+                              <span className="font-semibold text-amber-600">{item.quantity}×</span>{" "}{item.menu_items.name}
+                            </p>
+                            {item.special_requests && (
+                              <p className="text-xs text-amber-600 italic ml-4">"{item.special_requests}"</p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                      {order.special_notes && (
+                        <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-1.5 mb-3">
+                          {order.special_notes}
+                        </p>
+                      )}
+                      <div className="flex gap-2">
+                        {order.status === "confirmed" && (
+                          <button
+                            onClick={() => handleMarkPreparing(order.id)}
+                            disabled={updatingId === order.id}
+                            className="flex-1 py-2 bg-amber-500 text-stone-900 font-semibold text-sm rounded-lg hover:bg-amber-400 transition-colors disabled:opacity-50"
+                          >
+                            {updatingId === order.id ? "Uppdaterar…" : "Börja tillaga"}
+                          </button>
+                        )}
+                        {order.status === "preparing" && (
+                          <button
+                            onClick={() => handleMarkReady(order.id)}
+                            disabled={updatingId === order.id}
+                            className="flex-1 py-2 bg-emerald-500 text-white font-semibold text-sm rounded-lg hover:bg-emerald-400 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                          >
+                            <CheckCircle2 className="h-4 w-4" />
+                            {updatingId === order.id ? "Uppdaterar…" : "Markera klar"}
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </section>
+          )}
+
+          {/* Ready to serve */}
           {readyOrders.length > 0 && (
             <section>
-              <h2 className="text-sm font-semibold text-stone-500 uppercase tracking-wide mb-3">Redo att serveras</h2>
+              <h2 className="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-3">Redo att serveras</h2>
               <div className="space-y-2">
                 {readyOrders.map(order => (
                   <div key={order.id} className="bg-white border border-emerald-200 rounded-xl p-4">
@@ -316,11 +429,11 @@ export function WaiterClient({ restaurantId, staffName, initialPings, initialRea
                     </div>
                     <button
                       onClick={() => handleDeliver(order.id)}
-                      disabled={updatingOrderId === order.id}
+                      disabled={updatingId === order.id}
                       className="w-full py-2.5 bg-emerald-500 text-white font-semibold text-sm rounded-xl hover:bg-emerald-400 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                     >
                       <CheckCircle2 className="h-4 w-4" />
-                      {updatingOrderId === order.id ? "Uppdaterar…" : "Markera levererad"}
+                      {updatingId === order.id ? "Uppdaterar…" : "Markera levererad"}
                     </button>
                   </div>
                 ))}
@@ -328,16 +441,16 @@ export function WaiterClient({ restaurantId, staffName, initialPings, initialRea
             </section>
           )}
 
-          {!hasTasks && (
+          {!hasActivity && (
             <div className="flex flex-col items-center justify-center py-24 text-stone-400">
               <UtensilsCrossed className="h-14 w-14 mb-4 text-stone-300" />
               <p className="text-lg font-medium text-stone-500">Allt klart!</p>
-              <p className="text-sm mt-1">Inga bordsförfrågningar eller klara beställningar.</p>
+              <p className="text-sm mt-1">Inga aktiva beställningar eller förfrågningar.</p>
             </div>
           )}
         </div>
 
-        {/* Right: billing sidebar */}
+        {/* Billing sidebar */}
         <div className="w-56 border-l border-stone-200 bg-white flex flex-col overflow-hidden flex-shrink-0">
           <div className="px-4 py-3 border-b border-stone-100">
             <h2 className="text-xs font-semibold text-stone-500 uppercase tracking-wide">Bord & Notor</h2>
@@ -347,39 +460,32 @@ export function WaiterClient({ restaurantId, staffName, initialPings, initialRea
               <p className="text-xs text-stone-400 text-center py-8 px-4">Inga aktiva bord idag.</p>
             ) : (
               <div className="divide-y divide-stone-100">
-                {tableSummaries.map(({ table_number, totalCents, paidCents, orders }) => {
-                  const somePaid = paidCents > 0
-                  return (
-                    <button
-                      key={table_number}
-                      onClick={() => { setViewTable(table_number); setSelectedItemIds(new Set()) }}
-                      className="w-full flex items-center justify-between px-4 py-3 hover:bg-stone-50 transition-colors text-left"
-                    >
-                      <div>
-                        <p className="font-semibold text-stone-800 text-sm">Bord {table_number}</p>
-                        <p className="text-xs text-stone-500 mt-0.5">
-                          {orders.length} beställning{orders.length !== 1 ? "ar" : ""}
-                        </p>
+                {tableSummaries.map(({ table_number, totalCents, paidCents, orders }) => (
+                  <button
+                    key={table_number}
+                    onClick={() => { setViewTable(table_number); setSelectedItemIds(new Set()) }}
+                    className="w-full flex items-center justify-between px-4 py-3 hover:bg-stone-50 transition-colors text-left"
+                  >
+                    <div>
+                      <p className="font-semibold text-stone-800 text-sm">Bord {table_number}</p>
+                      <p className="text-xs text-stone-500 mt-0.5">{orders.length} beställning{orders.length !== 1 ? "ar" : ""}</p>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <div className="text-right">
+                        <p className="text-sm font-semibold text-stone-800">{formatPrice(totalCents)}</p>
+                        {paidCents > 0 && <p className="text-xs text-emerald-600">{formatPrice(paidCents)} betalt</p>}
                       </div>
-                      <div className="flex items-center gap-1.5">
-                        <div className="text-right">
-                          <p className="text-sm font-semibold text-stone-800">{formatPrice(totalCents)}</p>
-                          {somePaid && (
-                            <p className="text-xs text-emerald-600">{formatPrice(paidCents)} betalt</p>
-                          )}
-                        </div>
-                        <ChevronRight className="h-4 w-4 text-stone-300 flex-shrink-0" />
-                      </div>
-                    </button>
-                  )
-                })}
+                      <ChevronRight className="h-4 w-4 text-stone-300 flex-shrink-0" />
+                    </div>
+                  </button>
+                ))}
               </div>
             )}
           </div>
         </div>
       </div>
 
-      {/* Table billing modal */}
+      {/* Billing modal */}
       <Dialog open={viewTable !== null} onOpenChange={open => { if (!open) { setViewTable(null); setSelectedItemIds(new Set()) } }}>
         <DialogContent className="max-w-lg max-h-[85vh] flex flex-col p-0 gap-0">
           <DialogHeader className="px-6 pt-5 pb-4 border-b border-stone-100 flex-shrink-0">
@@ -398,7 +504,6 @@ export function WaiterClient({ restaurantId, staffName, initialPings, initialRea
             })()}
           </DialogHeader>
 
-          {/* Item list */}
           <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
             {viewTableOrders.map(order => (
               <div key={order.id}>
@@ -406,11 +511,9 @@ export function WaiterClient({ restaurantId, staffName, initialPings, initialRea
                   <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
                     order.status === "delivered" ? "bg-stone-100 text-stone-500" :
                     order.status === "ready" ? "bg-emerald-100 text-emerald-700" :
-                    order.status === "preparing" ? "bg-amber-100 text-amber-700" :
-                    "bg-blue-100 text-blue-700"
+                    order.status === "preparing" ? "bg-amber-100 text-amber-700" : "bg-blue-100 text-blue-700"
                   }`}>
-                    {order.status === "delivered" ? "Levererad" :
-                     order.status === "ready" ? "Klar" :
+                    {order.status === "delivered" ? "Levererad" : order.status === "ready" ? "Klar" :
                      order.status === "preparing" ? "Tillagas" : "Bekräftad"}
                   </span>
                   <span className="text-xs text-stone-400">{elapsed(order.created_at)}</span>
@@ -419,27 +522,21 @@ export function WaiterClient({ restaurantId, staffName, initialPings, initialRea
                   {order.order_items.map(item => {
                     const isPaid = item.payment_status === "paid"
                     const isSelected = selectedItemIds.has(item.id)
-                    const lineTotal = item.item_price_cents * item.quantity
                     return (
                       <button
                         key={item.id}
                         disabled={isPaid}
                         onClick={() => toggleItem(item.id)}
                         className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-left ${
-                          isPaid
-                            ? "opacity-40 cursor-default bg-stone-50"
-                            : isSelected
-                            ? "bg-amber-50 border border-amber-300"
-                            : "bg-white border border-stone-200 hover:border-stone-300"
+                          isPaid ? "opacity-40 cursor-default bg-stone-50" :
+                          isSelected ? "bg-amber-50 border border-amber-300" :
+                          "bg-white border border-stone-200 hover:border-stone-300"
                         }`}
                       >
-                        {/* Checkbox */}
                         {isPaid ? (
                           <CheckCircle2 className="h-4 w-4 text-emerald-500 flex-shrink-0" />
                         ) : (
-                          <div className={`w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 ${
-                            isSelected ? "bg-amber-500 border-amber-500" : "border-stone-300"
-                          }`}>
+                          <div className={`w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 ${isSelected ? "bg-amber-500 border-amber-500" : "border-stone-300"}`}>
                             {isSelected && <span className="text-white text-xs leading-none font-bold">✓</span>}
                           </div>
                         )}
@@ -448,7 +545,7 @@ export function WaiterClient({ restaurantId, staffName, initialPings, initialRea
                           {item.menu_items.name}
                         </span>
                         <span className={`text-sm font-semibold flex-shrink-0 ${isPaid ? "text-stone-400" : isSelected ? "text-amber-700" : "text-stone-700"}`}>
-                          {formatPrice(lineTotal)}
+                          {formatPrice(item.item_price_cents * item.quantity)}
                         </span>
                       </button>
                     )
@@ -458,36 +555,25 @@ export function WaiterClient({ restaurantId, staffName, initialPings, initialRea
             ))}
           </div>
 
-          {/* Footer: running total + action buttons */}
           <div className="px-6 py-4 border-t border-stone-100 flex-shrink-0 space-y-3">
-            {/* Running total */}
             {selectedItemIds.size > 0 && (
               <div className="flex items-center justify-between bg-amber-50 border border-amber-200 rounded-xl px-4 py-2.5">
-                <span className="text-sm text-amber-700 font-medium">
-                  {selectedItemIds.size} artikel{selectedItemIds.size !== 1 ? "ar" : ""} vald{selectedItemIds.size !== 1 ? "a" : ""}
-                </span>
+                <span className="text-sm text-amber-700 font-medium">{selectedItemIds.size} artikel{selectedItemIds.size !== 1 ? "ar" : ""} vald{selectedItemIds.size !== 1 ? "a" : ""}</span>
                 <span className="text-lg font-bold text-amber-800">{formatPrice(selectedTotal)}</span>
               </div>
             )}
-
             {viewTableOrders.some(o => o.order_items.some(i => i.payment_status === "unpaid")) && (
               <div className="space-y-2">
                 {selectedItemIds.size > 0 && (
-                  <button
-                    onClick={() => handleMarkItemsPaid(Array.from(selectedItemIds))}
-                    disabled={markingPaid}
-                    className="w-full py-2.5 bg-amber-500 text-stone-900 font-semibold text-sm rounded-xl hover:bg-amber-400 transition-colors disabled:opacity-50"
-                  >
+                  <button onClick={() => handleMarkItemsPaid(Array.from(selectedItemIds))} disabled={markingPaid}
+                    className="w-full py-2.5 bg-amber-500 text-stone-900 font-semibold text-sm rounded-xl hover:bg-amber-400 transition-colors disabled:opacity-50">
                     {markingPaid ? "Uppdaterar…" : `Betala valda · ${formatPrice(selectedTotal)}`}
                   </button>
                 )}
                 <button
-                  onClick={() => handleMarkItemsPaid(
-                    viewTableOrders.flatMap(o => o.order_items.filter(i => i.payment_status === "unpaid").map(i => i.id))
-                  )}
+                  onClick={() => handleMarkItemsPaid(viewTableOrders.flatMap(o => o.order_items.filter(i => i.payment_status === "unpaid").map(i => i.id)))}
                   disabled={markingPaid}
-                  className="w-full py-2.5 bg-emerald-500 text-white font-semibold text-sm rounded-xl hover:bg-emerald-400 transition-colors disabled:opacity-50"
-                >
+                  className="w-full py-2.5 bg-emerald-500 text-white font-semibold text-sm rounded-xl hover:bg-emerald-400 transition-colors disabled:opacity-50">
                   {markingPaid ? "Uppdaterar…" : "Betala hela bordet"}
                 </button>
               </div>

@@ -1,9 +1,9 @@
 import type { Metadata } from "next"
 import { redirect } from "next/navigation"
 import { createServerSupabaseClient } from "@/lib/supabase/server"
-import { WaiterClient } from "@/components/waiter/waiter-client"
+import { StaffClient } from "@/components/waiter/waiter-client"
 
-export const metadata: Metadata = { title: "Waiter View" }
+export const metadata: Metadata = { title: "Personalsvy" }
 
 export default async function WaiterPage() {
   const supabase = await createServerSupabaseClient()
@@ -22,12 +22,25 @@ export default async function WaiterPage() {
 
   const today = new Date().toISOString().split("T")[0]
 
-  const [{ data: pings }, { data: readyOrders }, { data: tableOrders }] = await Promise.all([
+  const [
+    { data: pings },
+    { data: kitchenOrders },
+    { data: readyOrders },
+    { data: tableOrders },
+    { data: restaurant },
+  ] = await Promise.all([
     supabase
       .from("table_pings")
       .select("*")
       .eq("restaurant_id", staff.restaurant_id)
       .eq("status", "pending")
+      .order("created_at", { ascending: true }),
+    supabase
+      .from("orders")
+      .select("id, table_number, status, special_notes, created_at, order_items(id, quantity, special_requests, menu_items(name))")
+      .eq("restaurant_id", staff.restaurant_id)
+      .in("status", ["confirmed", "preparing"])
+      .gte("created_at", `${today}T00:00:00`)
       .order("created_at", { ascending: true }),
     supabase
       .from("orders")
@@ -45,15 +58,23 @@ export default async function WaiterPage() {
       .gte("created_at", `${today}T00:00:00`)
       .order("table_number", { ascending: true })
       .order("created_at", { ascending: true }),
+    supabase
+      .from("restaurants")
+      .select("yellow_threshold_minutes, red_threshold_minutes")
+      .eq("id", staff.restaurant_id)
+      .single(),
   ])
 
   return (
-    <WaiterClient
+    <StaffClient
       restaurantId={staff.restaurant_id}
       staffName={staff.first_name}
       initialPings={pings ?? []}
+      initialKitchenOrders={kitchenOrders ?? []}
       initialReadyOrders={readyOrders ?? []}
       initialTableOrders={tableOrders ?? []}
+      yellowThreshold={restaurant?.yellow_threshold_minutes ?? 10}
+      redThreshold={restaurant?.red_threshold_minutes ?? 20}
     />
   )
 }
