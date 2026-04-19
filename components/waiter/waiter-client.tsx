@@ -1,6 +1,6 @@
 "use client"
 import { useState, useEffect, useCallback, useMemo } from "react"
-import { Bell, CheckCircle2, UtensilsCrossed, AlertCircle, Coffee, CreditCard, ChevronRight, Clock, ChefHat, X } from "lucide-react"
+import { Bell, CheckCircle2, UtensilsCrossed, AlertCircle, Coffee, CreditCard, ChevronRight, Clock, ChefHat, X, Utensils } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { updateOrderStatus, markItemsPaid } from "@/lib/actions/orders"
 import { formatPrice } from "@/lib/utils"
@@ -19,21 +19,13 @@ interface PendingOrder {
   order_items: Array<{ id: string; quantity: number; special_requests: string | null; menu_items: { name: string } }>
 }
 
-interface KitchenOrder {
-  id: string
-  table_number: number
-  status: string
-  special_notes: string | null
-  created_at: string
-  order_items: Array<{ id: string; quantity: number; special_requests: string | null; menu_items: { name: string } }>
-}
-
-interface ReadyOrder {
+interface ActiveOrder {
   id: string
   table_number: number
   total_cents: number
+  special_notes: string | null
   created_at: string
-  order_items: Array<{ id: string; quantity: number; menu_items: { name: string } }>
+  order_items: Array<{ id: string; quantity: number; special_requests: string | null; menu_items: { name: string } }>
 }
 
 interface BillingItem {
@@ -59,8 +51,7 @@ interface Props {
   staffName: string
   initialPings: TablePing[]
   initialPendingOrders: PendingOrder[]
-  initialKitchenOrders: KitchenOrder[]
-  initialReadyOrders: ReadyOrder[]
+  initialActiveOrders: ActiveOrder[]
   initialTableOrders: TableBillingOrder[]
   yellowThreshold: number
   redThreshold: number
@@ -85,13 +76,12 @@ const PING_ICON_COLORS: Record<string, string> = {
 
 export function StaffClient({
   restaurantId, staffName,
-  initialPings, initialPendingOrders, initialKitchenOrders, initialReadyOrders, initialTableOrders,
+  initialPings, initialPendingOrders, initialActiveOrders, initialTableOrders,
   yellowThreshold, redThreshold,
 }: Props) {
   const [pings, setPings] = useState<TablePing[]>(initialPings)
   const [pendingOrders, setPendingOrders] = useState<PendingOrder[]>(initialPendingOrders)
-  const [kitchenOrders, setKitchenOrders] = useState<KitchenOrder[]>(initialKitchenOrders)
-  const [readyOrders, setReadyOrders] = useState<ReadyOrder[]>(initialReadyOrders)
+  const [activeOrders, setActiveOrders] = useState<ActiveOrder[]>(initialActiveOrders)
   const [tableOrders, setTableOrders] = useState<TableBillingOrder[]>(initialTableOrders)
   const [updatingId, setUpdatingId] = useState<string | null>(null)
   const [viewTable, setViewTable] = useState<number | null>(null)
@@ -119,22 +109,13 @@ export function StaffClient({
     if (data) setPendingOrders(data as PendingOrder[])
   }, [supabase, restaurantId])
 
-  const fetchKitchenOrders = useCallback(async () => {
+  const fetchActiveOrders = useCallback(async () => {
     const today = new Date().toISOString().split("T")[0]
     const { data } = await supabase.from("orders")
-      .select("id, table_number, status, special_notes, created_at, order_items(id, quantity, special_requests, menu_items(name))")
-      .eq("restaurant_id", restaurantId).in("status", ["confirmed", "preparing"])
+      .select("id, table_number, total_cents, special_notes, created_at, order_items(id, quantity, special_requests, menu_items(name))")
+      .eq("restaurant_id", restaurantId).in("status", ["confirmed", "preparing", "ready"])
       .gte("created_at", `${today}T00:00:00`).order("created_at", { ascending: true })
-    if (data) setKitchenOrders(data)
-  }, [supabase, restaurantId])
-
-  const fetchReadyOrders = useCallback(async () => {
-    const today = new Date().toISOString().split("T")[0]
-    const { data } = await supabase.from("orders")
-      .select("id, table_number, total_cents, created_at, order_items(id, quantity, menu_items(name))")
-      .eq("restaurant_id", restaurantId).eq("status", "ready")
-      .gte("created_at", `${today}T00:00:00`).order("created_at", { ascending: true })
-    if (data) setReadyOrders(data)
+    if (data) setActiveOrders(data as ActiveOrder[])
   }, [supabase, restaurantId])
 
   const fetchTableOrders = useCallback(async () => {
@@ -156,12 +137,12 @@ export function StaffClient({
 
     const ordersChannel = supabase.channel(`staff-orders-${restaurantId}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "orders", filter: `restaurant_id=eq.${restaurantId}` }, () => {
-        fetchPendingOrders(); fetchKitchenOrders(); fetchReadyOrders(); fetchTableOrders()
+        fetchPendingOrders(); fetchActiveOrders(); fetchTableOrders()
       })
       .subscribe()
 
     const interval = setInterval(() => {
-      fetchPings(); fetchPendingOrders(); fetchKitchenOrders(); fetchReadyOrders(); fetchTableOrders()
+      fetchPings(); fetchPendingOrders(); fetchActiveOrders(); fetchTableOrders()
     }, 5000)
 
     return () => {
@@ -169,7 +150,7 @@ export function StaffClient({
       supabase.removeChannel(ordersChannel)
       clearInterval(interval)
     }
-  }, [supabase, restaurantId, fetchPings, fetchPendingOrders, fetchKitchenOrders, fetchReadyOrders, fetchTableOrders])
+  }, [supabase, restaurantId, fetchPings, fetchPendingOrders, fetchActiveOrders, fetchTableOrders])
 
   // ── Billing sidebar data ───────────────────────────────────────────────────
 
@@ -260,30 +241,12 @@ export function StaffClient({
     toast({ title: "Beställning avvisad" })
   }
 
-  async function handleMarkPreparing(orderId: string) {
-    setUpdatingId(orderId)
-    const { error } = await updateOrderStatus(orderId, "preparing")
-    setUpdatingId(null)
-    if (error) { toast({ title: "Kunde inte uppdatera beställning", variant: "destructive" }); return }
-    setKitchenOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: "preparing" } : o))
-  }
-
-  async function handleMarkReady(orderId: string) {
-    setUpdatingId(orderId)
-    const { error } = await updateOrderStatus(orderId, "ready")
-    setUpdatingId(null)
-    if (error) { toast({ title: "Kunde inte uppdatera beställning", variant: "destructive" }); return }
-    setKitchenOrders(prev => prev.filter(o => o.id !== orderId))
-    toast({ title: "Beställning markerad klar — servitören notifierad" })
-  }
-
-  async function handleDeliver(orderId: string) {
+  async function handleMarkDone(orderId: string) {
     setUpdatingId(orderId)
     const { error } = await updateOrderStatus(orderId, "delivered")
     setUpdatingId(null)
-    if (error) { toast({ title: "Kunde inte markera som levererad", variant: "destructive" }); return }
-    setReadyOrders(prev => prev.filter(o => o.id !== orderId))
-    toast({ title: "Beställning markerad som levererad" })
+    if (error) { toast({ title: "Kunde inte uppdatera beställning", variant: "destructive" }); return }
+    setActiveOrders(prev => prev.filter(o => o.id !== orderId))
   }
 
   async function handleMarkItemsPaid(itemIds: string[]) {
@@ -304,7 +267,7 @@ export function StaffClient({
     toast({ title: `${itemIds.length} ${itemIds.length === 1 ? "artikel" : "artiklar"} markerad${itemIds.length !== 1 ? "e" : ""} som betald${itemIds.length !== 1 ? "a" : ""}` })
   }
 
-  const hasActivity = pings.length > 0 || pendingOrders.length > 0 || kitchenOrders.length > 0 || readyOrders.length > 0
+  const hasActivity = pings.length > 0 || pendingOrders.length > 0 || activeOrders.length > 0
 
   // ── Render ─────────────────────────────────────────────────────────────────
 
@@ -326,11 +289,8 @@ export function StaffClient({
           {pings.length > 0 && (
             <span className="px-2.5 py-1 bg-red-500 text-white text-xs font-bold rounded-full">{pings.length} anrop</span>
           )}
-          {kitchenOrders.length > 0 && (
-            <span className="px-2.5 py-1 bg-amber-500 text-stone-900 text-xs font-bold rounded-full">{kitchenOrders.length} tillagas</span>
-          )}
-          {readyOrders.length > 0 && (
-            <span className="px-2.5 py-1 bg-emerald-500 text-white text-xs font-bold rounded-full">{readyOrders.length} klar{readyOrders.length !== 1 ? "a" : ""}</span>
+          {activeOrders.length > 0 && (
+            <span className="px-2.5 py-1 bg-amber-500 text-stone-900 text-xs font-bold rounded-full">{activeOrders.length} aktiv{activeOrders.length !== 1 ? "a" : ""}</span>
           )}
         </div>
       </div>
@@ -426,12 +386,12 @@ export function StaffClient({
             </section>
           )}
 
-          {/* Kitchen orders */}
-          {kitchenOrders.length > 0 && (
+          {/* Active orders */}
+          {activeOrders.length > 0 && (
             <section>
-              <h2 className="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-3">Att tillaga</h2>
+              <h2 className="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-3">Aktiva beställningar</h2>
               <div className="space-y-2">
-                {kitchenOrders.map(order => {
+                {activeOrders.map(order => {
                   const mins = elapsedMinutes(order.created_at)
                   const isRed = mins >= redThreshold
                   const isYellow = mins >= yellowThreshold && !isRed
@@ -440,14 +400,7 @@ export function StaffClient({
                       isRed ? "bg-red-50 border-red-300" : isYellow ? "bg-amber-50 border-amber-300" : "bg-white border-stone-200"
                     }`}>
                       <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2">
-                          <p className="font-bold text-stone-800 text-lg">Bord {order.table_number}</p>
-                          <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                            order.status === "preparing" ? "bg-amber-100 text-amber-700" : "bg-blue-100 text-blue-700"
-                          }`}>
-                            {order.status === "preparing" ? "Tillagas" : "Bekräftad"}
-                          </span>
-                        </div>
+                        <p className="font-bold text-stone-800 text-lg">Bord {order.table_number}</p>
                         <div className="flex items-center gap-1.5">
                           <Clock className={`h-3.5 w-3.5 ${isRed ? "text-red-500" : isYellow ? "text-amber-500" : "text-stone-400"}`} />
                           <span className={`text-xs font-medium ${isRed ? "text-red-600" : isYellow ? "text-amber-600" : "text-stone-400"}`}>
@@ -472,68 +425,17 @@ export function StaffClient({
                           {order.special_notes}
                         </p>
                       )}
-                      <div className="flex gap-2">
-                        {order.status === "confirmed" && (
-                          <button
-                            onClick={() => handleMarkPreparing(order.id)}
-                            disabled={updatingId === order.id}
-                            className="flex-1 py-2 bg-amber-500 text-stone-900 font-semibold text-sm rounded-lg hover:bg-amber-400 transition-colors disabled:opacity-50"
-                          >
-                            {updatingId === order.id ? "Uppdaterar…" : "Börja tillaga"}
-                          </button>
-                        )}
-                        {order.status === "preparing" && (
-                          <button
-                            onClick={() => handleMarkReady(order.id)}
-                            disabled={updatingId === order.id}
-                            className="flex-1 py-2 bg-emerald-500 text-white font-semibold text-sm rounded-lg hover:bg-emerald-400 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-                          >
-                            <CheckCircle2 className="h-4 w-4" />
-                            {updatingId === order.id ? "Uppdaterar…" : "Markera klar"}
-                          </button>
-                        )}
-                      </div>
+                      <button
+                        onClick={() => handleMarkDone(order.id)}
+                        disabled={updatingId === order.id}
+                        className="w-full py-2 bg-emerald-500 text-white font-semibold text-sm rounded-lg hover:bg-emerald-400 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                      >
+                        <Utensils className="h-4 w-4" />
+                        {updatingId === order.id ? "Uppdaterar…" : "Serverad"}
+                      </button>
                     </div>
                   )
                 })}
-              </div>
-            </section>
-          )}
-
-          {/* Ready to serve */}
-          {readyOrders.length > 0 && (
-            <section>
-              <h2 className="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-3">Redo att serveras</h2>
-              <div className="space-y-2">
-                {readyOrders.map(order => (
-                  <div key={order.id} className="bg-white border border-emerald-200 rounded-xl p-4">
-                    <div className="flex items-start justify-between gap-3 mb-3">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <p className="font-bold text-stone-800 text-lg">Bord {order.table_number}</p>
-                          <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-medium">Klar</span>
-                        </div>
-                        <p className="text-xs text-stone-400 mt-0.5">{elapsed(order.created_at)}</p>
-                      </div>
-                      <p className="font-semibold text-stone-700">{formatPrice(order.total_cents)}</p>
-                    </div>
-                    <div className="space-y-1 mb-3">
-                      {order.order_items.map(item => (
-                        <p key={item.id} className="text-sm text-stone-600">
-                          <span className="font-medium text-amber-600">{item.quantity}×</span>{" "}{item.menu_items.name}
-                        </p>
-                      ))}
-                    </div>
-                    <button
-                      onClick={() => handleDeliver(order.id)}
-                      disabled={updatingId === order.id}
-                      className="w-full py-2.5 bg-emerald-500 text-white font-semibold text-sm rounded-xl hover:bg-emerald-400 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-                    >
-                      <CheckCircle2 className="h-4 w-4" />
-                      {updatingId === order.id ? "Uppdaterar…" : "Markera levererad"}
-                    </button>
-                  </div>
-                ))}
               </div>
             </section>
           )}

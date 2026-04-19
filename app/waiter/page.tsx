@@ -25,8 +25,7 @@ export default async function WaiterPage() {
   const [
     { data: pings },
     { data: pendingOrders },
-    { data: kitchenOrders },
-    { data: readyOrders },
+    { data: activeOrders },
     { data: tableOrders },
     { data: restaurant },
   ] = await Promise.all([
@@ -46,16 +45,9 @@ export default async function WaiterPage() {
       .order("created_at", { ascending: true }),
     supabase
       .from("orders")
-      .select("id, table_number, status, special_notes, created_at, order_items(id, quantity, special_requests, menu_items(name))")
+      .select("id, table_number, total_cents, special_notes, created_at, order_items(id, quantity, special_requests, menu_items(name))")
       .eq("restaurant_id", staff.restaurant_id)
-      .in("status", ["confirmed", "preparing"])
-      .gte("created_at", `${today}T00:00:00`)
-      .order("created_at", { ascending: true }),
-    supabase
-      .from("orders")
-      .select("id, table_number, total_cents, created_at, order_items(id, quantity, menu_items(name))")
-      .eq("restaurant_id", staff.restaurant_id)
-      .eq("status", "ready")
+      .in("status", ["confirmed", "preparing", "ready"])
       .gte("created_at", `${today}T00:00:00`)
       .order("created_at", { ascending: true }),
     supabase
@@ -80,8 +72,7 @@ export default async function WaiterPage() {
       staffName={staff.first_name}
       initialPings={pings ?? []}
       initialPendingOrders={pendingOrders ?? []}
-      initialKitchenOrders={kitchenOrders ?? []}
-      initialReadyOrders={readyOrders ?? []}
+      initialActiveOrders={activeOrders ?? []}
       initialTableOrders={tableOrders ?? []}
       yellowThreshold={restaurant?.yellow_threshold_minutes ?? 10}
       redThreshold={restaurant?.red_threshold_minutes ?? 20}
