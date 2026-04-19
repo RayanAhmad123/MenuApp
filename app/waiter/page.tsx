@@ -24,6 +24,7 @@ export default async function WaiterPage() {
 
   const [
     { data: pings },
+    { data: pendingOrders },
     { data: kitchenOrders },
     { data: readyOrders },
     { data: tableOrders },
@@ -34,6 +35,14 @@ export default async function WaiterPage() {
       .select("*")
       .eq("restaurant_id", staff.restaurant_id)
       .eq("status", "pending")
+      .order("created_at", { ascending: true }),
+    supabase
+      .from("orders")
+      .select("id, table_number, total_cents, special_notes, created_at, order_items(id, quantity, special_requests, menu_items(name))")
+      .eq("restaurant_id", staff.restaurant_id)
+      .eq("status", "pending")
+      .is("stripe_payment_intent_id", null)
+      .gte("created_at", `${today}T00:00:00`)
       .order("created_at", { ascending: true }),
     supabase
       .from("orders")
@@ -70,6 +79,7 @@ export default async function WaiterPage() {
       restaurantId={staff.restaurant_id}
       staffName={staff.first_name}
       initialPings={pings ?? []}
+      initialPendingOrders={pendingOrders ?? []}
       initialKitchenOrders={kitchenOrders ?? []}
       initialReadyOrders={readyOrders ?? []}
       initialTableOrders={tableOrders ?? []}

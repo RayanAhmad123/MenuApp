@@ -1,6 +1,6 @@
 "use client"
 import { useState, useEffect, useCallback, useMemo } from "react"
-import { Bell, CheckCircle2, UtensilsCrossed, AlertCircle, Coffee, CreditCard, ChevronRight, Clock, ChefHat } from "lucide-react"
+import { Bell, CheckCircle2, UtensilsCrossed, AlertCircle, Coffee, CreditCard, ChevronRight, Clock, ChefHat, X } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { updateOrderStatus, markItemsPaid } from "@/lib/actions/orders"
 import { formatPrice } from "@/lib/utils"
@@ -9,6 +9,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import type { TablePing } from "@/types/database"
 
 // ── Types ────────────────────────────────────────────────────────────────────
+
+interface PendingOrder {
+  id: string
+  table_number: number
+  total_cents: number
+  special_notes: string | null
+  created_at: string
+  order_items: Array<{ id: string; quantity: number; special_requests: string | null; menu_items: { name: string } }>
+}
 
 interface KitchenOrder {
   id: string
@@ -49,6 +58,7 @@ interface Props {
   restaurantId: string
   staffName: string
   initialPings: TablePing[]
+  initialPendingOrders: PendingOrder[]
   initialKitchenOrders: KitchenOrder[]
   initialReadyOrders: ReadyOrder[]
   initialTableOrders: TableBillingOrder[]
@@ -75,10 +85,11 @@ const PING_ICON_COLORS: Record<string, string> = {
 
 export function StaffClient({
   restaurantId, staffName,
-  initialPings, initialKitchenOrders, initialReadyOrders, initialTableOrders,
+  initialPings, initialPendingOrders, initialKitchenOrders, initialReadyOrders, initialTableOrders,
   yellowThreshold, redThreshold,
 }: Props) {
   const [pings, setPings] = useState<TablePing[]>(initialPings)
+  const [pendingOrders, setPendingOrders] = useState<PendingOrder[]>(initialPendingOrders)
   const [kitchenOrders, setKitchenOrders] = useState<KitchenOrder[]>(initialKitchenOrders)
   const [readyOrders, setReadyOrders] = useState<ReadyOrder[]>(initialReadyOrders)
   const [tableOrders, setTableOrders] = useState<TableBillingOrder[]>(initialTableOrders)
@@ -96,6 +107,16 @@ export function StaffClient({
       .eq("restaurant_id", restaurantId).eq("status", "pending")
       .order("created_at", { ascending: true })
     if (data) setPings(data)
+  }, [supabase, restaurantId])
+
+  const fetchPendingOrders = useCallback(async () => {
+    const today = new Date().toISOString().split("T")[0]
+    const { data } = await supabase.from("orders")
+      .select("id, table_number, total_cents, special_notes, created_at, order_items(id, quantity, special_requests, menu_items(name))")
+      .eq("restaurant_id", restaurantId).eq("status", "pending")
+      .is("stripe_payment_intent_id", null)
+      .gte("created_at", `${today}T00:00:00`).order("created_at", { ascending: true })
+    if (data) setPendingOrders(data as PendingOrder[])
   }, [supabase, restaurantId])
 
   const fetchKitchenOrders = useCallback(async () => {
@@ -135,12 +156,12 @@ export function StaffClient({
 
     const ordersChannel = supabase.channel(`staff-orders-${restaurantId}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "orders", filter: `restaurant_id=eq.${restaurantId}` }, () => {
-        fetchKitchenOrders(); fetchReadyOrders(); fetchTableOrders()
+        fetchPendingOrders(); fetchKitchenOrders(); fetchReadyOrders(); fetchTableOrders()
       })
       .subscribe()
 
     const interval = setInterval(() => {
-      fetchPings(); fetchKitchenOrders(); fetchReadyOrders(); fetchTableOrders()
+      fetchPings(); fetchPendingOrders(); fetchKitchenOrders(); fetchReadyOrders(); fetchTableOrders()
     }, 5000)
 
     return () => {
@@ -148,7 +169,7 @@ export function StaffClient({
       supabase.removeChannel(ordersChannel)
       clearInterval(interval)
     }
-  }, [supabase, restaurantId, fetchPings, fetchKitchenOrders, fetchReadyOrders, fetchTableOrders])
+  }, [supabase, restaurantId, fetchPings, fetchPendingOrders, fetchKitchenOrders, fetchReadyOrders, fetchTableOrders])
 
   // ── Billing sidebar data ───────────────────────────────────────────────────
 
@@ -221,6 +242,24 @@ export function StaffClient({
     setPings(prev => prev.filter(p => p.id !== pingId))
   }
 
+  async function handleApproveOrder(orderId: string) {
+    setUpdatingId(orderId)
+    const { error } = await updateOrderStatus(orderId, "confirmed")
+    setUpdatingId(null)
+    if (error) { toast({ title: "Kunde inte godkänna beställning", variant: "destructive" }); return }
+    setPendingOrders(prev => prev.filter(o => o.id !== orderId))
+    toast({ title: "Beställning godkänd — skickad till köket" })
+  }
+
+  async function handleRejectOrder(orderId: string) {
+    setUpdatingId(orderId)
+    const { error } = await updateOrderStatus(orderId, "cancelled")
+    setUpdatingId(null)
+    if (error) { toast({ title: "Kunde inte avvisa beställning", variant: "destructive" }); return }
+    setPendingOrders(prev => prev.filter(o => o.id !== orderId))
+    toast({ title: "Beställning avvisad" })
+  }
+
   async function handleMarkPreparing(orderId: string) {
     setUpdatingId(orderId)
     const { error } = await updateOrderStatus(orderId, "preparing")
@@ -265,7 +304,7 @@ export function StaffClient({
     toast({ title: `${itemIds.length} ${itemIds.length === 1 ? "artikel" : "artiklar"} markerad${itemIds.length !== 1 ? "e" : ""} som betald${itemIds.length !== 1 ? "a" : ""}` })
   }
 
-  const hasActivity = pings.length > 0 || kitchenOrders.length > 0 || readyOrders.length > 0
+  const hasActivity = pings.length > 0 || pendingOrders.length > 0 || kitchenOrders.length > 0 || readyOrders.length > 0
 
   // ── Render ─────────────────────────────────────────────────────────────────
 
@@ -281,6 +320,9 @@ export function StaffClient({
           <p className="text-xs text-stone-400">Hej, {staffName}</p>
         </div>
         <div className="ml-auto flex items-center gap-3">
+          {pendingOrders.length > 0 && (
+            <span className="px-2.5 py-1 bg-indigo-500 text-white text-xs font-bold rounded-full animate-pulse">{pendingOrders.length} ny{pendingOrders.length !== 1 ? "a" : ""}</span>
+          )}
           {pings.length > 0 && (
             <span className="px-2.5 py-1 bg-red-500 text-white text-xs font-bold rounded-full">{pings.length} anrop</span>
           )}
@@ -298,6 +340,61 @@ export function StaffClient({
 
         {/* Main content */}
         <div className="flex-1 overflow-y-auto p-4 space-y-6">
+
+          {/* Incoming orders awaiting cashier approval */}
+          {pendingOrders.length > 0 && (
+            <section>
+              <h2 className="text-xs font-semibold text-indigo-500 uppercase tracking-wide mb-3">Nya beställningar</h2>
+              <div className="space-y-2">
+                {pendingOrders.map(order => (
+                  <div key={order.id} className="bg-indigo-50 border border-indigo-200 rounded-xl p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <div>
+                        <p className="font-bold text-stone-800 text-lg">Bord {order.table_number}</p>
+                        <p className="text-xs text-stone-400 mt-0.5">{elapsed(order.created_at)}</p>
+                      </div>
+                      <p className="font-semibold text-stone-700">{formatPrice(order.total_cents)}</p>
+                    </div>
+                    <div className="space-y-1 mb-3">
+                      {order.order_items.map(item => (
+                        <div key={item.id}>
+                          <p className="text-sm text-stone-700">
+                            <span className="font-semibold text-indigo-600">{item.quantity}×</span>{" "}{item.menu_items.name}
+                          </p>
+                          {item.special_requests && (
+                            <p className="text-xs text-indigo-500 italic ml-4">"{item.special_requests}"</p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                    {order.special_notes && (
+                      <p className="text-xs text-indigo-700 bg-indigo-100 border border-indigo-200 rounded-lg px-3 py-1.5 mb-3">
+                        {order.special_notes}
+                      </p>
+                    )}
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleRejectOrder(order.id)}
+                        disabled={updatingId === order.id}
+                        className="flex items-center justify-center gap-1.5 px-4 py-2 bg-white border border-stone-300 text-stone-600 font-medium text-sm rounded-lg hover:bg-stone-50 transition-colors disabled:opacity-50"
+                      >
+                        <X className="h-4 w-4" />
+                        Avvisa
+                      </button>
+                      <button
+                        onClick={() => handleApproveOrder(order.id)}
+                        disabled={updatingId === order.id}
+                        className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-indigo-500 text-white font-semibold text-sm rounded-lg hover:bg-indigo-400 transition-colors disabled:opacity-50"
+                      >
+                        <CheckCircle2 className="h-4 w-4" />
+                        {updatingId === order.id ? "Uppdaterar…" : "Godkänn → kök"}
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
 
           {/* Pings */}
           {pings.length > 0 && (
