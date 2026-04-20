@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
+import OrderFlowAnimation from "@/components/OrderFlowAnimation"
 import {
   UtensilsCrossed,
   QrCode,
@@ -824,7 +825,7 @@ export default function HomePage() {
       <Hero />
       <Stats />
       <Features />
-      <HowItWorks />
+      <OrderFlowAnimation />
       <Pricing />
       <Contact />
       <Footer />
