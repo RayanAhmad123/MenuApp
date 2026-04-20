@@ -823,9 +823,9 @@ export default function HomePage() {
     <div className="font-sans antialiased" style={{ scrollBehavior: "smooth" }}>
       <Nav />
       <Hero />
+      <OrderFlowAnimation />
       <Stats />
       <Features />
-      <OrderFlowAnimation />
       <Pricing />
       <Contact />
       <Footer />
