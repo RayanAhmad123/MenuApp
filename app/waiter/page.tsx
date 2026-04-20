@@ -4,6 +4,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { StaffClient } from "@/components/waiter/waiter-client"
 
 export const metadata: Metadata = { title: "Personalsvy" }
+export const dynamic = 'force-dynamic'
 
 export default async function WaiterPage() {
   const supabase = await createServerSupabaseClient()

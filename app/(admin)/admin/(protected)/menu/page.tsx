@@ -5,6 +5,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { MenuManagementClient } from "@/components/admin/menu-management-client"
 
 export const metadata: Metadata = { title: "Menu Management" }
+export const dynamic = 'force-dynamic'
 
 export default async function MenuPage() {
   const ctx = await getCurrentRestaurant()

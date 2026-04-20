@@ -5,6 +5,7 @@ import { getCurrentRestaurant } from "@/lib/actions/restaurant"
 import { OrdersClient } from "@/components/admin/orders-client"
 
 export const metadata: Metadata = { title: "Orders" }
+export const dynamic = 'force-dynamic'
 
 export default async function OrdersPage() {
   const ctx = await getCurrentRestaurant()

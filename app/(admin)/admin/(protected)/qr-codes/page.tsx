@@ -5,6 +5,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { QrCodesClient } from "@/components/admin/qr-codes-client"
 
 export const metadata: Metadata = { title: "QR Codes" }
+export const dynamic = 'force-dynamic'
 
 export default async function QrCodesPage() {
   const ctx = await getCurrentRestaurant()

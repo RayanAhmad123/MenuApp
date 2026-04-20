@@ -5,6 +5,7 @@ import { getCurrentRestaurant } from "@/lib/actions/restaurant"
 import { StaffClient } from "@/components/admin/staff-client"
 
 export const metadata: Metadata = { title: "Staff" }
+export const dynamic = 'force-dynamic'
 
 export default async function StaffPage() {
   const ctx = await getCurrentRestaurant()

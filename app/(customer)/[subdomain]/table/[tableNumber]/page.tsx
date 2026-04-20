@@ -2,6 +2,8 @@ import { notFound } from "next/navigation"
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { CustomerMenuClient } from "@/components/customer/menu-client"
 
+export const dynamic = 'force-dynamic'
+
 interface PageProps {
   params: {
     subdomain: string
