@@ -35,10 +35,10 @@ function Nav() {
   }, [])
 
   const links = [
-    { label: "Features", href: "#features" },
-    { label: "How It Works", href: "#how-it-works" },
-    { label: "Pricing", href: "#pricing" },
-    { label: "Contact", href: "#contact" },
+    { label: "Funktioner", href: "#features" },
+    { label: "Så här fungerar det", href: "#how-it-works" },
+    { label: "Priser", href: "#pricing" },
+    { label: "Kontakt", href: "#contact" },
   ]
 
   return (
@@ -76,14 +76,14 @@ function Nav() {
           href="#contact"
           className="hidden md:inline-flex items-center gap-1.5 px-4 py-2 bg-amber-500 text-stone-900 text-sm font-semibold rounded-lg hover:bg-amber-400 transition-colors"
         >
-          Get Started <ChevronRight className="h-3.5 w-3.5" />
+          Kom igång <ChevronRight className="h-3.5 w-3.5" />
         </a>
 
         {/* Mobile hamburger */}
         <button
           className="md:hidden text-stone-400 hover:text-stone-50 transition-colors"
           onClick={() => setOpen(!open)}
-          aria-label="Toggle menu"
+          aria-label="Växla meny"
         >
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
@@ -107,7 +107,7 @@ function Nav() {
             onClick={() => setOpen(false)}
             className="mt-3 block text-center px-4 py-2.5 bg-amber-500 text-stone-900 text-sm font-semibold rounded-lg hover:bg-amber-400 transition-colors"
           >
-            Get Started
+            Kom igång
           </a>
         </div>
       )}
@@ -131,23 +131,23 @@ function Hero() {
         <div>
           <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 border border-amber-500/20 rounded-full text-amber-400 text-xs font-medium mb-6">
             <Zap className="h-3 w-3" />
-            No app download required
+            Ingen app att ladda ned
           </div>
           <h1 className="font-serif text-4xl sm:text-5xl xl:text-6xl text-stone-50 font-bold leading-tight mb-5">
-            Turn Every Table Into a{" "}
-            <span className="text-amber-400">Seamless Experience</span>
+            Gör varje bord till en{" "}
+            <span className="text-amber-400">sömlös upplevelse</span>
           </h1>
           <p className="text-stone-400 text-lg leading-relaxed mb-8 max-w-xl">
-            Guests scan a QR code, browse your menu, and order — all from their
-            own phone. Orders land on the kitchen display in real-time. No
-            printers, no shouting, no delays.
+            Gästerna skannar en QR-kod, bläddrar i menyn och beställer — direkt
+            från sin egen telefon. Beställningarna visas på kökets skärm i
+            realtid. Inga skrivare, inget ropande, inga förseningar.
           </p>
           <div className="flex flex-col sm:flex-row gap-3">
             <a
               href="#contact"
               className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-amber-500 text-stone-900 font-semibold rounded-xl hover:bg-amber-400 transition-colors text-sm"
             >
-              Request a Demo <ArrowRight className="h-4 w-4" />
+              Boka en demo <ArrowRight className="h-4 w-4" />
             </a>
             <Link
               href="https://menuapp-amber.vercel.app/admin/login"
@@ -155,7 +155,7 @@ function Hero() {
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-stone-800/60 border border-stone-700/60 text-stone-300 font-semibold rounded-xl hover:bg-stone-700/60 hover:text-stone-100 transition-colors text-sm"
             >
-              See It In Action
+              Se hur det fungerar
             </Link>
           </div>
         </div>
@@ -184,13 +184,13 @@ function Hero() {
                 {/* QR scan indicator */}
                 <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 flex flex-col items-center gap-2">
                   <QrCode className="h-12 w-12 text-amber-400" />
-                  <div className="text-xs text-amber-400/80 font-medium">Table 7 · Scan to order</div>
+                  <div className="text-xs text-amber-400/80 font-medium">Bord 7 · Skanna för att beställa</div>
                 </div>
                 {/* Menu items */}
                 {[
-                  { name: "Truffle Risotto", price: "€18" },
-                  { name: "Burrata Salad", price: "€12" },
-                  { name: "Lamb Chops", price: "€28" },
+                  { name: "Tryffelrisotto", price: "€18" },
+                  { name: "Burratrasallad", price: "€12" },
+                  { name: "Lammkotletter", price: "€28" },
                 ].map((item) => (
                   <div
                     key={item.name}
@@ -205,7 +205,7 @@ function Hero() {
                 ))}
                 {/* CTA */}
                 <div className="rounded-lg bg-amber-500 text-stone-900 text-xs font-bold text-center py-2.5">
-                  Add to Order
+                  Lägg till i beställning
                 </div>
               </div>
             </div>
@@ -213,11 +213,11 @@ function Hero() {
             {/* Floating badge */}
             <div className="absolute -right-4 top-20 bg-stone-800 border border-stone-700 rounded-xl px-3 py-2 shadow-lg flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-              <span className="text-stone-100 text-xs font-medium">Order received</span>
+              <span className="text-stone-100 text-xs font-medium">Beställning mottagen</span>
             </div>
             <div className="absolute -left-6 bottom-24 bg-stone-800 border border-stone-700 rounded-xl px-3 py-2 shadow-lg flex items-center gap-2">
               <MonitorCheck className="h-3.5 w-3.5 text-amber-400" />
-              <span className="text-stone-100 text-xs font-medium">Kitchen notified</span>
+              <span className="text-stone-100 text-xs font-medium">Köket notifierat</span>
             </div>
           </div>
         </div>
@@ -230,10 +230,10 @@ function Hero() {
 
 function Stats() {
   const items = [
-    { icon: Zap, stat: "50ms", label: "Average order delivery to kitchen" },
-    { icon: Smartphone, stat: "0", label: "App downloads required" },
-    { icon: Clock, stat: "<1 day", label: "Average setup time" },
-    { icon: Store, stat: "Any phone", label: "No special hardware needed" },
+    { icon: Zap, stat: "50ms", label: "Genomsnittlig leveranstid till köket" },
+    { icon: Smartphone, stat: "0", label: "Appnedladdningar krävs" },
+    { icon: Clock, stat: "<1 dag", label: "Genomsnittlig uppstartstid" },
+    { icon: Store, stat: "Vilken telefon som helst", label: "Ingen speciell hårdvara behövs" },
   ]
 
   return (
@@ -257,33 +257,33 @@ function Features() {
   const features = [
     {
       icon: QrCode,
-      title: "QR Ordering",
-      desc: "Customers scan, browse, and order without waiting. No app download needed — just a camera.",
+      title: "QR-beställning",
+      desc: "Gästerna skannar, bläddrar och beställer utan att vänta. Ingen app behövs — bara en kamera.",
     },
     {
       icon: MonitorCheck,
-      title: "Live Kitchen Display",
-      desc: "Orders stream to the kitchen in real-time. No paper tickets, no relay mistakes.",
+      title: "Liveskärm för köket",
+      desc: "Beställningar strömmar till köket i realtid. Inga pappersbiljetter, inga missförstånd.",
     },
     {
       icon: BellRing,
-      title: "Waiter Alerts",
-      desc: "Tables ping staff for assistance, payment, or refills. Nothing slips through.",
+      title: "Servitörsnotiser",
+      desc: "Bord kan larma personalen för hjälp, betalning eller påfyllning. Ingenting faller mellan stolarna.",
     },
     {
       icon: LayoutGrid,
-      title: "Menu Management",
-      desc: "Update items, prices, and availability instantly from the admin panel — no developer needed.",
+      title: "Menyhantering",
+      desc: "Uppdatera rätter, priser och tillgänglighet direkt från adminpanelen — ingen utvecklare behövs.",
     },
     {
       icon: Globe,
-      title: "Multi-Location Ready",
-      desc: "One platform for all your venues. Each with its own branding, staff, and analytics.",
+      title: "Flera restauranger",
+      desc: "En plattform för alla dina restauranger. Varje med sin egen profil, personal och statistik.",
     },
     {
       icon: BarChart3,
-      title: "Analytics & Insights",
-      desc: "Track popular items, peak hours, and order trends to make smarter menu decisions.",
+      title: "Statistik & insikter",
+      desc: "Följ populära rätter, rusningstider och beställningstrender för smartare menybeslut.",
     },
   ]
 
@@ -292,14 +292,13 @@ function Features() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-14">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 border border-amber-500/20 rounded-full text-amber-400 text-xs font-medium mb-4">
-            Everything you need
+            Allt du behöver
           </div>
           <h2 className="font-serif text-3xl sm:text-4xl text-stone-50 font-bold mb-4">
-            Built for Modern Restaurants
+            Byggt för moderna restauranger
           </h2>
           <p className="text-stone-400 max-w-xl mx-auto">
-            From the kitchen to the front-of-house, every part of the dining
-            experience is covered.
+            Från köket till gästsalen — varje del av matupplevelsen är täckt.
           </p>
         </div>
 
@@ -328,28 +327,28 @@ function HowItWorks() {
   const steps = [
     {
       n: "01",
-      title: "We set up your digital menu",
-      desc: "Send us your menu and we'll have it live in minutes — or use the admin panel to build it yourself.",
+      title: "Vi sätter upp din digitala meny",
+      desc: "Skicka oss din meny så är den live inom minuter — eller bygg den själv direkt i adminpanelen.",
     },
     {
       n: "02",
-      title: "Print QR codes for each table",
-      desc: "Download print-ready QR codes from your dashboard and place them on tables, stands, or coasters.",
+      title: "Skriv ut QR-koder för varje bord",
+      desc: "Ladda ned utskriftsfärdiga QR-koder från din dashboard och placera dem på borden, ställ eller glasunderlägg.",
     },
     {
       n: "03",
-      title: "Customers scan and order",
-      desc: "Guests open their camera, scan the code, and place orders directly from their phone. No account needed.",
+      title: "Gästerna skannar och beställer",
+      desc: "Gästerna öppnar kameran, skannar koden och lägger beställningar direkt från sin telefon. Inget konto behövs.",
     },
     {
       n: "04",
-      title: "Orders appear on the kitchen display",
-      desc: "Each order lands on the KDS instantly with table number, items, and any modifications.",
+      title: "Beställningar visas på kökets skärm",
+      desc: "Varje beställning visas omedelbart på KDS med bordsnummer, rätter och eventuella önskemål.",
     },
     {
       n: "05",
-      title: "Waiters stay in the loop",
-      desc: "Staff get notified when tables request attention, payment, or refills — in real-time.",
+      title: "Personalen hålls uppdaterad",
+      desc: "Personalen får notiser när bord ber om hjälp, vill betala eller behöver påfyllning — i realtid.",
     },
   ]
 
@@ -358,14 +357,14 @@ function HowItWorks() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-14">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 border border-amber-500/20 rounded-full text-amber-400 text-xs font-medium mb-4">
-            Simple by design
+            Enkelt från grunden
           </div>
           <h2 className="font-serif text-3xl sm:text-4xl text-stone-50 font-bold mb-4">
-            Up and Running in Under a Day
+            Igång på under en dag
           </h2>
           <p className="text-stone-400 max-w-xl mx-auto">
-            No lengthy onboarding. No tech team required. Just a smarter way to
-            run your restaurant floor.
+            Ingen lång introduktion. Inget teknikteam krävs. Bara ett smartare
+            sätt att driva din restaurang.
           </p>
         </div>
 
@@ -397,47 +396,47 @@ function HowItWorks() {
 function Pricing() {
   const tiers = [
     {
-      name: "Starter",
+      name: "Startpaketet",
       price: "€49",
-      period: "/mo",
-      desc: "Perfect for single-location restaurants just getting started.",
+      period: "/mån",
+      desc: "Perfekt för restauranger med ett ställe som precis kommit igång.",
       features: [
-        "1 location",
-        "Up to 20 tables",
-        "QR ordering",
-        "Kitchen display",
-        "Basic analytics",
-        "Email support",
+        "1 restaurang",
+        "Upp till 20 bord",
+        "QR-beställning",
+        "Kökets skärm",
+        "Grundläggande statistik",
+        "E-postsupport",
       ],
       highlight: false,
     },
     {
-      name: "Growth",
+      name: "Tillväxtpaketet",
       price: "€99",
-      period: "/mo",
-      desc: "For growing restaurants that need more power and locations.",
+      period: "/mån",
+      desc: "För växande restauranger som behöver mer kraft och fler platser.",
       features: [
-        "3 locations",
-        "Unlimited tables",
-        "QR ordering",
-        "Kitchen display",
-        "Advanced analytics",
-        "Priority support",
+        "3 restauranger",
+        "Obegränsat antal bord",
+        "QR-beställning",
+        "Kökets skärm",
+        "Avancerad statistik",
+        "Prioriterad support",
       ],
       highlight: true,
     },
     {
-      name: "Enterprise",
-      price: "Custom",
+      name: "Företagspaketet",
+      price: "Offert",
       period: "",
-      desc: "For groups and chains that need full control and dedicated care.",
+      desc: "För kedjor och grupper som behöver full kontroll och dedikerad support.",
       features: [
-        "Unlimited locations",
-        "White-label branding",
-        "Custom integrations",
-        "Dedicated support",
-        "SLA guarantee",
-        "Onboarding assistance",
+        "Obegränsat antal restauranger",
+        "White-label-varumärke",
+        "Anpassade integrationer",
+        "Dedikerad support",
+        "SLA-garanti",
+        "Onboardinghjälp",
       ],
       highlight: false,
     },
@@ -448,14 +447,14 @@ function Pricing() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-14">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 border border-amber-500/20 rounded-full text-amber-400 text-xs font-medium mb-4">
-            Transparent pricing
+            Tydlig prissättning
           </div>
           <h2 className="font-serif text-3xl sm:text-4xl text-stone-50 font-bold mb-4">
-            Simple, Honest Pricing
+            Enkla, ärliga priser
           </h2>
           <p className="text-stone-400 max-w-xl mx-auto">
-            No hidden fees. No per-order commissions. Pay a flat monthly rate and
-            keep every euro your restaurant earns.
+            Inga dolda avgifter. Inga provisioner per beställning. Betala en fast
+            månadskostnad och behåll varje krona din restaurang tjänar.
           </p>
         </div>
 
@@ -471,7 +470,7 @@ function Pricing() {
             >
               {highlight && (
                 <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-stone-900 border border-amber-500/40 text-amber-400 text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap">
-                  Most Popular
+                  Mest populär
                 </div>
               )}
               <div className="mb-5">
@@ -536,7 +535,7 @@ function Pricing() {
                     : "bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500/20"
                 }`}
               >
-                Contact Us
+                Kontakta oss
               </a>
             </div>
           ))}
@@ -574,14 +573,14 @@ function Contact() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 border border-amber-500/20 rounded-full text-amber-400 text-xs font-medium mb-4">
-            Get in touch
+            Hör av dig
           </div>
           <h2 className="font-serif text-3xl sm:text-4xl text-stone-50 font-bold mb-4">
-            Ready to Upgrade Your Restaurant?
+            Redo att uppgradera din restaurang?
           </h2>
           <p className="text-stone-400 max-w-xl mx-auto">
-            Tell us a bit about your restaurant and we'll get back to you within
-            24 hours to set up a personalised demo.
+            Berätta lite om din restaurang så återkommer vi inom 24 timmar för
+            att boka en personlig demo.
           </p>
         </div>
 
@@ -594,11 +593,10 @@ function Contact() {
                   <CheckCircle2 className="h-7 w-7 text-amber-400" />
                 </div>
                 <h3 className="font-serif text-2xl text-stone-50 font-semibold">
-                  Message Sent!
+                  Meddelande skickat!
                 </h3>
                 <p className="text-stone-400 max-w-xs">
-                  Thanks for reaching out. We'll get back to you within 24
-                  hours.
+                  Tack för att du hörde av dig. Vi återkommer inom 24 timmar.
                 </p>
                 <button
                   onClick={() => {
@@ -613,7 +611,7 @@ function Contact() {
                   }}
                   className="text-amber-400 text-sm hover:underline"
                 >
-                  Send another message
+                  Skicka ett nytt meddelande
                 </button>
               </div>
             ) : (
@@ -621,7 +619,7 @@ function Contact() {
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-stone-400 text-xs font-medium mb-1.5">
-                      Your Name *
+                      Namn *
                     </label>
                     <input
                       type="text"
@@ -629,13 +627,13 @@ function Contact() {
                       required
                       value={form.name}
                       onChange={handleChange}
-                      placeholder="Jane Smith"
+                      placeholder="Anna Lindqvist"
                       className="w-full bg-stone-800/60 border border-stone-700/60 rounded-xl px-4 py-2.5 text-stone-100 text-sm placeholder-stone-600 focus:outline-none focus:border-amber-500/60 focus:ring-1 focus:ring-amber-500/30 transition-colors"
                     />
                   </div>
                   <div>
                     <label className="block text-stone-400 text-xs font-medium mb-1.5">
-                      Restaurant Name *
+                      Restaurangens namn *
                     </label>
                     <input
                       type="text"
@@ -651,7 +649,7 @@ function Contact() {
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-stone-400 text-xs font-medium mb-1.5">
-                      Email Address *
+                      E-postadress *
                     </label>
                     <input
                       type="email"
@@ -659,35 +657,35 @@ function Contact() {
                       required
                       value={form.email}
                       onChange={handleChange}
-                      placeholder="jane@restaurant.com"
+                      placeholder="anna@restaurang.se"
                       className="w-full bg-stone-800/60 border border-stone-700/60 rounded-xl px-4 py-2.5 text-stone-100 text-sm placeholder-stone-600 focus:outline-none focus:border-amber-500/60 focus:ring-1 focus:ring-amber-500/30 transition-colors"
                     />
                   </div>
                   <div>
                     <label className="block text-stone-400 text-xs font-medium mb-1.5">
-                      Phone{" "}
-                      <span className="text-stone-600">(optional)</span>
+                      Telefon{" "}
+                      <span className="text-stone-600">(valfritt)</span>
                     </label>
                     <input
                       type="tel"
                       name="phone"
                       value={form.phone}
                       onChange={handleChange}
-                      placeholder="+1 555 000 0000"
+                      placeholder="+46 70 000 00 00"
                       className="w-full bg-stone-800/60 border border-stone-700/60 rounded-xl px-4 py-2.5 text-stone-100 text-sm placeholder-stone-600 focus:outline-none focus:border-amber-500/60 focus:ring-1 focus:ring-amber-500/30 transition-colors"
                     />
                   </div>
                 </div>
                 <div>
                   <label className="block text-stone-400 text-xs font-medium mb-1.5">
-                    Message / Notes
+                    Meddelande / Övrigt
                   </label>
                   <textarea
                     name="message"
                     value={form.message}
                     onChange={handleChange}
                     rows={4}
-                    placeholder="Tell us about your restaurant — number of tables, locations, anything specific you need..."
+                    placeholder="Berätta om din restaurang — antal bord, platser, specifika behov..."
                     className="w-full bg-stone-800/60 border border-stone-700/60 rounded-xl px-4 py-2.5 text-stone-100 text-sm placeholder-stone-600 focus:outline-none focus:border-amber-500/60 focus:ring-1 focus:ring-amber-500/30 transition-colors resize-none"
                   />
                 </div>
@@ -695,7 +693,7 @@ function Contact() {
                   type="submit"
                   className="w-full py-3 bg-amber-500 text-stone-900 font-semibold rounded-xl hover:bg-amber-400 transition-colors text-sm flex items-center justify-center gap-2"
                 >
-                  Send Message <ArrowRight className="h-4 w-4" />
+                  Skicka meddelande <ArrowRight className="h-4 w-4" />
                 </button>
               </form>
             )}
@@ -707,7 +705,7 @@ function Contact() {
               <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center mb-4">
                 <Mail className="h-5 w-5 text-amber-400" />
               </div>
-              <h3 className="text-stone-100 font-semibold mb-1">Email us directly</h3>
+              <h3 className="text-stone-100 font-semibold mb-1">Maila oss direkt</h3>
               <a
                 href="mailto:menu@hirly.app"
                 className="text-amber-400 text-sm hover:underline"
@@ -715,20 +713,20 @@ function Contact() {
                 menu@hirly.app
               </a>
               <p className="text-stone-500 text-xs mt-2">
-                We respond within 24 hours.
+                Vi svarar inom 24 timmar.
               </p>
             </div>
             <div className="bg-stone-900/60 border border-stone-800/60 rounded-2xl p-6">
               <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center mb-4">
                 <CheckCircle2 className="h-5 w-5 text-amber-400" />
               </div>
-              <h3 className="text-stone-100 font-semibold mb-2">What to expect</h3>
+              <h3 className="text-stone-100 font-semibold mb-2">Vad händer sedan?</h3>
               <ul className="space-y-2">
                 {[
-                  "Quick discovery call (15 min)",
-                  "Live demo of your digital menu",
-                  "Custom pricing for your setup",
-                  "Go live within the day",
+                  "Kort introduktionssamtal (15 min)",
+                  "Live-demo av din digitala meny",
+                  "Anpassat prisförslag för ditt upplägg",
+                  "Lansering redan samma dag",
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-2 text-sm text-stone-400">
                     <ChevronRight className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
@@ -760,19 +758,19 @@ function Footer() {
               <span className="font-serif text-xl text-stone-50 font-semibold">MenuApp</span>
             </div>
             <p className="text-stone-500 text-sm max-w-xs">
-              The premium QR ordering platform for modern restaurants. No app
-              download, no friction — just great dining.
+              Den ledande QR-beställningsplattformen för moderna restauranger.
+              Ingen app, ingen friktion — bara en fantastisk matupplevelse.
             </p>
           </div>
 
           {/* Links */}
           <div>
-            <h4 className="text-stone-300 text-sm font-semibold mb-3">Product</h4>
+            <h4 className="text-stone-300 text-sm font-semibold mb-3">Produkt</h4>
             <ul className="space-y-2">
               {[
-                { label: "Features", href: "#features" },
-                { label: "Pricing", href: "#pricing" },
-                { label: "Contact", href: "#contact" },
+                { label: "Funktioner", href: "#features" },
+                { label: "Priser", href: "#pricing" },
+                { label: "Kontakt", href: "#contact" },
               ].map(({ label, href }) => (
                 <li key={label}>
                   <a
@@ -787,14 +785,14 @@ function Footer() {
           </div>
 
           <div>
-            <h4 className="text-stone-300 text-sm font-semibold mb-3">Legal</h4>
+            <h4 className="text-stone-300 text-sm font-semibold mb-3">Juridiskt</h4>
             <ul className="space-y-2">
               <li>
                 <a
                   href="#"
                   className="text-stone-500 text-sm hover:text-amber-400 transition-colors"
                 >
-                  Privacy Policy
+                  Integritetspolicy
                 </a>
               </li>
               <li>
@@ -810,7 +808,7 @@ function Footer() {
         </div>
 
         <div className="border-t border-stone-800/60 pt-6 text-center text-stone-600 text-xs">
-          © 2025 MenuApp. All rights reserved.
+          © 2025 MenuApp. Alla rättigheter förbehållna.
         </div>
       </div>
     </footer>
