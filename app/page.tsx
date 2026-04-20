@@ -189,9 +189,9 @@ function Hero() {
                 </div>
                 {/* Menu items */}
                 {[
-                  { name: "Tryffelrisotto", price: "€18" },
-                  { name: "Burratrasallad", price: "€12" },
-                  { name: "Lammkotletter", price: "€28" },
+                  { name: "Tryffelrisotto", price: "199 kr" },
+                  { name: "Burratrasallad", price: "129 kr" },
+                  { name: "Lammkotletter", price: "299 kr" },
                 ].map((item) => (
                   <div
                     key={item.name}
@@ -398,7 +398,7 @@ function Pricing() {
   const tiers = [
     {
       name: "Startpaketet",
-      price: "€49",
+      price: "549 kr",
       period: "/mån",
       desc: "Perfekt för restauranger med ett ställe som precis kommit igång.",
       features: [
@@ -413,7 +413,7 @@ function Pricing() {
     },
     {
       name: "Tillväxtpaketet",
-      price: "€99",
+      price: "999 kr",
       period: "/mån",
       desc: "För växande restauranger som behöver mer kraft och fler platser.",
       features: [
