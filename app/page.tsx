@@ -1,8 +1,8 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
-import OrderFlowAnimation from "@/components/OrderFlowAnimation"
+import ScrollStory from "@/components/ScrollStory"
 import {
   UtensilsCrossed,
   QrCode,
@@ -37,7 +37,7 @@ function Nav() {
 
   const links = [
     { label: "Funktioner", href: "#features" },
-    { label: "Så här fungerar det", href: "#how-it-works" },
+    { label: "Så fungerar det", href: "#how-it-works" },
     { label: "Priser", href: "#pricing" },
     { label: "Kontakt", href: "#contact" },
   ]
@@ -46,43 +46,41 @@ function Nav() {
     <header
       className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
         scrolled
-          ? "bg-white/90 backdrop-blur-md border-b border-stone-200 shadow-sm"
+          ? "bg-stone-50/80 backdrop-blur-md border-b border-stone-200/80"
           : "bg-transparent"
       }`}
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-        {/* Logo */}
         <a href="#" className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-amber-500 flex items-center justify-center shrink-0">
-            <UtensilsCrossed className="h-4 w-4 text-stone-900" />
+          <div className="w-8 h-8 rounded-lg bg-stone-950 flex items-center justify-center shrink-0">
+            <UtensilsCrossed className="h-4 w-4 text-amber-400" />
           </div>
-          <span className="font-serif text-xl text-stone-900 font-semibold">MenuApp</span>
+          <span className="font-serif text-xl text-stone-950 font-bold tracking-tight">
+            MenuApp
+          </span>
         </a>
 
-        {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-6">
+        <nav className="hidden md:flex items-center gap-7">
           {links.map((l) => (
             <a
               key={l.href}
               href={l.href}
-              className="text-sm text-stone-500 hover:text-stone-900 transition-colors"
+              className="text-sm text-stone-600 hover:text-stone-950 transition-colors"
             >
               {l.label}
             </a>
           ))}
         </nav>
 
-        {/* Desktop CTA */}
         <a
           href="#contact"
-          className="hidden md:inline-flex items-center gap-1.5 px-4 py-2 bg-amber-500 text-stone-900 text-sm font-semibold rounded-lg hover:bg-amber-400 transition-colors"
+          className="hidden md:inline-flex items-center gap-1.5 px-4 py-2 bg-stone-950 text-white text-sm font-semibold rounded-full hover:bg-stone-800 transition-colors"
         >
-          Kom igång <ChevronRight className="h-3.5 w-3.5" />
+          Boka demo <ChevronRight className="h-3.5 w-3.5" />
         </a>
 
-        {/* Mobile hamburger */}
         <button
-          className="md:hidden text-stone-500 hover:text-stone-900 transition-colors"
+          className="md:hidden text-stone-950"
           onClick={() => setOpen(!open)}
           aria-label="Växla meny"
         >
@@ -90,15 +88,14 @@ function Nav() {
         </button>
       </div>
 
-      {/* Mobile drawer */}
       {open && (
-        <div className="md:hidden bg-white border-b border-stone-200 px-4 pb-5 pt-2">
+        <div className="md:hidden bg-stone-50 border-b border-stone-200 px-4 pb-5 pt-2">
           {links.map((l) => (
             <a
               key={l.href}
               href={l.href}
               onClick={() => setOpen(false)}
-              className="block py-2.5 text-stone-600 hover:text-amber-500 transition-colors text-sm font-medium"
+              className="block py-2.5 text-stone-700 hover:text-amber-600 transition-colors text-sm font-medium"
             >
               {l.label}
             </a>
@@ -106,9 +103,9 @@ function Nav() {
           <a
             href="#contact"
             onClick={() => setOpen(false)}
-            className="mt-3 block text-center px-4 py-2.5 bg-amber-500 text-stone-900 text-sm font-semibold rounded-lg hover:bg-amber-400 transition-colors"
+            className="mt-3 block text-center px-4 py-2.5 bg-stone-950 text-white text-sm font-semibold rounded-full"
           >
-            Kom igång
+            Boka demo
           </a>
         </div>
       )}
@@ -120,109 +117,71 @@ function Nav() {
 
 function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
-      {/* Background */}
-      <div className="absolute inset-0 bg-white">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[600px] bg-amber-500/8 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-amber-600/4 rounded-full blur-3xl pointer-events-none" />
-      </div>
+    <section className="relative min-h-screen flex items-center bg-stone-50 overflow-hidden pt-16">
+      <div
+        className="absolute inset-0 opacity-[0.04] pointer-events-none"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle, #1c1917 1px, transparent 1px)",
+          backgroundSize: "26px 26px",
+        }}
+      />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[900px] h-[560px] bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-20 grid lg:grid-cols-2 gap-14 items-center">
-        {/* Copy */}
-        <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 border border-amber-500/20 rounded-full text-amber-500 text-xs font-medium mb-6">
-            <Zap className="h-3 w-3" />
-            Ingen app att ladda ned
-          </div>
-          <h1 className="font-serif text-4xl sm:text-5xl xl:text-6xl text-stone-900 font-bold leading-tight mb-5">
-            Gör varje bord till en{" "}
-            <span className="text-amber-500">sömlös upplevelse</span>
-          </h1>
-          <p className="text-stone-600 text-lg leading-relaxed mb-8 max-w-xl">
-            Gästerna skannar en QR-kod, bläddrar i menyn och beställer — direkt
-            från sin egen telefon. Beställningarna visas på kökets skärm i
-            realtid. Inga skrivare, inget ropande, inga förseningar.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <a
-              href="#contact"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-amber-500 text-stone-900 font-semibold rounded-xl hover:bg-amber-400 transition-colors text-sm"
-            >
-              Boka en demo <ArrowRight className="h-4 w-4" />
-            </a>
-            <Link
-              href="https://menuapp-amber.vercel.app/admin/login"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-stone-100 border border-stone-200 text-stone-700 font-semibold rounded-xl hover:bg-stone-200 hover:text-stone-900 transition-colors text-sm"
-            >
-              Se hur det fungerar
-            </Link>
-          </div>
+      <div className="relative max-w-5xl mx-auto px-4 sm:px-6 py-20 text-center">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-stone-200 rounded-full text-stone-700 text-xs font-medium mb-8 shadow-sm">
+          <span className="relative flex h-1.5 w-1.5">
+            <span className="absolute inline-flex h-full w-full rounded-full bg-amber-500 opacity-60 animate-ping" />
+            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-500" />
+          </span>
+          QR-beställning för moderna restauranger
         </div>
 
-        {/* Illustration card */}
-        <div className="flex justify-center lg:justify-end">
-          <div className="relative w-72 sm:w-80">
-            {/* Phone shell — keep dark, it's a phone screen */}
-            <div className="rounded-[2.5rem] bg-stone-900 border-2 border-stone-700 shadow-2xl overflow-hidden">
-              {/* Status bar */}
-              <div className="h-8 bg-stone-800 flex items-center justify-center">
-                <div className="w-24 h-4 rounded-full bg-stone-700" />
-              </div>
-              {/* Screen content */}
-              <div className="bg-stone-950 p-5 space-y-4">
-                {/* Header */}
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center">
-                    <UtensilsCrossed className="h-4 w-4 text-amber-400" />
-                  </div>
-                  <div>
-                    <div className="h-2.5 w-20 bg-stone-700 rounded" />
-                    <div className="h-2 w-14 bg-stone-800 rounded mt-1" />
-                  </div>
-                </div>
-                {/* QR scan indicator */}
-                <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 flex flex-col items-center gap-2">
-                  <QrCode className="h-12 w-12 text-amber-400" />
-                  <div className="text-xs text-amber-400/80 font-medium">Bord 7 · Skanna för att beställa</div>
-                </div>
-                {/* Menu items */}
-                {[
-                  { name: "Tryffelrisotto", price: "199 kr" },
-                  { name: "Burratrasallad", price: "129 kr" },
-                  { name: "Lammkotletter", price: "299 kr" },
-                ].map((item) => (
-                  <div
-                    key={item.name}
-                    className="flex items-center justify-between py-2 border-b border-stone-800/60 last:border-0"
-                  >
-                    <div>
-                      <div className="h-2.5 w-28 bg-stone-600 rounded" />
-                      <div className="h-2 w-16 bg-stone-800 rounded mt-1" />
-                    </div>
-                    <div className="text-xs font-semibold text-amber-400">{item.price}</div>
-                  </div>
-                ))}
-                {/* CTA */}
-                <div className="rounded-lg bg-amber-500 text-stone-900 text-xs font-bold text-center py-2.5">
-                  Lägg till i beställning
-                </div>
-              </div>
-            </div>
+        <h1 className="font-serif text-[2.75rem] sm:text-6xl lg:text-7xl xl:text-8xl text-stone-950 font-bold leading-[0.95] tracking-tight mb-6">
+          Menyn i fickan.
+          <br />
+          <span className="italic text-amber-500 font-semibold">Köket</span> i
+          realtid.
+        </h1>
 
-            {/* Floating badges */}
-            <div className="absolute -right-4 top-20 bg-white border border-stone-200 rounded-xl px-3 py-2 shadow-md flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-              <span className="text-stone-800 text-xs font-medium">Beställning mottagen</span>
-            </div>
-            <div className="absolute -left-6 bottom-24 bg-white border border-stone-200 rounded-xl px-3 py-2 shadow-md flex items-center gap-2">
-              <MonitorCheck className="h-3.5 w-3.5 text-amber-500" />
-              <span className="text-stone-800 text-xs font-medium">Köket notifierat</span>
-            </div>
+        <p className="text-stone-600 text-lg sm:text-xl leading-relaxed max-w-2xl mx-auto mb-10">
+          Gästen skannar en QR-kod och beställer från sin mobil. Beställningen
+          går direkt till kökets skärm — inga skrivare, inget ropande, inga
+          förseningar.
+        </p>
+
+        <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+          <a
+            href="#contact"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-stone-950 text-white font-semibold rounded-full hover:bg-stone-800 transition-colors text-sm"
+          >
+            Boka en demo <ArrowRight className="h-4 w-4" />
+          </a>
+          <a
+            href="#how-it-works"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-white border border-stone-200 text-stone-950 font-semibold rounded-full hover:border-stone-300 transition-colors text-sm shadow-sm"
+          >
+            Se hur det fungerar
+          </a>
+        </div>
+
+        {/* Scroll cue */}
+        <div className="mt-24 flex flex-col items-center gap-3 text-stone-400">
+          <span className="text-[10px] uppercase tracking-[0.25em] font-semibold">
+            Scrolla
+          </span>
+          <div className="relative w-px h-12 bg-stone-200 overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-4 bg-gradient-to-b from-amber-500 to-transparent animate-[scrollcue_1.8s_ease-in-out_infinite]" />
           </div>
         </div>
       </div>
+
+      <style>{`
+        @keyframes scrollcue {
+          0% { transform: translateY(-100%); }
+          100% { transform: translateY(300%); }
+        }
+      `}</style>
     </section>
   )
 }
@@ -231,20 +190,23 @@ function Hero() {
 
 function Stats() {
   const items = [
-    { icon: Zap, stat: "50ms", label: "Genomsnittlig leveranstid till köket" },
-    { icon: Smartphone, stat: "0", label: "Appnedladdningar krävs" },
-    { icon: Clock, stat: "<1 dag", label: "Genomsnittlig uppstartstid" },
-    { icon: Store, stat: "Vilken telefon som helst", label: "Ingen speciell hårdvara behövs" },
+    { icon: Zap, stat: "50ms", label: "Till köket" },
+    { icon: Smartphone, stat: "0", label: "Appar att ladda ner" },
+    { icon: Clock, stat: "<1 dag", label: "Att komma igång" },
+    { icon: Store, stat: "∞", label: "Restauranger i en panel" },
   ]
 
   return (
-    <section className="bg-amber-500">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 grid grid-cols-2 lg:grid-cols-4 gap-8">
+    <section className="relative bg-stone-950 overflow-hidden">
+      <div className="absolute top-0 left-1/4 w-[500px] h-[300px] bg-amber-500/20 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-16 grid grid-cols-2 lg:grid-cols-4 gap-8">
         {items.map(({ icon: Icon, stat, label }) => (
-          <div key={stat} className="flex flex-col items-center text-center gap-1">
-            <Icon className="h-5 w-5 text-stone-900/60 mb-1" />
-            <div className="font-serif text-3xl font-bold text-stone-900">{stat}</div>
-            <div className="text-stone-800 text-sm">{label}</div>
+          <div key={label} className="flex flex-col gap-2">
+            <Icon className="h-4 w-4 text-amber-400" />
+            <div className="font-serif text-4xl sm:text-5xl font-bold text-white tracking-tight">
+              {stat}
+            </div>
+            <div className="text-stone-400 text-sm">{label}</div>
           </div>
         ))}
       </div>
@@ -259,7 +221,7 @@ function Features() {
     {
       icon: QrCode,
       title: "QR-beställning",
-      desc: "Gästerna skannar, bläddrar och beställer utan att vänta. Ingen app behövs — bara en kamera.",
+      desc: "Gästerna skannar, bläddrar och beställer utan att vänta. Ingen app, bara en kamera.",
     },
     {
       icon: MonitorCheck,
@@ -269,50 +231,52 @@ function Features() {
     {
       icon: BellRing,
       title: "Servitörsnotiser",
-      desc: "Bord kan larma personalen för hjälp, betalning eller påfyllning. Ingenting faller mellan stolarna.",
+      desc: "Bord kan larma personalen för hjälp, betalning eller påfyllning. Inget faller mellan stolarna.",
     },
     {
       icon: LayoutGrid,
       title: "Menyhantering",
-      desc: "Uppdatera rätter, priser och tillgänglighet direkt från adminpanelen — ingen utvecklare behövs.",
+      desc: "Uppdatera rätter, priser och tillgänglighet från adminpanelen — ingen utvecklare behövs.",
     },
     {
       icon: Globe,
       title: "Flera restauranger",
-      desc: "En plattform för alla dina restauranger. Varje med sin egen profil, personal och statistik.",
+      desc: "En plattform för alla dina restauranger. Varje med egen profil, personal och statistik.",
     },
     {
       icon: BarChart3,
       title: "Statistik & insikter",
-      desc: "Följ populära rätter, rusningstider och beställningstrender för smartare menybeslut.",
+      desc: "Följ populära rätter, rusningstider och beställningstrender för smartare beslut.",
     },
   ]
 
   return (
-    <section id="features" className="bg-white py-24">
+    <section id="features" className="bg-stone-50 py-24 sm:py-32">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-14">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 border border-amber-500/20 rounded-full text-amber-500 text-xs font-medium mb-4">
-            Allt du behöver
+        <div className="max-w-2xl mb-14">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-stone-200 rounded-full text-stone-700 text-[10px] font-bold uppercase tracking-widest mb-5 shadow-sm">
+            Funktioner
           </div>
-          <h2 className="font-serif text-3xl sm:text-4xl text-stone-900 font-bold mb-4">
-            Byggt för moderna restauranger
+          <h2 className="font-serif text-4xl sm:text-5xl text-stone-950 font-bold tracking-tight leading-[1.05] mb-4">
+            Allt du behöver. <span className="italic text-amber-500">Inget du inte.</span>
           </h2>
-          <p className="text-stone-600 max-w-xl mx-auto">
+          <p className="text-stone-600 text-lg leading-relaxed">
             Från köket till gästsalen — varje del av matupplevelsen är täckt.
           </p>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {features.map(({ icon: Icon, title, desc }) => (
             <div
               key={title}
-              className="bg-white border border-stone-200 rounded-2xl p-6 shadow-sm hover:border-amber-500/40 hover:shadow-md transition-all group"
+              className="group bg-white border border-stone-200 rounded-2xl p-6 hover:border-stone-300 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
             >
-              <div className="w-11 h-11 rounded-xl bg-amber-500/10 flex items-center justify-center mb-4 group-hover:bg-amber-500/20 transition-colors">
-                <Icon className="h-5 w-5 text-amber-500" />
+              <div className="w-10 h-10 rounded-xl bg-stone-950 flex items-center justify-center mb-5 group-hover:bg-amber-500 transition-colors">
+                <Icon className="h-5 w-5 text-amber-400 group-hover:text-stone-950 transition-colors" />
               </div>
-              <h3 className="text-stone-900 font-semibold text-lg mb-2">{title}</h3>
+              <h3 className="text-stone-950 font-semibold text-base mb-2">
+                {title}
+              </h3>
               <p className="text-stone-600 text-sm leading-relaxed">{desc}</p>
             </div>
           ))}
@@ -327,103 +291,100 @@ function Features() {
 function Pricing() {
   const tiers = [
     {
-      name: "Startpaketet",
-      price: "549 kr",
-      period: "/mån",
-      desc: "Perfekt för restauranger med ett ställe som precis kommit igång.",
+      name: "Start",
+      price: "549",
+      period: "kr/mån",
+      desc: "Perfekt för restauranger med ett ställe.",
       features: [
         "1 restaurang",
         "Upp till 20 bord",
         "QR-beställning",
         "Kökets skärm",
-        "Grundläggande statistik",
         "E-postsupport",
       ],
       highlight: false,
     },
     {
-      name: "Tillväxtpaketet",
-      price: "999 kr",
-      period: "/mån",
-      desc: "För växande restauranger som behöver mer kraft och fler platser.",
+      name: "Tillväxt",
+      price: "999",
+      period: "kr/mån",
+      desc: "För växande restauranger med fler platser.",
       features: [
         "3 restauranger",
         "Obegränsat antal bord",
-        "QR-beställning",
-        "Kökets skärm",
+        "Allt i Start",
         "Avancerad statistik",
         "Prioriterad support",
       ],
       highlight: true,
     },
     {
-      name: "Företagspaketet",
+      name: "Företag",
       price: "Offert",
       period: "",
-      desc: "För kedjor och grupper som behöver full kontroll och dedikerad support.",
+      desc: "För kedjor och grupper som behöver mer.",
       features: [
         "Obegränsat antal restauranger",
-        "White-label-varumärke",
+        "White-label",
         "Anpassade integrationer",
         "Dedikerad support",
         "SLA-garanti",
-        "Onboardinghjälp",
       ],
       highlight: false,
     },
   ]
 
   return (
-    <section id="pricing" className="bg-white py-24">
+    <section id="pricing" className="bg-white py-24 sm:py-32 border-y border-stone-200">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-14">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 border border-amber-500/20 rounded-full text-amber-500 text-xs font-medium mb-4">
-            Tydlig prissättning
+        <div className="max-w-2xl mx-auto text-center mb-14">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-stone-50 border border-stone-200 rounded-full text-stone-700 text-[10px] font-bold uppercase tracking-widest mb-5">
+            Priser
           </div>
-          <h2 className="font-serif text-3xl sm:text-4xl text-stone-900 font-bold mb-4">
-            Enkla, ärliga priser
+          <h2 className="font-serif text-4xl sm:text-5xl text-stone-950 font-bold tracking-tight leading-[1.05] mb-4">
+            Enkla, ärliga priser.
           </h2>
-          <p className="text-stone-600 max-w-xl mx-auto">
-            Inga dolda avgifter. Inga provisioner per beställning. Betala en fast
-            månadskostnad och behåll varje krona din restaurang tjänar.
+          <p className="text-stone-600 text-lg leading-relaxed">
+            Inga dolda avgifter. Inga provisioner per beställning. En fast
+            månadskostnad — behåll varje krona du tjänar.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-3 gap-4 max-w-5xl mx-auto">
           {tiers.map(({ name, price, period, desc, features, highlight }) => (
             <div
               key={name}
-              className={`relative rounded-2xl p-7 flex flex-col border transition-all ${
+              className={`relative rounded-3xl p-7 flex flex-col transition-all ${
                 highlight
-                  ? "bg-amber-500 border-amber-400 shadow-xl shadow-amber-500/20 scale-[1.02]"
-                  : "bg-white border-stone-200 shadow-sm"
+                  ? "bg-stone-950 text-white lg:scale-[1.04] shadow-2xl shadow-stone-950/20"
+                  : "bg-stone-50 border border-stone-200"
               }`}
             >
               {highlight && (
-                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-white border border-amber-500/40 text-amber-500 text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-500 text-stone-950 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
                   Mest populär
                 </div>
               )}
-              <div className="mb-5">
+              <div className="mb-6">
                 <div
-                  className={`text-sm font-semibold mb-1 ${
-                    highlight ? "text-stone-900" : "text-amber-500"
+                  className={`text-xs font-bold uppercase tracking-widest mb-3 ${
+                    highlight ? "text-amber-400" : "text-stone-500"
                   }`}
                 >
                   {name}
                 </div>
-                <div className="flex items-end gap-1 mb-2">
+                <div className="flex items-baseline gap-1 mb-3">
                   <span
-                    className={`font-serif text-4xl font-bold ${
-                      highlight ? "text-stone-900" : "text-stone-900"
+                    className={`font-serif text-5xl font-bold ${
+                      highlight ? "text-white" : "text-stone-950"
                     }`}
                   >
                     {price}
                   </span>
                   {period && (
                     <span
-                      className={`text-sm mb-1.5 ${
-                        highlight ? "text-stone-800" : "text-stone-500"
+                      className={`text-sm ${
+                        highlight ? "text-stone-400" : "text-stone-500"
                       }`}
                     >
                       {period}
@@ -432,7 +393,7 @@ function Pricing() {
                 </div>
                 <p
                   className={`text-sm ${
-                    highlight ? "text-stone-800" : "text-stone-600"
+                    highlight ? "text-stone-300" : "text-stone-600"
                   }`}
                 >
                   {desc}
@@ -441,15 +402,15 @@ function Pricing() {
 
               <ul className="space-y-2.5 mb-7 flex-1">
                 {features.map((f) => (
-                  <li key={f} className="flex items-center gap-2">
+                  <li key={f} className="flex items-start gap-2.5">
                     <CheckCircle2
-                      className={`h-4 w-4 shrink-0 ${
-                        highlight ? "text-stone-900" : "text-amber-500"
+                      className={`h-4 w-4 shrink-0 mt-0.5 ${
+                        highlight ? "text-amber-400" : "text-amber-500"
                       }`}
                     />
                     <span
                       className={`text-sm ${
-                        highlight ? "text-stone-900" : "text-stone-700"
+                        highlight ? "text-stone-200" : "text-stone-700"
                       }`}
                     >
                       {f}
@@ -460,10 +421,10 @@ function Pricing() {
 
               <a
                 href="#contact"
-                className={`block text-center py-3 rounded-xl font-semibold text-sm transition-colors ${
+                className={`block text-center py-3 rounded-full font-semibold text-sm transition-colors ${
                   highlight
-                    ? "bg-stone-900 text-amber-400 hover:bg-stone-800"
-                    : "bg-amber-500/10 border border-amber-500/30 text-amber-500 hover:bg-amber-500/20"
+                    ? "bg-amber-500 text-stone-950 hover:bg-amber-400"
+                    : "bg-stone-950 text-white hover:bg-stone-800"
                 }`}
               >
                 Kontakta oss
@@ -500,30 +461,28 @@ function Contact() {
   }
 
   return (
-    <section id="contact" className="bg-stone-50 py-24">
+    <section id="contact" className="bg-stone-50 py-24 sm:py-32">
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 border border-amber-500/20 rounded-full text-amber-500 text-xs font-medium mb-4">
-            Hör av dig
+        <div className="max-w-2xl mx-auto text-center mb-14">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-stone-200 rounded-full text-stone-700 text-[10px] font-bold uppercase tracking-widest mb-5 shadow-sm">
+            Kontakt
           </div>
-          <h2 className="font-serif text-3xl sm:text-4xl text-stone-900 font-bold mb-4">
-            Redo att uppgradera din restaurang?
+          <h2 className="font-serif text-4xl sm:text-5xl text-stone-950 font-bold tracking-tight leading-[1.05] mb-4">
+            Redo att <span className="italic text-amber-500">uppgradera</span>?
           </h2>
-          <p className="text-stone-600 max-w-xl mx-auto">
-            Berätta lite om din restaurang så återkommer vi inom 24 timmar för
-            att boka en personlig demo.
+          <p className="text-stone-600 text-lg leading-relaxed">
+            Berätta lite om din restaurang så hör vi av oss inom 24 timmar.
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-5 gap-10">
-          {/* Form */}
-          <div className="lg:col-span-3 bg-white border border-stone-200 rounded-2xl p-7 shadow-sm">
+        <div className="grid lg:grid-cols-5 gap-6">
+          <div className="lg:col-span-3 bg-white border border-stone-200 rounded-3xl p-7 shadow-sm">
             {submitted ? (
               <div className="h-full flex flex-col items-center justify-center text-center py-10 gap-4">
-                <div className="w-14 h-14 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center">
-                  <CheckCircle2 className="h-7 w-7 text-amber-500" />
+                <div className="w-14 h-14 rounded-full bg-amber-500 flex items-center justify-center">
+                  <CheckCircle2 className="h-7 w-7 text-white" strokeWidth={2.5} />
                 </div>
-                <h3 className="font-serif text-2xl text-stone-900 font-semibold">
+                <h3 className="font-serif text-2xl text-stone-950 font-bold">
                   Meddelande skickat!
                 </h3>
                 <p className="text-stone-600 max-w-xs">
@@ -540,7 +499,7 @@ function Contact() {
                       message: "",
                     })
                   }}
-                  className="text-amber-500 text-sm hover:underline"
+                  className="text-amber-600 text-sm hover:underline font-medium"
                 >
                   Skicka ett nytt meddelande
                 </button>
@@ -548,81 +507,58 @@ function Contact() {
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-stone-600 text-xs font-medium mb-1.5">
-                      Namn *
-                    </label>
-                    <input
-                      type="text"
-                      name="name"
-                      required
-                      value={form.name}
-                      onChange={handleChange}
-                      placeholder="Anna Lindqvist"
-                      className="w-full bg-white border border-stone-200 rounded-xl px-4 py-2.5 text-stone-900 text-sm placeholder-stone-400 focus:outline-none focus:border-amber-500/60 focus:ring-1 focus:ring-amber-500/30 transition-colors"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-stone-600 text-xs font-medium mb-1.5">
-                      Restaurangens namn *
-                    </label>
-                    <input
-                      type="text"
-                      name="restaurant"
-                      required
-                      value={form.restaurant}
-                      onChange={handleChange}
-                      placeholder="Bella Cucina"
-                      className="w-full bg-white border border-stone-200 rounded-xl px-4 py-2.5 text-stone-900 text-sm placeholder-stone-400 focus:outline-none focus:border-amber-500/60 focus:ring-1 focus:ring-amber-500/30 transition-colors"
-                    />
-                  </div>
+                  <Field
+                    label="Namn *"
+                    name="name"
+                    value={form.name}
+                    onChange={handleChange}
+                    placeholder="Anna Lindqvist"
+                    required
+                  />
+                  <Field
+                    label="Restaurang *"
+                    name="restaurant"
+                    value={form.restaurant}
+                    onChange={handleChange}
+                    placeholder="Bella Cucina"
+                    required
+                  />
                 </div>
                 <div className="grid sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-stone-600 text-xs font-medium mb-1.5">
-                      E-postadress *
-                    </label>
-                    <input
-                      type="email"
-                      name="email"
-                      required
-                      value={form.email}
-                      onChange={handleChange}
-                      placeholder="anna@restaurang.se"
-                      className="w-full bg-white border border-stone-200 rounded-xl px-4 py-2.5 text-stone-900 text-sm placeholder-stone-400 focus:outline-none focus:border-amber-500/60 focus:ring-1 focus:ring-amber-500/30 transition-colors"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-stone-600 text-xs font-medium mb-1.5">
-                      Telefon{" "}
-                      <span className="text-stone-400">(valfritt)</span>
-                    </label>
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={form.phone}
-                      onChange={handleChange}
-                      placeholder="+46 70 000 00 00"
-                      className="w-full bg-white border border-stone-200 rounded-xl px-4 py-2.5 text-stone-900 text-sm placeholder-stone-400 focus:outline-none focus:border-amber-500/60 focus:ring-1 focus:ring-amber-500/30 transition-colors"
-                    />
-                  </div>
+                  <Field
+                    label="E-post *"
+                    name="email"
+                    type="email"
+                    value={form.email}
+                    onChange={handleChange}
+                    placeholder="anna@restaurang.se"
+                    required
+                  />
+                  <Field
+                    label="Telefon"
+                    name="phone"
+                    type="tel"
+                    value={form.phone}
+                    onChange={handleChange}
+                    placeholder="+46 70 000 00 00"
+                  />
                 </div>
                 <div>
-                  <label className="block text-stone-600 text-xs font-medium mb-1.5">
-                    Meddelande / Övrigt
+                  <label className="block text-stone-700 text-xs font-semibold mb-1.5">
+                    Meddelande
                   </label>
                   <textarea
                     name="message"
                     value={form.message}
                     onChange={handleChange}
                     rows={4}
-                    placeholder="Berätta om din restaurang — antal bord, platser, specifika behov..."
-                    className="w-full bg-white border border-stone-200 rounded-xl px-4 py-2.5 text-stone-900 text-sm placeholder-stone-400 focus:outline-none focus:border-amber-500/60 focus:ring-1 focus:ring-amber-500/30 transition-colors resize-none"
+                    placeholder="Antal bord, platser, specifika behov..."
+                    className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 text-stone-950 text-sm placeholder-stone-400 focus:outline-none focus:border-stone-950 focus:bg-white transition-colors resize-none"
                   />
                 </div>
                 <button
                   type="submit"
-                  className="w-full py-3 bg-amber-500 text-stone-900 font-semibold rounded-xl hover:bg-amber-400 transition-colors text-sm flex items-center justify-center gap-2"
+                  className="w-full py-3.5 bg-stone-950 text-white font-semibold rounded-full hover:bg-stone-800 transition-colors text-sm flex items-center justify-center gap-2"
                 >
                   Skicka meddelande <ArrowRight className="h-4 w-4" />
                 </button>
@@ -630,37 +566,40 @@ function Contact() {
             )}
           </div>
 
-          {/* Info */}
-          <div className="lg:col-span-2 flex flex-col gap-6 justify-center">
-            <div className="bg-white border border-stone-200 rounded-2xl p-6 shadow-sm">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center mb-4">
-                <Mail className="h-5 w-5 text-amber-500" />
+          <div className="lg:col-span-2 flex flex-col gap-4">
+            <div className="bg-stone-950 rounded-3xl p-6 text-white">
+              <div className="w-10 h-10 rounded-xl bg-amber-500 flex items-center justify-center mb-4">
+                <Mail className="h-5 w-5 text-stone-950" />
               </div>
-              <h3 className="text-stone-900 font-semibold mb-1">Maila oss direkt</h3>
+              <h3 className="font-serif text-xl font-bold mb-1">Skriv till oss</h3>
               <a
                 href="mailto:menu@hirly.app"
-                className="text-amber-500 text-sm hover:underline"
+                className="text-amber-400 text-sm hover:underline"
               >
                 menu@hirly.app
               </a>
-              <p className="text-stone-500 text-xs mt-2">
+              <p className="text-stone-400 text-xs mt-2">
                 Vi svarar inom 24 timmar.
               </p>
             </div>
-            <div className="bg-white border border-stone-200 rounded-2xl p-6 shadow-sm">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center mb-4">
-                <CheckCircle2 className="h-5 w-5 text-amber-500" />
-              </div>
-              <h3 className="text-stone-900 font-semibold mb-2">Vad händer sedan?</h3>
-              <ul className="space-y-2">
+            <div className="bg-white border border-stone-200 rounded-3xl p-6 shadow-sm">
+              <h3 className="text-stone-950 font-semibold mb-3">
+                Vad händer sedan?
+              </h3>
+              <ul className="space-y-2.5">
                 {[
-                  "Kort introduktionssamtal (15 min)",
+                  "15 min introduktionssamtal",
                   "Live-demo av din digitala meny",
-                  "Anpassat prisförslag för ditt upplägg",
+                  "Anpassat prisförslag",
                   "Lansering redan samma dag",
-                ].map((item) => (
-                  <li key={item} className="flex items-start gap-2 text-sm text-stone-600">
-                    <ChevronRight className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
+                ].map((item, i) => (
+                  <li
+                    key={item}
+                    className="flex items-start gap-2.5 text-sm text-stone-700"
+                  >
+                    <span className="mt-0.5 shrink-0 w-5 h-5 rounded-full bg-stone-950 text-amber-400 flex items-center justify-center text-[10px] font-bold">
+                      {i + 1}
+                    </span>
                     {item}
                   </li>
                 ))}
@@ -673,31 +612,52 @@ function Contact() {
   )
 }
 
+function Field({
+  label,
+  ...props
+}: {
+  label: string
+} & React.InputHTMLAttributes<HTMLInputElement>) {
+  return (
+    <div>
+      <label className="block text-stone-700 text-xs font-semibold mb-1.5">
+        {label}
+      </label>
+      <input
+        {...props}
+        className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 text-stone-950 text-sm placeholder-stone-400 focus:outline-none focus:border-stone-950 focus:bg-white transition-colors"
+      />
+    </div>
+  )
+}
+
 // ─── Footer ───────────────────────────────────────────────────────────────────
 
 function Footer() {
   return (
-    <footer className="bg-stone-100 border-t border-stone-200">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
+    <footer className="bg-stone-950 text-stone-400">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-14">
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
-          {/* Brand */}
           <div className="lg:col-span-2">
             <div className="flex items-center gap-2.5 mb-3">
               <div className="w-8 h-8 rounded-lg bg-amber-500 flex items-center justify-center shrink-0">
-                <UtensilsCrossed className="h-4 w-4 text-stone-900" />
+                <UtensilsCrossed className="h-4 w-4 text-stone-950" />
               </div>
-              <span className="font-serif text-xl text-stone-900 font-semibold">MenuApp</span>
+              <span className="font-serif text-xl text-white font-bold tracking-tight">
+                MenuApp
+              </span>
             </div>
-            <p className="text-stone-600 text-sm max-w-xs">
-              Den ledande QR-beställningsplattformen för moderna restauranger.
-              Ingen app, ingen friktion — bara en fantastisk matupplevelse.
+            <p className="text-stone-400 text-sm max-w-xs leading-relaxed">
+              QR-beställning för moderna restauranger. Ingen app, ingen
+              friktion — bara en fantastisk matupplevelse.
             </p>
           </div>
 
-          {/* Links */}
           <div>
-            <h4 className="text-stone-700 text-sm font-semibold mb-3">Produkt</h4>
-            <ul className="space-y-2">
+            <h4 className="text-white text-xs font-bold uppercase tracking-widest mb-4">
+              Produkt
+            </h4>
+            <ul className="space-y-2.5">
               {[
                 { label: "Funktioner", href: "#features" },
                 { label: "Priser", href: "#pricing" },
@@ -706,7 +666,7 @@ function Footer() {
                 <li key={label}>
                   <a
                     href={href}
-                    className="text-stone-600 text-sm hover:text-amber-500 transition-colors"
+                    className="text-stone-400 text-sm hover:text-amber-400 transition-colors"
                   >
                     {label}
                   </a>
@@ -716,12 +676,14 @@ function Footer() {
           </div>
 
           <div>
-            <h4 className="text-stone-700 text-sm font-semibold mb-3">Juridiskt</h4>
-            <ul className="space-y-2">
+            <h4 className="text-white text-xs font-bold uppercase tracking-widest mb-4">
+              Juridiskt
+            </h4>
+            <ul className="space-y-2.5">
               <li>
                 <a
                   href="#"
-                  className="text-stone-600 text-sm hover:text-amber-500 transition-colors"
+                  className="text-stone-400 text-sm hover:text-amber-400 transition-colors"
                 >
                   Integritetspolicy
                 </a>
@@ -729,7 +691,7 @@ function Footer() {
               <li>
                 <a
                   href="mailto:menu@hirly.app"
-                  className="text-stone-600 text-sm hover:text-amber-500 transition-colors"
+                  className="text-stone-400 text-sm hover:text-amber-400 transition-colors"
                 >
                   menu@hirly.app
                 </a>
@@ -738,8 +700,8 @@ function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-stone-200 pt-6 text-center text-stone-500 text-xs">
-          © 2025 MenuApp. Alla rättigheter förbehållna.
+        <div className="border-t border-stone-800 pt-6 text-xs text-stone-500">
+          © 2026 MenuApp. Alla rättigheter förbehållna.
         </div>
       </div>
     </footer>
@@ -750,10 +712,13 @@ function Footer() {
 
 export default function HomePage() {
   return (
-    <div className="font-sans antialiased bg-white" style={{ scrollBehavior: "smooth" }}>
+    <div
+      className="font-sans antialiased bg-stone-50"
+      style={{ scrollBehavior: "smooth" }}
+    >
       <Nav />
       <Hero />
-      <OrderFlowAnimation />
+      <ScrollStory />
       <Stats />
       <Features />
       <Pricing />
