@@ -76,67 +76,80 @@ export default function ScrollStory() {
       className="relative bg-stone-50"
       style={{ height: `${STEPS.length * 100}vh` }}
     >
-      <div className="sticky top-0 h-screen flex items-center overflow-hidden">
+      <div className="sticky top-0 h-screen flex items-center overflow-hidden pt-16 lg:pt-0">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[700px] bg-amber-500/8 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 max-w-6xl mx-auto w-full px-4 sm:px-6 grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+        <div className="relative z-10 max-w-6xl mx-auto w-full px-4 sm:px-6 grid lg:grid-cols-2 gap-5 sm:gap-8 lg:gap-16 items-center">
+          {/* Phone column */}
+          <div className="order-1 lg:order-2 flex justify-center">
+            <Phone active={active} progress={progress} />
+          </div>
+
+          {/* Progress bars — horizontal on mobile, vertical on desktop */}
+          <div className="order-2 lg:hidden flex justify-center gap-2">
+            {STEPS.map((_, i) => (
+              <div
+                key={i}
+                className={`relative overflow-hidden rounded-full transition-all duration-500 bg-stone-200 h-1 ${
+                  i === active ? "w-10" : "w-5"
+                }`}
+              >
+                <div
+                  className="absolute inset-0 bg-amber-500 origin-left"
+                  style={{
+                    width:
+                      i === active ? `${progress * 100}%` : i < active ? "100%" : "0%",
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+
           {/* Copy column */}
-          <div className="order-2 lg:order-1 relative min-h-[220px] lg:min-h-[320px]">
+          <div className="order-3 lg:order-1 relative min-h-[140px] sm:min-h-[180px] lg:min-h-[320px] text-center lg:text-left">
             {STEPS.map((s, i) => (
               <div
                 key={i}
-                className="absolute inset-0 transition-all duration-500"
+                className="absolute inset-0 transition-all duration-500 flex flex-col items-center lg:items-start"
                 style={{
                   opacity: i === active ? 1 : 0,
                   transform: `translateY(${i === active ? 0 : 24}px)`,
                   pointerEvents: i === active ? "auto" : "none",
                 }}
               >
-                <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-stone-200 rounded-full text-stone-950 text-[10px] font-bold uppercase tracking-widest mb-5 shadow-sm">
+                <div className="inline-flex items-center gap-2 px-2.5 py-1 bg-white border border-stone-200 rounded-full text-stone-950 text-[9px] sm:text-[10px] font-bold uppercase tracking-widest mb-3 sm:mb-4 lg:mb-5 shadow-sm">
                   <span className="text-amber-500">0{i + 1}</span>
                   <span className="w-1 h-1 bg-stone-300 rounded-full" />
                   {s.label}
                 </div>
-                <h3 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-stone-950 font-bold leading-[1.02] tracking-tight mb-5">
+                <h3 className="font-serif text-2xl sm:text-3xl lg:text-6xl text-stone-950 font-bold leading-[1.05] tracking-tight mb-2 sm:mb-3 lg:mb-5 px-2 lg:px-0">
                   {s.title}
                 </h3>
-                <p className="text-stone-600 text-base sm:text-lg leading-relaxed max-w-lg">
+                <p className="text-stone-600 text-sm sm:text-base lg:text-lg leading-relaxed max-w-md lg:max-w-lg px-4 lg:px-0">
                   {s.desc}
                 </p>
               </div>
             ))}
 
-            {/* Progress bars */}
-            <div className="absolute -bottom-16 lg:bottom-auto lg:-left-10 lg:top-1/2 lg:-translate-y-1/2 flex lg:flex-col gap-2">
+            {/* Desktop vertical progress bars */}
+            <div className="hidden lg:flex absolute bottom-auto -left-10 top-1/2 -translate-y-1/2 flex-col gap-2">
               {STEPS.map((_, i) => (
                 <div
                   key={i}
                   className={`relative overflow-hidden rounded-full transition-all duration-500 bg-stone-200 ${
-                    i === active
-                      ? "w-12 h-1 lg:w-1 lg:h-12"
-                      : "w-6 h-1 lg:w-1 lg:h-6"
+                    i === active ? "w-1 h-12" : "w-1 h-6"
                   }`}
                 >
                   <div
-                    className="absolute inset-0 bg-amber-500 origin-left lg:origin-top"
+                    className="absolute inset-0 bg-amber-500 origin-top"
                     style={{
-                      transform:
-                        i < active
-                          ? "scaleX(1) scaleY(1)"
-                          : i === active
-                          ? `scale(1, 1)`
-                          : "scaleX(0) scaleY(0)",
-                      width: i === active ? `${progress * 100}%` : i < active ? "100%" : "0%",
+                      height:
+                        i === active ? `${progress * 100}%` : i < active ? "100%" : "0%",
                     }}
                   />
                 </div>
               ))}
             </div>
-          </div>
-
-          {/* Phone column */}
-          <div className="order-1 lg:order-2 flex justify-center">
-            <Phone active={active} progress={progress} />
           </div>
         </div>
       </div>
@@ -149,15 +162,15 @@ export default function ScrollStory() {
 function Phone({ active, progress }: { active: number; progress: number }) {
   const Screens = [ScreenScan, ScreenMenu, ScreenCart, ScreenSend, ScreenDone]
   return (
-    <div className="relative w-[260px] sm:w-[300px]">
+    <div className="relative w-[180px] sm:w-[220px] lg:w-[300px]">
       <div className="absolute -inset-6 bg-amber-500/15 blur-3xl rounded-full pointer-events-none" />
 
-      <div className="relative rounded-[3rem] bg-stone-950 p-2 shadow-2xl shadow-stone-900/30 ring-1 ring-stone-800/60">
+      <div className="relative rounded-[2.25rem] sm:rounded-[2.75rem] lg:rounded-[3rem] bg-stone-950 p-1.5 sm:p-2 shadow-2xl shadow-stone-900/30 ring-1 ring-stone-800/60">
         <div
-          className="relative rounded-[2.5rem] bg-stone-50 overflow-hidden"
+          className="relative rounded-[1.75rem] sm:rounded-[2.25rem] lg:rounded-[2.5rem] bg-stone-50 overflow-hidden"
           style={{ aspectRatio: "9 / 19" }}
         >
-          <div className="absolute top-2.5 left-1/2 -translate-x-1/2 w-24 h-6 bg-stone-950 rounded-full z-30" />
+          <div className="absolute top-2 lg:top-2.5 left-1/2 -translate-x-1/2 w-16 sm:w-20 lg:w-24 h-4 sm:h-5 lg:h-6 bg-stone-950 rounded-full z-30" />
 
           {Screens.map((Screen, i) => (
             <div
