@@ -166,7 +166,7 @@ function Hero() {
         </div>
 
         {/* Scroll cue */}
-        <div className="mt-24 flex flex-col items-center gap-3 text-stone-400">
+        <div className="mt-14 sm:mt-20 lg:mt-24 flex flex-col items-center gap-3 text-stone-400">
           <span className="text-[10px] uppercase tracking-[0.25em] font-semibold">
             Scrolla
           </span>
