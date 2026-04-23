@@ -245,8 +245,9 @@ function Features() {
     },
     {
       icon: BarChart3,
-      title: "Statistik & insikter",
-      desc: "Följ populära rätter, rusningstider och beställningstrender för smartare beslut.",
+      title: "Menyintelligens",
+      desc: "Stars/Plowhorses-matris, per-rätt statistik, heta timmar och attach-analys — bestäm med data, inte magkänsla.",
+      badge: "Unikt",
     },
   ]
 
@@ -266,20 +267,115 @@ function Features() {
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {features.map(({ icon: Icon, title, desc }) => (
-            <div
-              key={title}
-              className="group bg-white border border-stone-200 rounded-2xl p-6 hover:border-stone-300 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
-            >
-              <div className="w-10 h-10 rounded-xl bg-stone-950 flex items-center justify-center mb-5 group-hover:bg-amber-500 transition-colors">
-                <Icon className="h-5 w-5 text-amber-400 group-hover:text-stone-950 transition-colors" />
+          {features.map((f) => {
+            const Icon = f.icon
+            const badge = "badge" in f ? (f as { badge?: string }).badge : undefined
+            return (
+              <div
+                key={f.title}
+                className="relative group bg-white border border-stone-200 rounded-2xl p-6 hover:border-stone-300 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
+              >
+                {badge && (
+                  <span className="absolute top-4 right-4 text-[9px] font-bold tracking-wider uppercase bg-amber-500 text-stone-950 px-1.5 py-0.5 rounded">
+                    {badge}
+                  </span>
+                )}
+                <div className="w-10 h-10 rounded-xl bg-stone-950 flex items-center justify-center mb-5 group-hover:bg-amber-500 transition-colors">
+                  <Icon className="h-5 w-5 text-amber-400 group-hover:text-stone-950 transition-colors" />
+                </div>
+                <h3 className="text-stone-950 font-semibold text-base mb-2">
+                  {f.title}
+                </h3>
+                <p className="text-stone-600 text-sm leading-relaxed">{f.desc}</p>
               </div>
-              <h3 className="text-stone-950 font-semibold text-base mb-2">
-                {title}
-              </h3>
-              <p className="text-stone-600 text-sm leading-relaxed">{desc}</p>
+            )
+          })}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ─── Intelligence block — product differentiator ────────────────────────────
+
+function Intelligence() {
+  const points = [
+    { title: "Menu engineering-matris", desc: "Klassisk Stars / Plowhorses / Puzzles / Dogs — ingen konkurrent har det inbyggt." },
+    { title: "Per-rätt insikter", desc: "Enheter sålda, intäkter, marginal, andel av beställningar och vanliga kombinationer." },
+    { title: "Smarta förslag", desc: "Systemet pekar ut priskandidater, dolda pärlor och döda timmar med lämpliga åtgärder." },
+    { title: "Värme-kartor", desc: "Se beställningsmönster per veckodag × timme — optimera bemanning och happy hours." },
+  ]
+  return (
+    <section className="bg-white py-24 sm:py-32 border-y border-stone-200">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 grid lg:grid-cols-2 gap-14 items-center">
+        <div>
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-50 border border-amber-200 rounded-full text-amber-700 text-[10px] font-bold uppercase tracking-widest mb-5">
+            <BarChart3 className="h-3 w-3" /> Nytt — Menyintelligens
+          </div>
+          <h2 className="font-serif text-4xl sm:text-5xl text-stone-950 font-bold tracking-tight leading-[1.05] mb-5">
+            Varje rätt får en <span className="italic text-amber-500">betygsruta</span>.
+          </h2>
+          <p className="text-stone-600 text-lg leading-relaxed mb-8">
+            Medan andra plattformar nöjer sig med total försäljning, analyserar vi varje rätt som en produkt —
+            popularitet mot marginal, timing mot attach-rate. Resultatet: veta <em>exakt</em> vad du ska ta bort,
+            höja priset på eller framhäva.
+          </p>
+          <div className="grid sm:grid-cols-2 gap-5">
+            {points.map((p) => (
+              <div key={p.title}>
+                <div className="flex items-center gap-2 mb-1">
+                  <CheckCircle2 className="h-4 w-4 text-amber-500" />
+                  <h3 className="font-semibold text-stone-950 text-sm">{p.title}</h3>
+                </div>
+                <p className="text-stone-600 text-sm leading-relaxed pl-6">{p.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Mock matrix preview */}
+        <div className="relative">
+          <div className="absolute -inset-4 bg-amber-500/10 blur-3xl rounded-full pointer-events-none" />
+          <div className="relative bg-stone-50 border border-stone-200 rounded-3xl p-6 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <p className="text-xs text-stone-500 font-semibold uppercase tracking-wider">Menyanalys</p>
+                <p className="font-serif text-lg text-stone-950 font-bold">Popularitet × Marginal</p>
+              </div>
+              <div className="flex gap-2 text-[10px] font-medium">
+                <span className="px-2 py-0.5 rounded bg-green-100 text-green-700">Stars: 4</span>
+                <span className="px-2 py-0.5 rounded bg-amber-100 text-amber-700">Plow: 3</span>
+              </div>
             </div>
-          ))}
+            <svg viewBox="0 0 300 240" className="w-full h-auto">
+              <rect x="20" y="10" width="130" height="110" fill="#2563eb" fillOpacity="0.06" />
+              <rect x="150" y="10" width="130" height="110" fill="#16a34a" fillOpacity="0.06" />
+              <rect x="20" y="120" width="130" height="110" fill="#dc2626" fillOpacity="0.06" />
+              <rect x="150" y="120" width="130" height="110" fill="#d97706" fillOpacity="0.06" />
+              <line x1="150" y1="10" x2="150" y2="230" stroke="#d6d3d1" strokeDasharray="3 3" />
+              <line x1="20" y1="120" x2="280" y2="120" stroke="#d6d3d1" strokeDasharray="3 3" />
+              <text x="26" y="26" fontSize="9" fontWeight="600" fill="#2563eb">PUZZLE</text>
+              <text x="274" y="26" fontSize="9" fontWeight="600" fill="#16a34a" textAnchor="end">STAR</text>
+              <text x="26" y="222" fontSize="9" fontWeight="600" fill="#dc2626">DOG</text>
+              <text x="274" y="222" fontSize="9" fontWeight="600" fill="#d97706" textAnchor="end">PLOWHORSE</text>
+              {/* Stars */}
+              <circle cx="210" cy="35" r="6" fill="#16a34a" stroke="white" strokeWidth="2" />
+              <circle cx="240" cy="60" r="6" fill="#16a34a" stroke="white" strokeWidth="2" />
+              <circle cx="185" cy="80" r="6" fill="#16a34a" stroke="white" strokeWidth="2" />
+              <circle cx="260" cy="95" r="6" fill="#16a34a" stroke="white" strokeWidth="2" />
+              {/* Plowhorses */}
+              <circle cx="220" cy="160" r="6" fill="#d97706" stroke="white" strokeWidth="2" />
+              <circle cx="200" cy="180" r="6" fill="#d97706" stroke="white" strokeWidth="2" />
+              <circle cx="250" cy="175" r="6" fill="#d97706" stroke="white" strokeWidth="2" />
+              {/* Puzzles */}
+              <circle cx="70" cy="50" r="6" fill="#2563eb" stroke="white" strokeWidth="2" />
+              <circle cx="110" cy="80" r="6" fill="#2563eb" stroke="white" strokeWidth="2" />
+              {/* Dogs */}
+              <circle cx="50" cy="190" r="6" fill="#dc2626" stroke="white" strokeWidth="2" />
+              <circle cx="90" cy="170" r="6" fill="#dc2626" stroke="white" strokeWidth="2" />
+            </svg>
+            <p className="text-xs text-stone-500 mt-3 text-center">Intäkt, timing och kombinationer analyseras per rätt.</p>
+          </div>
         </div>
       </div>
     </section>
@@ -721,6 +817,7 @@ export default function HomePage() {
       <ScrollStory />
       <Stats />
       <Features />
+      <Intelligence />
       <Pricing />
       <Contact />
       <Footer />

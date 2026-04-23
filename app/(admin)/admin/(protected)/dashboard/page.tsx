@@ -1,9 +1,11 @@
 import type { Metadata } from "next"
+import Link from "next/link"
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { getCurrentRestaurant } from "@/lib/actions/restaurant"
+import { getAnalyticsSummary } from "@/lib/actions/analytics"
 import { formatPrice } from "@/lib/utils"
-import { TrendingUp, ShoppingBag, Clock, Table2 } from "lucide-react"
+import { TrendingUp, ShoppingBag, Clock, Table2, ArrowUpRight, Flame, BarChart3 } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import type { Order } from "@/types/database"
 
@@ -17,18 +19,22 @@ export default async function DashboardPage() {
   const supabase = await createServerSupabaseClient()
   const today = new Date().toISOString().split("T")[0]
 
-  // Fetch today's orders
-  const { data: todayOrders } = await supabase
-    .from("orders")
-    .select("*")
-    .eq("restaurant_id", ctx.restaurant.id)
-    .gte("created_at", `${today}T00:00:00`)
-    .order("created_at", { ascending: false })
+  const [ordersResult, summary] = await Promise.all([
+    supabase
+      .from("orders")
+      .select("*")
+      .eq("restaurant_id", ctx.restaurant.id)
+      .gte("created_at", `${today}T00:00:00`)
+      .order("created_at", { ascending: false }),
+    getAnalyticsSummary(ctx.restaurant.id, 7),
+  ])
 
-  const orders = (todayOrders ?? []) as Pick<Order, "id" | "total_cents" | "status" | "payment_status" | "table_number" | "created_at">[]
+  const orders = (ordersResult.data ?? []) as Pick<Order, "id" | "total_cents" | "status" | "payment_status" | "table_number" | "created_at">[]
   const totalRevenue = orders.filter(o => o.payment_status === "paid").reduce((s, o) => s + o.total_cents, 0)
   const pendingOrders = orders.filter(o => ["pending", "confirmed", "preparing"].includes(o.status)).length
   const activeTables = new Set(orders.filter(o => !["delivered", "cancelled"].includes(o.status)).map(o => o.table_number)).size
+  const topSellers = summary.topItems.filter(i => i.quantitySold > 0).slice(0, 5)
+  const peakHour = summary.hourly.reduce((best, h) => h.orders > best.orders ? h : best, summary.hourly[0])
 
   const stats = [
     { title: "Today's Revenue", value: formatPrice(totalRevenue), icon: TrendingUp, color: "text-emerald-600", bg: "bg-emerald-50" },
@@ -64,6 +70,73 @@ export default async function DashboardPage() {
             </Card>
           )
         })}
+      </div>
+
+      {/* 7-day intelligence strip */}
+      <div className="grid lg:grid-cols-3 gap-4 mb-8">
+        <Card className="border-stone-200 lg:col-span-2">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="text-stone-800 text-xl flex items-center gap-2">
+              <Flame className="h-4 w-4 text-amber-600" />
+              Top sellers — last 7 days
+            </CardTitle>
+            <Link href="/admin/analytics" className="text-xs text-amber-700 hover:underline flex items-center gap-1">
+              Full analytics <ArrowUpRight className="h-3 w-3" />
+            </Link>
+          </CardHeader>
+          <CardContent>
+            {topSellers.length === 0 ? (
+              <p className="text-stone-400 text-center py-8 text-sm">No sales yet — share QR codes with guests to get started.</p>
+            ) : (
+              <div className="space-y-1.5">
+                {topSellers.map((item, i) => (
+                  <div key={item.itemId} className="flex items-center gap-3 py-2">
+                    <span className="text-xs font-bold text-stone-400 w-4">{i + 1}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-stone-800 truncate">{item.name}</p>
+                      <p className="text-xs text-stone-500">{item.categoryName ?? "—"}</p>
+                    </div>
+                    <span className="text-sm font-semibold text-stone-800 tabular-nums">{item.quantitySold}×</span>
+                    <span className="text-xs text-stone-500 tabular-nums w-20 text-right">{formatPrice(item.revenueCents)}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="border-stone-200">
+          <CardHeader>
+            <CardTitle className="text-stone-800 text-xl flex items-center gap-2">
+              <BarChart3 className="h-4 w-4 text-amber-600" />
+              7-day pulse
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm">
+            <div className="flex justify-between">
+              <span className="text-stone-500">Revenue</span>
+              <span className="font-semibold text-stone-800">{formatPrice(summary.totalRevenueCents)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-stone-500">Orders</span>
+              <span className="font-semibold text-stone-800">{summary.totalOrders}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-stone-500">Avg order</span>
+              <span className="font-semibold text-stone-800">{formatPrice(summary.avgOrderCents)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-stone-500">Peak hour</span>
+              <span className="font-semibold text-stone-800">
+                {peakHour && peakHour.orders > 0 ? `${String(peakHour.hour).padStart(2, "0")}:00` : "—"}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-stone-500">Items / order</span>
+              <span className="font-semibold text-stone-800">{summary.avgItemsPerOrder.toFixed(1)}</span>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Recent orders table */}

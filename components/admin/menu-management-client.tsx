@@ -4,7 +4,7 @@ import Image from "next/image"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import { Plus, Pencil, Trash2, ChevronDown, ChevronUp, Eye, EyeOff, Upload, X } from "lucide-react"
+import { Plus, Pencil, Trash2, ChevronDown, ChevronUp, Eye, EyeOff, Upload, X, BarChart3, TrendingUp, TrendingDown, Flame } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -15,8 +15,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/hooks/use-toast"
 import { createMenuItem, updateMenuItem, deleteMenuItem, createCategory, uploadMenuImage } from "@/lib/actions/menu"
-import { formatPrice } from "@/lib/utils"
+import { getItemDeepStats } from "@/lib/actions/analytics"
+import type { ItemDeepStat } from "@/lib/actions/analytics"
+import { ItemStatsDrawer } from "@/components/admin/analytics/item-stats-drawer"
+import { formatPrice, cn } from "@/lib/utils"
 import type { Category, MenuItem, Allergen } from "@/types/database"
+
+export type InlineItemStats = {
+  quantitySold: number
+  revenueCents: number
+  ordersContaining: number
+}
 
 type MenuItemWithDetails = MenuItem & {
   item_allergens: Array<{ allergen_id: string; allergens: Allergen }>
@@ -33,6 +42,7 @@ const ItemSchema = z.object({
   name: z.string().min(1, "Namn krävs"),
   description: z.string().optional(),
   priceCents: z.coerce.number().int().nonnegative("Priset måste vara 0 eller mer"),
+  costCents: z.coerce.number().int().nonnegative("Kostnad måste vara 0 eller mer").optional(),
   categoryId: z.string().uuid("Välj en kategori"),
   isAvailable: z.boolean().default(true),
   isVegetarian: z.boolean().default(false),
@@ -47,9 +57,11 @@ interface Props {
   categories: Category[]
   menuItems: MenuItemWithDetails[]
   allergens: Allergen[]
+  itemStats?: Record<string, InlineItemStats>
+  maxItemQty?: number
 }
 
-export function MenuManagementClient({ restaurantId, categories: initCats, menuItems: initItems }: Props) {
+export function MenuManagementClient({ restaurantId, categories: initCats, menuItems: initItems, itemStats = {}, maxItemQty = 0 }: Props) {
   const [categories, setCategories] = useState(initCats)
   const [items, setItems] = useState(initItems)
   const [expandedCats, setExpandedCats] = useState<Set<string>>(new Set(initCats.map(c => c.id)))
@@ -61,17 +73,20 @@ export function MenuManagementClient({ restaurantId, categories: initCats, menuI
   const [imageUrl, setImageUrl] = useState<string | null>(null)
   const [uploadingImage, setUploadingImage] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [statsItemId, setStatsItemId] = useState<string | null>(null)
+  const [statsDetail, setStatsDetail] = useState<ItemDeepStat | null>(null)
+  const [statsLoading, setStatsLoading] = useState(false)
   const { toast } = useToast()
 
   const form = useForm<ItemFormValues>({
     resolver: zodResolver(ItemSchema),
-    defaultValues: { name: "", description: "", priceCents: 0, categoryId: "", isAvailable: true, isVegetarian: false, isVegan: false, isGlutenFree: false },
+    defaultValues: { name: "", description: "", priceCents: 0, costCents: undefined, categoryId: "", isAvailable: true, isVegetarian: false, isVegan: false, isGlutenFree: false },
   })
 
   function openAddItem(categoryId: string) {
     setEditingItem(null)
     setImageUrl(null)
-    form.reset({ name: "", description: "", priceCents: 0, categoryId, isAvailable: true, isVegetarian: false, isVegan: false, isGlutenFree: false })
+    form.reset({ name: "", description: "", priceCents: 0, costCents: undefined, categoryId, isAvailable: true, isVegetarian: false, isVegan: false, isGlutenFree: false })
     setItemDialogOpen(true)
   }
 
@@ -82,6 +97,7 @@ export function MenuManagementClient({ restaurantId, categories: initCats, menuI
       name: item.name,
       description: item.description ?? "",
       priceCents: item.price_cents,
+      costCents: item.cost_cents ?? undefined,
       categoryId: item.category_id,
       isAvailable: item.is_available,
       isVegetarian: item.is_vegetarian,
@@ -89,6 +105,14 @@ export function MenuManagementClient({ restaurantId, categories: initCats, menuI
       isGlutenFree: item.is_gluten_free,
     })
     setItemDialogOpen(true)
+  }
+
+  async function openItemStats(itemId: string) {
+    setStatsItemId(itemId)
+    setStatsLoading(true)
+    const detail = await getItemDeepStats(restaurantId, itemId, 30)
+    setStatsDetail(detail)
+    setStatsLoading(false)
   }
 
   async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -109,11 +133,13 @@ export function MenuManagementClient({ restaurantId, categories: initCats, menuI
   }
 
   async function onSubmitItem(values: ItemFormValues) {
+    const costCents = values.costCents === undefined || Number.isNaN(values.costCents) ? null : values.costCents
     if (editingItem) {
       const { error } = await updateMenuItem(editingItem.id, {
         name: values.name,
         description: values.description,
         priceCents: values.priceCents,
+        costCents,
         categoryId: values.categoryId,
         isAvailable: values.isAvailable,
         isVegetarian: values.isVegetarian,
@@ -130,6 +156,7 @@ export function MenuManagementClient({ restaurantId, categories: initCats, menuI
         name: values.name,
         description: values.description ?? null,
         price_cents: values.priceCents,
+        cost_cents: costCents,
         category_id: values.categoryId,
         is_available: values.isAvailable,
         is_vegetarian: values.isVegetarian,
@@ -145,6 +172,7 @@ export function MenuManagementClient({ restaurantId, categories: initCats, menuI
         name: values.name,
         description: values.description,
         priceCents: values.priceCents,
+        costCents,
         imageUrl,
         isAvailable: values.isAvailable,
         isVegetarian: values.isVegetarian,
@@ -163,6 +191,7 @@ export function MenuManagementClient({ restaurantId, categories: initCats, menuI
         name: values.name,
         description: values.description ?? null,
         price_cents: values.priceCents,
+        cost_cents: costCents,
         image_url: imageUrl,
         is_available: values.isAvailable,
         is_vegetarian: values.isVegetarian,
@@ -286,7 +315,11 @@ export function MenuManagementClient({ restaurantId, categories: initCats, menuI
                   </p>
                 ) : (
                   <div className="divide-y divide-stone-100">
-                    {catItems.map(item => (
+                    {catItems.map(item => {
+                      const stats = itemStats[item.id]
+                      const qty = stats?.quantitySold ?? 0
+                      const popularity = maxItemQty > 0 ? qty / maxItemQty : 0
+                      return (
                       <div key={item.id} className="flex items-center gap-3 py-3">
                         {item.image_url && (
                           <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
@@ -294,10 +327,18 @@ export function MenuManagementClient({ restaurantId, categories: initCats, menuI
                           </div>
                         )}
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 flex-wrap">
                             <p className={`font-medium text-sm ${item.is_available ? "text-stone-800" : "text-stone-400 line-through"}`}>
                               {item.name}
                             </p>
+                            {popularity >= 0.7 && qty > 0 && (
+                              <Badge variant="secondary" className="text-[10px] bg-amber-100 text-amber-700 flex items-center gap-0.5">
+                                <Flame className="h-2.5 w-2.5" /> Top seller
+                              </Badge>
+                            )}
+                            {stats && qty === 0 && (
+                              <Badge variant="secondary" className="text-[10px] bg-stone-100 text-stone-500">0 sold / 30d</Badge>
+                            )}
                             {item.is_vegan && <Badge variant="secondary" className="text-xs bg-green-100 text-green-700">Vegansk</Badge>}
                             {!item.is_vegan && item.is_vegetarian && <Badge variant="secondary" className="text-xs bg-emerald-100 text-emerald-700">Vegetarisk</Badge>}
                             {item.is_gluten_free && <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-700">GF</Badge>}
@@ -305,8 +346,35 @@ export function MenuManagementClient({ restaurantId, categories: initCats, menuI
                           {item.description && (
                             <p className="text-xs text-stone-400 mt-0.5 truncate max-w-md">{item.description}</p>
                           )}
+                          {stats && qty > 0 && (
+                            <div className="flex items-center gap-2 mt-1.5">
+                              <div className="flex-1 max-w-[160px] h-1 bg-stone-100 rounded-full overflow-hidden">
+                                <div
+                                  className={cn("h-full rounded-full", popularity >= 0.7 ? "bg-amber-500" : popularity >= 0.35 ? "bg-amber-300" : "bg-stone-300")}
+                                  style={{ width: `${Math.max(4, popularity * 100)}%` }}
+                                />
+                              </div>
+                              <span className="text-[11px] text-stone-500 tabular-nums">
+                                {qty}× · {formatPrice(stats.revenueCents)} · 30d
+                              </span>
+                            </div>
+                          )}
                         </div>
-                        <span className="font-semibold text-stone-700 text-sm">{formatPrice(item.price_cents)}</span>
+                        <div className="text-right flex-shrink-0">
+                          <p className="font-semibold text-stone-700 text-sm tabular-nums">{formatPrice(item.price_cents)}</p>
+                          {item.cost_cents !== null && item.cost_cents !== undefined && (
+                            <p className="text-[10px] text-stone-400">
+                              cost {formatPrice(item.cost_cents)}
+                            </p>
+                          )}
+                        </div>
+                        <button
+                          onClick={() => openItemStats(item.id)}
+                          className="text-stone-400 hover:text-blue-600 transition-colors"
+                          title="View stats"
+                        >
+                          <BarChart3 className="h-4 w-4" />
+                        </button>
                         <button
                           onClick={() => handleToggleAvailability(item)}
                           className="text-stone-400 hover:text-stone-600 transition-colors"
@@ -328,7 +396,7 @@ export function MenuManagementClient({ restaurantId, categories: initCats, menuI
                           <Trash2 className="h-4 w-4" />
                         </button>
                       </div>
-                    ))}
+                    )})}
                   </div>
                 )}
               </CardContent>
@@ -391,12 +459,21 @@ export function MenuManagementClient({ restaurantId, categories: initCats, menuI
               </div>
             </div>
 
-            <div className="space-y-1.5">
-              <Label>Pris (i ören) *</Label>
-              <Input type="number" {...form.register("priceCents")} placeholder="12000" />
-              {form.formState.errors.priceCents && (
-                <p className="text-xs text-red-500">{form.formState.errors.priceCents.message}</p>
-              )}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label>Pris (i ören) *</Label>
+                <Input type="number" {...form.register("priceCents")} placeholder="12000" />
+                {form.formState.errors.priceCents && (
+                  <p className="text-xs text-red-500">{form.formState.errors.priceCents.message}</p>
+                )}
+              </div>
+              <div className="space-y-1.5">
+                <Label className="flex items-center gap-1">
+                  Matkostnad <span className="text-stone-400 text-xs">(valfritt)</span>
+                </Label>
+                <Input type="number" {...form.register("costCents")} placeholder="4000" />
+                <p className="text-[11px] text-stone-400">Låser upp riktig marginalanalys.</p>
+              </div>
             </div>
 
             <div className="space-y-1.5">
@@ -465,6 +542,17 @@ export function MenuManagementClient({ restaurantId, categories: initCats, menuI
           </form>
         </DialogContent>
       </Dialog>
+
+      <ItemStatsDrawer
+        open={statsItemId !== null}
+        loading={statsLoading}
+        detail={statsDetail}
+        hasCostData={statsDetail?.costCents !== null && statsDetail?.costCents !== undefined}
+        onClose={() => {
+          setStatsItemId(null)
+          setStatsDetail(null)
+        }}
+      />
     </div>
   )
 }

@@ -138,6 +138,7 @@ export type Database = {
           name: string
           description: string | null
           price_cents: number
+          cost_cents: number | null
           image_url: string | null
           is_available: boolean
           is_vegetarian: boolean
@@ -153,6 +154,7 @@ export type Database = {
           name: string
           description?: string | null
           price_cents: number
+          cost_cents?: number | null
           image_url?: string | null
           is_available?: boolean
           is_vegetarian?: boolean
@@ -168,6 +170,7 @@ export type Database = {
           name?: string
           description?: string | null
           price_cents?: number
+          cost_cents?: number | null
           image_url?: string | null
           is_available?: boolean
           is_vegetarian?: boolean

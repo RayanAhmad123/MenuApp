@@ -3,7 +3,7 @@ import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import {
   LayoutDashboard, UtensilsCrossed, ClipboardList,
-  Users, Settings, QrCode, ChefHat, LogOut,
+  Users, Settings, QrCode, ChefHat, LogOut, BarChart3,
 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button"
 
 const navItems = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/admin/analytics", label: "Analytics", icon: BarChart3 },
   { href: "/admin/menu", label: "Menu", icon: UtensilsCrossed },
   { href: "/admin/orders", label: "Orders", icon: ClipboardList },
   { href: "/admin/staff", label: "Staff", icon: Users },

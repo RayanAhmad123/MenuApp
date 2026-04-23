@@ -13,6 +13,7 @@ const MenuItemSchema = z.object({
   name: z.string().min(1).max(100),
   description: z.string().optional(),
   priceCents: z.number().int().nonnegative(),
+  costCents: z.number().int().nonnegative().nullable().optional(),
   imageUrl: z.string().url().optional().nullable(),
   isAvailable: z.boolean().default(true),
   isVegetarian: z.boolean().default(false),
@@ -36,6 +37,7 @@ export async function createMenuItem(data: z.infer<typeof MenuItemSchema>) {
       name: itemData.name,
       description: itemData.description ?? null,
       price_cents: itemData.priceCents,
+      cost_cents: itemData.costCents ?? null,
       image_url: itemData.imageUrl ?? null,
       is_available: itemData.isAvailable,
       is_vegetarian: itemData.isVegetarian,
@@ -68,6 +70,7 @@ export async function updateMenuItem(
   if (data.name !== undefined) update.name = data.name
   if (data.description !== undefined) update.description = data.description
   if (data.priceCents !== undefined) update.price_cents = data.priceCents
+  if (data.costCents !== undefined) update.cost_cents = data.costCents
   if (data.imageUrl !== undefined) update.image_url = data.imageUrl
   if (data.isAvailable !== undefined) update.is_available = data.isAvailable
   if (data.isVegetarian !== undefined) update.is_vegetarian = data.isVegetarian
