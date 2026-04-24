@@ -7,7 +7,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { getItemStatsMap } from "@/lib/actions/analytics"
 import { MenuManagementClient } from "@/components/admin/menu-management-client"
 
-export const metadata: Metadata = { title: "Menu Management" }
+export const metadata: Metadata = { title: "Meny" }
 export const dynamic = 'force-dynamic'
 
 export default async function MenuPage() {
@@ -40,15 +40,15 @@ export default async function MenuPage() {
     <div className="p-8">
       <div className="mb-8 flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="font-serif text-3xl text-stone-800 font-semibold">Menu Management</h1>
-          <p className="text-stone-500 mt-1">Inline popularity signals — click any item's chart icon for 30-day stats.</p>
+          <h1 className="font-serif text-3xl text-stone-800 font-semibold">Meny</h1>
+          <p className="text-stone-500 mt-1">Inbäddade popularitetssignaler — klicka på en rätts diagramikon för 30-dagarsstatistik.</p>
         </div>
         <Link
           href="/admin/analytics"
           className="inline-flex items-center gap-2 text-sm font-medium text-amber-700 hover:text-amber-800 px-3 py-2 rounded-lg bg-amber-50 hover:bg-amber-100 transition-colors"
         >
           <BarChart3 className="h-4 w-4" />
-          Open full analytics
+          Öppna full analys
         </Link>
       </div>
       <MenuManagementClient

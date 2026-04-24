@@ -4,7 +4,7 @@ import { getCurrentRestaurant } from "@/lib/actions/restaurant"
 import { getAnalyticsSummary } from "@/lib/actions/analytics"
 import { AnalyticsClient } from "@/components/admin/analytics/analytics-client"
 
-export const metadata: Metadata = { title: "Analytics" }
+export const metadata: Metadata = { title: "Analys" }
 export const dynamic = "force-dynamic"
 
 export default async function AnalyticsPage({

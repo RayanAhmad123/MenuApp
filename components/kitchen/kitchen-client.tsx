@@ -113,7 +113,7 @@ export function KitchenClient({ restaurantId, initialOrders, yellowThreshold, re
           </p>
         </div>
         <div className="ml-auto text-xs text-stone-600 font-mono">
-          {new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
+          {new Date().toLocaleTimeString("sv-SE", { hour: "2-digit", minute: "2-digit" })}
         </div>
       </div>
 
@@ -180,7 +180,7 @@ export function KitchenClient({ restaurantId, initialOrders, yellowThreshold, re
 
                 {order.special_notes && (
                   <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg px-3 py-2">
-                    <p className="text-xs text-amber-300">Note: {order.special_notes}</p>
+                    <p className="text-xs text-amber-300">Notering: {order.special_notes}</p>
                   </div>
                 )}
 

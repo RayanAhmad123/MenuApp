@@ -221,13 +221,14 @@ export function CustomerMenuClient({ restaurant, subdomain, categories, menuItem
 }
 
 function MenuItemCard({ item, onSelect }: { item: MenuItemWithDetails; onSelect: () => void }) {
+  const hasDietary = item.is_vegan || (item.is_vegetarian && !item.is_vegan) || item.is_gluten_free
   return (
     <button
       onClick={onSelect}
-      className="w-full text-left bg-stone-900 border border-stone-800 rounded-2xl overflow-hidden hover:border-amber-700/50 transition-all duration-200 hover:shadow-lg hover:shadow-amber-900/20 group flex flex-col aspect-square"
+      className="w-full text-left bg-stone-900 border border-stone-800 rounded-2xl overflow-hidden hover:border-amber-700/50 transition-all duration-200 hover:shadow-lg hover:shadow-amber-900/20 group flex flex-col"
     >
-      {/* Image — top portion */}
-      <div className="relative flex-1 min-h-0 bg-stone-800">
+      {/* Image */}
+      <div className="relative aspect-[4/3] bg-stone-800">
         {item.image_url ? (
           <Image
             src={item.image_url}
@@ -242,33 +243,42 @@ function MenuItemCard({ item, onSelect }: { item: MenuItemWithDetails; onSelect:
         )}
       </div>
 
-      {/* Info — bottom portion */}
-      <div className="p-3 flex-shrink-0">
-        <div className="flex items-start justify-between gap-1 mb-1.5">
-          <h3 className="font-serif text-stone-50 font-medium text-sm leading-tight group-hover:text-amber-300 transition-colors line-clamp-2">
+      {/* Info */}
+      <div className="p-3 flex flex-col gap-1.5">
+        <div className="flex items-start justify-between gap-2">
+          <h3 className="font-serif text-stone-50 font-medium text-sm leading-tight group-hover:text-amber-300 transition-colors line-clamp-2 flex-1">
             {item.name}
           </h3>
-          <span className="flex-shrink-0 font-semibold text-amber-400 text-sm ml-1">
+          <span className="flex-shrink-0 font-semibold text-amber-400 text-sm">
             {formatPrice(item.price_cents)}
           </span>
         </div>
-        <div className="flex flex-wrap gap-1">
-          {item.is_vegan && (
-            <span className="inline-flex items-center gap-0.5 text-xs px-1.5 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800">
-              <Leaf className="h-2.5 w-2.5" />
-            </span>
-          )}
-          {item.is_vegetarian && !item.is_vegan && (
-            <span className="inline-flex items-center gap-0.5 text-xs px-1.5 py-0.5 rounded-full bg-green-950 text-green-400 border border-green-800">
-              <Heart className="h-2.5 w-2.5" />
-            </span>
-          )}
-          {item.is_gluten_free && (
-            <span className="text-xs px-1.5 py-0.5 rounded-full bg-amber-950 text-amber-400 border border-amber-800 leading-none">
-              GF
-            </span>
-          )}
-        </div>
+        {item.description && (
+          <p className="text-xs text-stone-400 leading-snug line-clamp-2">
+            {item.description}
+          </p>
+        )}
+        {hasDietary && (
+          <div className="flex flex-wrap gap-1 pt-0.5">
+            {item.is_vegan && (
+              <span className="inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800">
+                <Leaf className="h-2.5 w-2.5" />
+                Vegansk
+              </span>
+            )}
+            {item.is_vegetarian && !item.is_vegan && (
+              <span className="inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-green-950 text-green-400 border border-green-800">
+                <Heart className="h-2.5 w-2.5" />
+                Vegetarisk
+              </span>
+            )}
+            {item.is_gluten_free && (
+              <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-amber-950 text-amber-400 border border-amber-800 leading-none">
+                Glutenfritt
+              </span>
+            )}
+          </div>
+        )}
       </div>
     </button>
   )

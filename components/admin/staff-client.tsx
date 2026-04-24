@@ -28,6 +28,11 @@ const roleColors = {
   kitchen: "bg-orange-100 text-orange-700",
   waiter: "bg-blue-100 text-blue-700",
 }
+const roleLabels: Record<"admin" | "kitchen" | "waiter", string> = {
+  admin: "Administratör",
+  kitchen: "Kök",
+  waiter: "Servitör",
+}
 
 export function StaffClient({ staff: initialStaff, restaurantId }: { staff: Staff[]; restaurantId: string }) {
   const [staff, setStaff] = useState(initialStaff)
@@ -44,9 +49,9 @@ export function StaffClient({ staff: initialStaff, restaurantId }: { staff: Staf
   async function onSubmit(data: z.infer<typeof InviteSchema>) {
     const { error } = await inviteStaff(restaurantId, data.email, data.role, data.firstName, data.lastName)
     if (error) {
-      toast({ title: "Failed to invite staff", description: error, variant: "destructive" })
+      toast({ title: "Kunde inte bjuda in personal", description: error, variant: "destructive" })
     } else {
-      toast({ title: "Staff member added" })
+      toast({ title: "Personal tillagd" })
       setShowInvite(false)
       reset()
     }
@@ -62,10 +67,10 @@ export function StaffClient({ staff: initialStaff, restaurantId }: { staff: Staf
   return (
     <div className="max-w-3xl">
       <div className="flex justify-between items-center mb-6">
-        <p className="text-stone-500">{staff.length} team member{staff.length !== 1 ? "s" : ""}</p>
+        <p className="text-stone-500">{staff.length} {staff.length === 1 ? "teammedlem" : "teammedlemmar"}</p>
         <Button variant="amber" onClick={() => setShowInvite(true)}>
           <UserPlus className="h-4 w-4 mr-2" />
-          Add Staff
+          Lägg till personal
         </Button>
       </div>
 
@@ -86,7 +91,7 @@ export function StaffClient({ staff: initialStaff, restaurantId }: { staff: Staf
                 </div>
                 <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${roleColors[member.role]}`}>
                   <Icon className="h-3 w-3" />
-                  {member.role}
+                  {roleLabels[member.role]}
                 </span>
                 <Switch
                   checked={member.is_active}
@@ -101,45 +106,45 @@ export function StaffClient({ staff: initialStaff, restaurantId }: { staff: Staf
       <Dialog open={showInvite} onOpenChange={setShowInvite}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Add Staff Member</DialogTitle>
+            <DialogTitle>Lägg till personal</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label>First Name</Label>
-                <Input {...register("firstName")} placeholder="Jane" />
+                <Label>Förnamn</Label>
+                <Input {...register("firstName")} placeholder="Anna" />
                 {errors.firstName && <p className="text-xs text-red-500">{errors.firstName.message}</p>}
               </div>
               <div className="space-y-1.5">
-                <Label>Last Name</Label>
-                <Input {...register("lastName")} placeholder="Smith" />
+                <Label>Efternamn</Label>
+                <Input {...register("lastName")} placeholder="Svensson" />
                 {errors.lastName && <p className="text-xs text-red-500">{errors.lastName.message}</p>}
               </div>
             </div>
             <div className="space-y-1.5">
-              <Label>Email</Label>
-              <Input {...register("email")} type="email" placeholder="jane@restaurant.com" />
+              <Label>E-post</Label>
+              <Input {...register("email")} type="email" placeholder="anna@restaurang.se" />
               {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
             </div>
             <div className="space-y-1.5">
-              <Label>Role</Label>
+              <Label>Roll</Label>
               <Select value={roleValue} onValueChange={v => setValue("role", v as "admin" | "kitchen" | "waiter")}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="admin">Admin</SelectItem>
-                  <SelectItem value="kitchen">Kitchen</SelectItem>
-                  <SelectItem value="waiter">Waiter</SelectItem>
+                  <SelectItem value="admin">Administratör</SelectItem>
+                  <SelectItem value="kitchen">Kök</SelectItem>
+                  <SelectItem value="waiter">Servitör</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="flex gap-3 pt-2">
               <Button type="button" variant="outline" className="flex-1" onClick={() => setShowInvite(false)}>
-                Cancel
+                Avbryt
               </Button>
               <Button type="submit" variant="amber" className="flex-1" disabled={isSubmitting}>
-                {isSubmitting ? "Adding..." : "Add Staff"}
+                {isSubmitting ? "Lägger till…" : "Lägg till"}
               </Button>
             </div>
           </form>

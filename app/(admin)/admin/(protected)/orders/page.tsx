@@ -4,7 +4,7 @@ import { redirect } from "next/navigation"
 import { getCurrentRestaurant } from "@/lib/actions/restaurant"
 import { OrdersClient } from "@/components/admin/orders-client"
 
-export const metadata: Metadata = { title: "Orders" }
+export const metadata: Metadata = { title: "Beställningar" }
 export const dynamic = 'force-dynamic'
 
 export default async function OrdersPage() {
@@ -28,7 +28,7 @@ export default async function OrdersPage() {
 
   return (
     <div className="p-8">
-      <h1 className="font-serif text-3xl text-stone-800 font-semibold mb-6">Orders</h1>
+      <h1 className="font-serif text-3xl text-stone-800 font-semibold mb-6">Beställningar</h1>
       <OrdersClient
         orders={orders ?? []}
         restaurantId={ctx.restaurant.id}

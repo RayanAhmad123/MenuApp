@@ -1,7 +1,7 @@
 "use client"
 import { useState } from "react"
 import { formatPrice, formatDate } from "@/lib/utils"
-import { updateOrderStatus } from "@/lib/actions/orders"
+import { updateOrderStatus, markOrdersPaid } from "@/lib/actions/orders"
 import { useToast } from "@/hooks/use-toast"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -59,6 +59,17 @@ export function OrdersClient({
     const id = confirmCancelId
     setConfirmCancelId(null)
     await handleStatusChange(id, "cancelled")
+  }
+
+  async function handleMarkPaid(orderId: string) {
+    const { error } = await markOrdersPaid([orderId])
+    if (error) {
+      toast({ title: "Kunde inte markera som betald", variant: "destructive" })
+      return
+    }
+    setOrders(prev => prev.map(o => o.id === orderId ? { ...o, payment_status: "paid" } : o))
+    if (selected?.id === orderId) setSelected(prev => prev ? { ...prev, payment_status: "paid" } : null)
+    toast({ title: "Beställning markerad som betald" })
   }
 
   return (
@@ -199,6 +210,16 @@ export function OrdersClient({
                     onClick={() => handleStatusChange(selected.id, "delivered")}
                   >
                     Markera levererad
+                  </Button>
+                )}
+                {selected.payment_status !== "paid" && selected.status !== "cancelled" && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full text-emerald-700 border-emerald-200 hover:bg-emerald-50"
+                    onClick={() => handleMarkPaid(selected.id)}
+                  >
+                    Markera som betald
                   </Button>
                 )}
                 {!["delivered", "cancelled"].includes(selected.status) && (

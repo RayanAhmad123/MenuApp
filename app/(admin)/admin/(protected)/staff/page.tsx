@@ -4,7 +4,7 @@ import { redirect } from "next/navigation"
 import { getCurrentRestaurant } from "@/lib/actions/restaurant"
 import { StaffClient } from "@/components/admin/staff-client"
 
-export const metadata: Metadata = { title: "Staff" }
+export const metadata: Metadata = { title: "Personal" }
 export const dynamic = 'force-dynamic'
 
 export default async function StaffPage() {
@@ -20,7 +20,7 @@ export default async function StaffPage() {
 
   return (
     <div className="p-8">
-      <h1 className="font-serif text-3xl text-stone-800 font-semibold mb-6">Staff</h1>
+      <h1 className="font-serif text-3xl text-stone-800 font-semibold mb-6">Personal</h1>
       <StaffClient staff={staff ?? []} restaurantId={ctx.restaurant.id} />
     </div>
   )

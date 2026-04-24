@@ -3,7 +3,7 @@ import { redirect } from "next/navigation"
 import { getCurrentRestaurant } from "@/lib/actions/restaurant"
 import { SettingsClient } from "@/components/admin/settings-client"
 
-export const metadata: Metadata = { title: "Settings" }
+export const metadata: Metadata = { title: "Inställningar" }
 export const dynamic = 'force-dynamic'
 
 export default async function SettingsPage() {
@@ -11,7 +11,7 @@ export default async function SettingsPage() {
   if (!ctx) return redirect("/admin/login")
   return (
     <div className="p-8 max-w-2xl">
-      <h1 className="font-serif text-3xl text-stone-800 font-semibold mb-6">Settings</h1>
+      <h1 className="font-serif text-3xl text-stone-800 font-semibold mb-6">Inställningar</h1>
       <SettingsClient restaurant={ctx.restaurant} />
     </div>
   )
