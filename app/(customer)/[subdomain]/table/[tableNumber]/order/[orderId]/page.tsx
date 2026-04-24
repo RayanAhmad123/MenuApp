@@ -104,6 +104,7 @@ export default function OrderStatusPage() {
   }
 
   const currentStep = stepIndex(order.status)
+  const waitEstimate = estimateWait(order.status)
 
   return (
     <div className="menu-page min-h-screen">
@@ -136,6 +137,12 @@ export default function OrderStatusPage() {
              "Väntar på bekräftelse"}
           </div>
           <p className="text-stone-500 text-sm">Bord {tableNumber} · {timeAgo(order.created_at)}</p>
+          {waitEstimate && (
+            <div className="inline-flex items-center gap-1.5 mt-3 px-3 py-1 rounded-full bg-stone-900 border border-stone-800 text-xs text-stone-400">
+              <Clock className="h-3 w-3 text-amber-400" />
+              <span>{waitEstimate}</span>
+            </div>
+          )}
         </div>
 
         {/* Progress steps */}
@@ -228,6 +235,21 @@ export default function OrderStatusPage() {
       </main>
     </div>
   )
+}
+
+function estimateWait(status: string): string | null {
+  switch (status) {
+    case "pending":
+      return "Beräknad väntetid: 15–20 min"
+    case "confirmed":
+      return "Beräknad väntetid: 10–15 min"
+    case "preparing":
+      return "Beräknad väntetid: 5–10 min"
+    case "ready":
+      return "Serveras strax"
+    default:
+      return null
+  }
 }
 
 function LiveIndicator({ state }: { state: LiveState }) {

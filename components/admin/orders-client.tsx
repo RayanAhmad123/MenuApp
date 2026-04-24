@@ -1,10 +1,12 @@
 "use client"
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { formatPrice, formatDate } from "@/lib/utils"
 import { updateOrderStatus, markOrdersPaid } from "@/lib/actions/orders"
 import { useToast } from "@/hooks/use-toast"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Search } from "lucide-react"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -39,9 +41,25 @@ export function OrdersClient({
   const [orders, setOrders] = useState(initialOrders)
   const [selected, setSelected] = useState<OrderWithItems | null>(null)
   const [confirmCancelId, setConfirmCancelId] = useState<string | null>(null)
+  const [tableSearch, setTableSearch] = useState("")
+  const [dateFrom, setDateFrom] = useState("")
+  const [dateTo, setDateTo] = useState("")
   const { toast } = useToast()
 
-  const filtered = filter === "all" ? orders : orders.filter(o => o.status === filter)
+  const filtered = useMemo(() => {
+    const tableQuery = tableSearch.trim()
+    const fromMs = dateFrom ? new Date(`${dateFrom}T00:00:00`).getTime() : -Infinity
+    const toMs = dateTo ? new Date(`${dateTo}T23:59:59.999`).getTime() : Infinity
+    return orders.filter(o => {
+      if (filter !== "all" && o.status !== filter) return false
+      if (tableQuery && !String(o.table_number).includes(tableQuery)) return false
+      const ts = new Date(o.created_at).getTime()
+      if (ts < fromMs || ts > toMs) return false
+      return true
+    })
+  }, [orders, filter, tableSearch, dateFrom, dateTo])
+
+  const hasActiveSearch = tableSearch.trim() !== "" || dateFrom !== "" || dateTo !== ""
 
   async function handleStatusChange(orderId: string, status: OrderWithItems["status"]) {
     const { error } = await updateOrderStatus(orderId, status)
@@ -76,6 +94,44 @@ export function OrdersClient({
     <div className="flex gap-6">
       {/* Orders list */}
       <div className="flex-1 min-w-0">
+        {/* Search + date range */}
+        <div className="flex flex-wrap items-center gap-2 mb-3">
+          <div className="relative">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-stone-400 pointer-events-none" />
+            <Input
+              type="search"
+              inputMode="numeric"
+              placeholder="Sök bord"
+              value={tableSearch}
+              onChange={e => setTableSearch(e.target.value)}
+              className="pl-8 h-9 w-32 text-sm"
+            />
+          </div>
+          <div className="flex items-center gap-1 text-xs text-stone-500">
+            <Input
+              type="date"
+              value={dateFrom}
+              onChange={e => setDateFrom(e.target.value)}
+              className="h-9 w-36 text-sm"
+            />
+            <span>–</span>
+            <Input
+              type="date"
+              value={dateTo}
+              onChange={e => setDateTo(e.target.value)}
+              className="h-9 w-36 text-sm"
+            />
+          </div>
+          {hasActiveSearch && (
+            <button
+              onClick={() => { setTableSearch(""); setDateFrom(""); setDateTo("") }}
+              className="text-xs text-stone-500 hover:text-stone-800 underline"
+            >
+              Rensa
+            </button>
+          )}
+        </div>
+
         {/* Filter tabs */}
         <div className="flex flex-wrap gap-1 mb-4">
           {STATUS_OPTIONS.map(s => (
@@ -123,7 +179,9 @@ export function OrdersClient({
             </button>
           ))}
           {filtered.length === 0 && (
-            <div className="text-center py-12 text-stone-400">Inga beställningar med denna status.</div>
+            <div className="text-center py-12 text-stone-400">
+              {hasActiveSearch ? "Inga beställningar matchar sökningen." : "Inga beställningar med denna status."}
+            </div>
           )}
         </div>
       </div>

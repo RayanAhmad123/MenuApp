@@ -5,7 +5,7 @@ import Image from "next/image"
 import {
   TrendingUp, TrendingDown, ShoppingBag, Clock, Users,
   Award, AlertTriangle, Sparkles, Target, ArrowUpRight, Info,
-  Lightbulb,
+  Lightbulb, X,
 } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
@@ -40,6 +40,7 @@ export function AnalyticsClient({ restaurantId, summary, initialDays }: Props) {
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
   const [itemDetail, setItemDetail] = useState<ItemDeepStat | null>(null)
   const [loadingItem, setLoadingItem] = useState(false)
+  const [insightsDismissed, setInsightsDismissed] = useState(false)
 
   function changeRange(newDays: number) {
     setDays(newDays)
@@ -109,12 +110,19 @@ export function AnalyticsClient({ restaurantId, summary, initialDays }: Props) {
       </div>
 
       {/* Insight cards */}
-      {insights.length > 0 && (
+      {insights.length > 0 && !insightsDismissed && (
         <Card className="border-amber-200 bg-amber-50/50">
           <CardContent className="p-5">
             <div className="flex items-center gap-2 mb-3">
               <Lightbulb className="h-4 w-4 text-amber-600" />
               <h3 className="font-semibold text-stone-800 text-sm">Föreslagna åtgärder</h3>
+              <button
+                onClick={() => setInsightsDismissed(true)}
+                aria-label="Dölj föreslagna åtgärder"
+                className="ml-auto text-stone-400 hover:text-stone-700 transition-colors"
+              >
+                <X className="h-4 w-4" />
+              </button>
             </div>
             <div className="grid md:grid-cols-2 gap-3">
               {insights.map((ins, i) => (

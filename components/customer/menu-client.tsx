@@ -32,15 +32,36 @@ interface Props {
   tableNumber: number
 }
 
+const PING_COOLDOWN_MS = 60_000
+
 export function CustomerMenuClient({ restaurant, subdomain, categories, menuItems, tableNumber }: Props) {
   const [activeCategory, setActiveCategory] = useState<string>(categories[0]?.id ?? "")
   const [selectedItem, setSelectedItem] = useState<MenuItemWithDetails | null>(null)
   const [activeOrderId, setActiveOrderId] = useState<string | null>(null)
+  const [pingCooldownUntil, setPingCooldownUntil] = useState<number>(0)
+  const [now, setNow] = useState(() => Date.now())
   const { items, addItem, itemCount } = useCart()
   const { toast } = useToast()
 
   const filteredItems = menuItems.filter(item => item.category_id === activeCategory)
   const storageKey = `menuapp-active-order-${subdomain}-${tableNumber}`
+  const pingStorageKey = `menuapp-last-ping-${subdomain}-${tableNumber}`
+  const cooldownRemaining = Math.max(0, Math.ceil((pingCooldownUntil - now) / 1000))
+
+  useEffect(() => {
+    const stored = (() => {
+      try { return Number(localStorage.getItem(pingStorageKey) ?? "0") } catch { return 0 }
+    })()
+    if (stored && stored + PING_COOLDOWN_MS > Date.now()) {
+      setPingCooldownUntil(stored + PING_COOLDOWN_MS)
+    }
+  }, [pingStorageKey])
+
+  useEffect(() => {
+    if (cooldownRemaining <= 0) return
+    const id = setInterval(() => setNow(Date.now()), 1000)
+    return () => clearInterval(id)
+  }, [cooldownRemaining])
 
   // Restore the active order link if the guest re-enters the menu.
   useEffect(() => {
@@ -70,10 +91,15 @@ export function CustomerMenuClient({ restaurant, subdomain, categories, menuItem
   }
 
   async function handlePingWaiter() {
+    if (cooldownRemaining > 0) return
     const { error } = await createTablePing(restaurant.id, tableNumber, "assistance")
     if (error) {
       toast({ title: "Kunde inte tillkalla servitör", variant: "destructive" })
     } else {
+      const until = Date.now() + PING_COOLDOWN_MS
+      setPingCooldownUntil(until)
+      setNow(Date.now())
+      try { localStorage.setItem(pingStorageKey, String(Date.now())) } catch { /* ignore */ }
       toast({ title: "Servitör tillkallad", description: "Någon kommer strax." })
     }
   }
@@ -82,7 +108,7 @@ export function CustomerMenuClient({ restaurant, subdomain, categories, menuItem
     <div className="menu-page min-h-screen">
       {/* Header */}
       <header className="sticky top-0 z-40 bg-stone-950/95 backdrop-blur-md border-b border-stone-800">
-        <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             {restaurant.logo_url && (
               <Image
@@ -103,10 +129,13 @@ export function CustomerMenuClient({ restaurant, subdomain, categories, menuItem
               variant="ghost"
               size="sm"
               onClick={handlePingWaiter}
-              className="text-amber-400 hover:text-amber-300 hover:bg-stone-800"
+              disabled={cooldownRemaining > 0}
+              className="text-amber-400 hover:text-amber-300 hover:bg-stone-800 disabled:opacity-60 disabled:cursor-not-allowed"
             >
               <Bell className="h-4 w-4 mr-1" />
-              <span className="hidden sm:inline">Servitör</span>
+              <span className="hidden sm:inline">
+                {cooldownRemaining > 0 ? `${cooldownRemaining}s` : "Servitör"}
+              </span>
             </Button>
             <Link href={`/${subdomain}/table/${tableNumber}/cart`}>
               <Button
@@ -129,7 +158,7 @@ export function CustomerMenuClient({ restaurant, subdomain, categories, menuItem
 
       {/* Category tabs */}
       <div className="sticky top-[73px] z-30 bg-stone-950/90 backdrop-blur-md border-b border-stone-800">
-        <div className="max-w-2xl mx-auto px-4">
+        <div className="max-w-5xl mx-auto px-4">
           <div className="flex gap-1 overflow-x-auto py-3 scrollbar-hide">
             {categories.map(cat => (
               <button
@@ -150,7 +179,7 @@ export function CustomerMenuClient({ restaurant, subdomain, categories, menuItem
 
       {/* Active order banner */}
       {activeOrderId && (
-        <div className="max-w-2xl mx-auto px-4 pt-4">
+        <div className="max-w-5xl mx-auto px-4 pt-4">
           <div className="flex items-center gap-3 bg-amber-950/60 border border-amber-800 rounded-xl px-4 py-3">
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-amber-200">Du har en aktiv beställning</p>
@@ -175,8 +204,8 @@ export function CustomerMenuClient({ restaurant, subdomain, categories, menuItem
       )}
 
       {/* Menu items grid */}
-      <main className="max-w-2xl mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 gap-3">
+      <main className="max-w-5xl mx-auto px-4 py-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {filteredItems.map(item => (
             <MenuItemCard
               key={item.id}

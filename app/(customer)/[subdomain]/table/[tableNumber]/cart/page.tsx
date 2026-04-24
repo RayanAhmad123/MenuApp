@@ -195,6 +195,13 @@ export default function CartPage() {
             >
               {isPlacingOrder ? "Bearbetar..." : `Beställ · ${formatPrice(totalCents)}`}
             </Button>
+
+            <Link
+              href={`/${subdomain}/table/${tableNumber}`}
+              className="block text-center text-sm text-stone-400 hover:text-amber-400 transition-colors py-2"
+            >
+              ← Fortsätt handla
+            </Link>
           </>
         ) : (
           <Elements stripe={stripePromise} options={{ clientSecret, appearance: { theme: "night" } }}>
