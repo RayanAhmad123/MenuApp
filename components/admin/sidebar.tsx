@@ -10,13 +10,13 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 
 const navItems = [
-  { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/admin/analytics", label: "Analytics", icon: BarChart3 },
-  { href: "/admin/menu", label: "Menu", icon: UtensilsCrossed },
-  { href: "/admin/orders", label: "Orders", icon: ClipboardList },
-  { href: "/admin/staff", label: "Staff", icon: Users },
-  { href: "/admin/qr-codes", label: "QR Codes", icon: QrCode },
-  { href: "/admin/settings", label: "Settings", icon: Settings },
+  { href: "/admin/dashboard", label: "Översikt", icon: LayoutDashboard },
+  { href: "/admin/analytics", label: "Analys", icon: BarChart3 },
+  { href: "/admin/menu", label: "Meny", icon: UtensilsCrossed },
+  { href: "/admin/orders", label: "Beställningar", icon: ClipboardList },
+  { href: "/admin/staff", label: "Personal", icon: Users },
+  { href: "/admin/qr-codes", label: "QR-koder", icon: QrCode },
+  { href: "/admin/settings", label: "Inställningar", icon: Settings },
 ]
 
 interface Props {
@@ -82,10 +82,12 @@ export function AdminSidebar({ restaurantName, logoUrl, staffName, role }: Props
         <div className="border-t border-stone-800 pt-2 mt-2">
           <Link
             href="/kitchen"
+            target="_blank"
+            rel="noopener noreferrer"
             className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-stone-400 hover:text-stone-100 hover:bg-stone-800 transition-all"
           >
             <ChefHat className="h-4 w-4" />
-            Kitchen View
+            Köksvy
           </Link>
         </div>
       </nav>
@@ -105,7 +107,7 @@ export function AdminSidebar({ restaurantName, logoUrl, staffName, role }: Props
           className="flex items-center gap-2 text-sm text-stone-500 hover:text-stone-300 transition-colors w-full"
         >
           <LogOut className="h-4 w-4" />
-          Sign out
+          Logga ut
         </button>
       </div>
     </aside>

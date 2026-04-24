@@ -1,14 +1,15 @@
 "use client"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { ShoppingCart, Bell, Leaf, Wheat, Heart, UtensilsCrossed } from "lucide-react"
+import { ShoppingCart, Bell, Leaf, Heart, UtensilsCrossed, ArrowRight, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { useCart } from "@/hooks/use-cart"
 import { formatPrice } from "@/lib/utils"
 import { createTablePing } from "@/lib/actions/orders"
+import { createClient } from "@/lib/supabase/client"
 import { useToast } from "@/hooks/use-toast"
 import type { Category, MenuItem } from "@/types/database"
 
@@ -34,10 +35,39 @@ interface Props {
 export function CustomerMenuClient({ restaurant, subdomain, categories, menuItems, tableNumber }: Props) {
   const [activeCategory, setActiveCategory] = useState<string>(categories[0]?.id ?? "")
   const [selectedItem, setSelectedItem] = useState<MenuItemWithDetails | null>(null)
+  const [activeOrderId, setActiveOrderId] = useState<string | null>(null)
   const { items, addItem, itemCount } = useCart()
   const { toast } = useToast()
 
   const filteredItems = menuItems.filter(item => item.category_id === activeCategory)
+  const storageKey = `menuapp-active-order-${subdomain}-${tableNumber}`
+
+  // Restore the active order link if the guest re-enters the menu.
+  useEffect(() => {
+    const stored = (() => {
+      try { return localStorage.getItem(storageKey) } catch { return null }
+    })()
+    if (!stored) return
+
+    const supabase = createClient()
+    supabase
+      .from("orders")
+      .select("id, status")
+      .eq("id", stored)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (!data || data.status === "delivered" || data.status === "cancelled") {
+          try { localStorage.removeItem(storageKey) } catch { /* ignore */ }
+          return
+        }
+        setActiveOrderId(data.id)
+      })
+  }, [storageKey])
+
+  function dismissActiveOrder() {
+    setActiveOrderId(null)
+    try { localStorage.removeItem(storageKey) } catch { /* ignore */ }
+  }
 
   async function handlePingWaiter() {
     const { error } = await createTablePing(restaurant.id, tableNumber, "assistance")
@@ -117,6 +147,32 @@ export function CustomerMenuClient({ restaurant, subdomain, categories, menuItem
           </div>
         </div>
       </div>
+
+      {/* Active order banner */}
+      {activeOrderId && (
+        <div className="max-w-2xl mx-auto px-4 pt-4">
+          <div className="flex items-center gap-3 bg-amber-950/60 border border-amber-800 rounded-xl px-4 py-3">
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-amber-200">Du har en aktiv beställning</p>
+              <p className="text-xs text-amber-400/70">Följ status i realtid.</p>
+            </div>
+            <Link
+              href={`/${subdomain}/table/${tableNumber}/order/${activeOrderId}`}
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-amber-500 text-stone-900 text-sm font-semibold hover:bg-amber-400 transition-colors"
+            >
+              Visa
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+            <button
+              onClick={dismissActiveOrder}
+              aria-label="Dölj"
+              className="text-amber-400/60 hover:text-amber-300 transition-colors"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Menu items grid */}
       <main className="max-w-2xl mx-auto px-4 py-6">

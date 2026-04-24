@@ -49,6 +49,16 @@ export default function CartPage() {
         toast({ title: result.error ?? "Något gick fel", variant: "destructive" })
         return
       }
+      if (result.orderId) {
+        try {
+          localStorage.setItem(
+            `menuapp-active-order-${subdomain}-${tableNumber}`,
+            result.orderId
+          )
+        } catch {
+          // Private mode / quota — non-critical
+        }
+      }
       if (!restaurant.payment_enabled) {
         // No payment needed — go straight to order confirmation
         clearCart()

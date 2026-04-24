@@ -1,6 +1,7 @@
 "use client"
 import { useState, useEffect, useCallback, useMemo } from "react"
-import { Bell, CheckCircle2, UtensilsCrossed, AlertCircle, Coffee, CreditCard, ChevronRight, Clock, ChefHat, X, Utensils } from "lucide-react"
+import Link from "next/link"
+import { Bell, CheckCircle2, UtensilsCrossed, AlertCircle, Coffee, CreditCard, ChevronRight, Clock, ChefHat, X, Utensils, LayoutDashboard } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { updateOrderStatus, markItemsPaid } from "@/lib/actions/orders"
 import { formatPrice } from "@/lib/utils"
@@ -49,6 +50,7 @@ interface TableBillingOrder {
 interface Props {
   restaurantId: string
   staffName: string
+  role: string
   initialPings: TablePing[]
   initialPendingOrders: PendingOrder[]
   initialActiveOrders: ActiveOrder[]
@@ -76,7 +78,7 @@ const PING_ICON_COLORS: Record<string, string> = {
 // ── Component ────────────────────────────────────────────────────────────────
 
 export function StaffClient({
-  restaurantId, staffName,
+  restaurantId, staffName, role,
   initialPings, initialPendingOrders, initialActiveOrders, initialTableOrders,
   yellowThreshold, redThreshold, paymentEnabled,
 }: Props) {
@@ -292,6 +294,15 @@ export function StaffClient({
           )}
           {activeOrders.length > 0 && (
             <span className="px-2.5 py-1 bg-amber-500 text-stone-900 text-xs font-bold rounded-full">{activeOrders.length} aktiv{activeOrders.length !== 1 ? "a" : ""}</span>
+          )}
+          {role === "admin" && (
+            <Link
+              href="/admin/dashboard"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-stone-800 text-stone-300 text-xs font-medium hover:bg-stone-700 hover:text-stone-100 transition-colors"
+            >
+              <LayoutDashboard className="h-3.5 w-3.5" />
+              Till admin
+            </Link>
           )}
         </div>
       </div>

@@ -1,10 +1,20 @@
 "use client"
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
 import QRCode from "qrcode"
-import { Download, Plus, Trash2, QrCode } from "lucide-react"
+import { Download, Plus, Trash2, QrCode, Printer } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { useToast } from "@/hooks/use-toast"
 import { createClient } from "@/lib/supabase/client"
 import type { QrCode as QrCodeType } from "@/types/database"
@@ -19,11 +29,11 @@ export function QrCodesClient({ restaurantId, restaurantSubdomain, initialQrCode
   const [qrCodes, setQrCodes] = useState(initialQrCodes)
   const [tableCount, setTableCount] = useState("")
   const [generating, setGenerating] = useState(false)
+  const [confirmCount, setConfirmCount] = useState<{ toCreate: number[] } | null>(null)
   const [qrDataUrls, setQrDataUrls] = useState<Record<number, string>>({})
   const { toast } = useToast()
   const supabase = createClient()
 
-  // Generate QR data URLs for all table numbers
   useEffect(() => {
     async function generateAll() {
       const urls: Record<number, string> = {}
@@ -45,13 +55,12 @@ export function QrCodesClient({ restaurantId, restaurantSubdomain, initialQrCode
     if (qrCodes.length > 0) generateAll()
   }, [qrCodes, restaurantSubdomain])
 
-  async function handleGenerateTables() {
+  function handleStartGenerate() {
     const count = parseInt(tableCount, 10)
     if (isNaN(count) || count < 1 || count > 100) {
-      toast({ title: "Enter a number between 1 and 100", variant: "destructive" })
+      toast({ title: "Ange ett antal mellan 1 och 100", variant: "destructive" })
       return
     }
-    setGenerating(true)
 
     const existingNumbers = new Set(qrCodes.map(q => q.table_number))
     const toCreate: number[] = []
@@ -60,10 +69,18 @@ export function QrCodesClient({ restaurantId, restaurantSubdomain, initialQrCode
     }
 
     if (toCreate.length === 0) {
-      toast({ title: "All tables up to that number already exist." })
-      setGenerating(false)
+      toast({ title: "Alla bord upp till det numret finns redan" })
       return
     }
+
+    setConfirmCount({ toCreate })
+  }
+
+  async function handleConfirmGenerate() {
+    if (!confirmCount) return
+    const { toCreate } = confirmCount
+    setConfirmCount(null)
+    setGenerating(true)
 
     const rows = toCreate.map(table_number => ({
       restaurant_id: restaurantId,
@@ -75,10 +92,10 @@ export function QrCodesClient({ restaurantId, restaurantSubdomain, initialQrCode
     setGenerating(false)
 
     if (error) {
-      toast({ title: "Failed to generate QR codes", variant: "destructive" })
+      toast({ title: "Kunde inte skapa QR-koder", variant: "destructive" })
     } else {
       setQrCodes(prev => [...prev, ...(data ?? [])].sort((a, b) => a.table_number - b.table_number))
-      toast({ title: `${toCreate.length} QR code${toCreate.length !== 1 ? "s" : ""} created` })
+      toast({ title: `${toCreate.length} QR-kod${toCreate.length !== 1 ? "er" : ""} skapad${toCreate.length !== 1 ? "e" : ""}` })
       setTableCount("")
     }
   }
@@ -86,7 +103,7 @@ export function QrCodesClient({ restaurantId, restaurantSubdomain, initialQrCode
   async function handleDelete(id: string, tableNumber: number) {
     const { error } = await supabase.from("qr_codes").delete().eq("id", id)
     if (error) {
-      toast({ title: "Failed to delete QR code", variant: "destructive" })
+      toast({ title: "Kunde inte ta bort QR-kod", variant: "destructive" })
     } else {
       setQrCodes(prev => prev.filter(q => q.id !== id))
       setQrDataUrls(prev => {
@@ -102,7 +119,7 @@ export function QrCodesClient({ restaurantId, restaurantSubdomain, initialQrCode
     if (!dataUrl) return
     const link = document.createElement("a")
     link.href = dataUrl
-    link.download = `table-${tableNumber}-qr.png`
+    link.download = `bord-${tableNumber}-qr.png`
     link.click()
   }
 
@@ -114,59 +131,76 @@ export function QrCodesClient({ restaurantId, restaurantSubdomain, initialQrCode
     }
   }
 
+  function handlePrint() {
+    window.print()
+  }
+
   return (
     <div className="space-y-6">
+      {/* Current count */}
+      <div className="flex items-baseline gap-3 print:hidden">
+        <span className="font-serif text-2xl font-semibold text-stone-800">{qrCodes.length}</span>
+        <span className="text-sm text-stone-500">
+          {qrCodes.length === 1 ? "bord registrerat" : "bord registrerade"}
+        </span>
+      </div>
+
       {/* Generate controls */}
-      <div className="flex items-end gap-3">
+      <div className="flex flex-wrap items-end gap-3 print:hidden">
         <div className="space-y-1.5">
-          <label className="text-sm font-medium text-stone-700">Number of tables</label>
+          <label className="text-sm font-medium text-stone-700">Antal bord</label>
           <Input
             type="number"
             min={1}
             max={100}
-            placeholder="e.g. 20"
+            placeholder="t.ex. 20"
             value={tableCount}
             onChange={e => setTableCount(e.target.value)}
-            onKeyDown={e => { if (e.key === "Enter") handleGenerateTables() }}
+            onKeyDown={e => { if (e.key === "Enter") handleStartGenerate() }}
             className="w-36"
           />
         </div>
-        <Button variant="amber" onClick={handleGenerateTables} disabled={generating || !tableCount}>
+        <Button variant="amber" onClick={handleStartGenerate} disabled={generating || !tableCount}>
           <Plus className="h-4 w-4 mr-1" />
-          {generating ? "Creating…" : "Generate Tables"}
+          {generating ? "Skapar…" : "Skapa bord"}
         </Button>
         {qrCodes.length > 0 && (
-          <Button variant="outline" onClick={handleDownloadAll}>
-            <Download className="h-4 w-4 mr-1" /> Download All
-          </Button>
+          <>
+            <Button variant="outline" onClick={handleDownloadAll}>
+              <Download className="h-4 w-4 mr-1" /> Ladda ner alla
+            </Button>
+            <Button variant="outline" onClick={handlePrint}>
+              <Printer className="h-4 w-4 mr-1" /> Skriv ut
+            </Button>
+          </>
         )}
       </div>
 
       {/* Info */}
-      <div className="bg-amber-50 border border-amber-100 rounded-xl p-4 text-sm text-amber-800">
+      <div className="bg-amber-50 border border-amber-100 rounded-xl p-4 text-sm text-amber-800 print:hidden">
         <p>
-          Customer menu URL pattern:{" "}
+          Mönster för gästmenylänk:{" "}
           <code className="font-mono bg-amber-100 px-1.5 py-0.5 rounded text-xs">
-            {typeof window !== "undefined" ? window.location.origin : ""}/{restaurantSubdomain}/table/[number]
+            {typeof window !== "undefined" ? window.location.origin : ""}/{restaurantSubdomain}/table/[nummer]
           </code>
         </p>
       </div>
 
       {/* QR code grid */}
       {qrCodes.length === 0 ? (
-        <div className="text-center py-20 text-stone-400">
+        <div className="text-center py-20 text-stone-400 print:hidden">
           <QrCode className="h-12 w-12 mx-auto mb-3 text-stone-300" />
-          <p>No QR codes yet. Enter a table count above and click Generate.</p>
+          <p>Inga QR-koder ännu. Ange ett antal bord ovan och klicka på Skapa.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 print:grid-cols-3 print:gap-6">
           {qrCodes.map(qr => (
-            <Card key={qr.id} className="border-stone-200">
+            <Card key={qr.id} className="border-stone-200 print:break-inside-avoid print:border-stone-400">
               <CardContent className="p-4 flex flex-col items-center gap-3">
                 {qrDataUrls[qr.table_number] ? (
                   <img
                     src={qrDataUrls[qr.table_number]}
-                    alt={`Table ${qr.table_number} QR`}
+                    alt={`Bord ${qr.table_number} QR`}
                     className="w-full aspect-square rounded-lg"
                   />
                 ) : (
@@ -174,8 +208,8 @@ export function QrCodesClient({ restaurantId, restaurantSubdomain, initialQrCode
                     <QrCode className="h-8 w-8 text-stone-300" />
                   </div>
                 )}
-                <p className="text-sm font-semibold text-stone-700">Table {qr.table_number}</p>
-                <div className="flex gap-1 w-full">
+                <p className="text-sm font-semibold text-stone-700">Bord {qr.table_number}</p>
+                <div className="flex gap-1 w-full print:hidden">
                   <Button
                     variant="outline"
                     size="sm"
@@ -183,7 +217,7 @@ export function QrCodesClient({ restaurantId, restaurantSubdomain, initialQrCode
                     onClick={() => handleDownload(qr.table_number)}
                     disabled={!qrDataUrls[qr.table_number]}
                   >
-                    <Download className="h-3 w-3 mr-1" /> Save
+                    <Download className="h-3 w-3 mr-1" /> Spara
                   </Button>
                   <Button
                     variant="outline"
@@ -199,6 +233,31 @@ export function QrCodesClient({ restaurantId, restaurantSubdomain, initialQrCode
           ))}
         </div>
       )}
+
+      <AlertDialog open={confirmCount !== null} onOpenChange={open => { if (!open) setConfirmCount(null) }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Skapa nya bord?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {confirmCount && (
+                <>
+                  Detta skapar {confirmCount.toCreate.length} nya bord
+                  {confirmCount.toCreate.length <= 10
+                    ? ` (bord ${confirmCount.toCreate.join(", ")}).`
+                    : ` (bord ${confirmCount.toCreate[0]}–${confirmCount.toCreate[confirmCount.toCreate.length - 1]}).`}
+                  {" "}Befintliga QR-koder förblir oförändrade.
+                </>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Avbryt</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmGenerate} className="bg-amber-500 text-stone-900 hover:bg-amber-400">
+              Skapa bord
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

@@ -2,7 +2,7 @@
 import { useEffect, useState, useCallback, useMemo, useRef } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
-import { CheckCircle2, Clock, ChefHat, CheckCheck, Truck, Bell, ArrowLeft } from "lucide-react"
+import { CheckCircle2, Clock, ChefHat, CheckCheck, Truck, Bell, ArrowLeft, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { createClient } from "@/lib/supabase/client"
 import { formatPrice, timeAgo } from "@/lib/utils"
@@ -205,18 +205,26 @@ export default function OrderStatusPage() {
           </div>
         </div>
 
-        {/* Ping waiter */}
-        <Button
-          variant="outline"
-          className="w-full border-stone-700 text-stone-400 hover:text-stone-200 hover:bg-stone-800"
-          onClick={async () => {
-            const { createTablePing } = await import("@/lib/actions/orders")
-            await createTablePing(order.restaurant_id, order.table_number, "assistance", order.id)
-          }}
-        >
-          <Bell className="h-4 w-4 mr-2" />
-          Tillkalla servitör
-        </Button>
+        {/* Actions */}
+        <div className="space-y-2">
+          <Link href={`/${subdomain}/table/${tableNumber}`}>
+            <Button variant="amber" size="xl" className="w-full">
+              <Plus className="h-4 w-4 mr-2" />
+              Beställ mer
+            </Button>
+          </Link>
+          <Button
+            variant="outline"
+            className="w-full border-stone-700 text-stone-400 hover:text-stone-200 hover:bg-stone-800"
+            onClick={async () => {
+              const { createTablePing } = await import("@/lib/actions/orders")
+              await createTablePing(order.restaurant_id, order.table_number, "assistance", order.id)
+            }}
+          >
+            <Bell className="h-4 w-4 mr-2" />
+            Tillkalla servitör
+          </Button>
+        </div>
       </main>
     </div>
   )

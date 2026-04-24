@@ -71,6 +71,7 @@ export default async function WaiterPage() {
     <StaffClient
       restaurantId={staff.restaurant_id}
       staffName={staff.first_name}
+      role={staff.role}
       initialPings={pings ?? []}
       initialPendingOrders={pendingOrders ?? []}
       initialActiveOrders={activeOrders ?? []}
