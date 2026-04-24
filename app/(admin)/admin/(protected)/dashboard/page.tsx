@@ -9,9 +9,30 @@ import { TrendingUp, ShoppingBag, Clock, Table2, ArrowUpRight, Flame, BarChart3 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import type { Order } from "@/types/database"
 
-export const metadata: Metadata = { title: "Dashboard" }
+export const metadata: Metadata = { title: "Översikt" }
 export const dynamic = 'force-dynamic'
 
+const STATUS_LABELS: Record<string, string> = {
+  pending: "Väntar",
+  confirmed: "Bekräftad",
+  preparing: "Tillagas",
+  ready: "Klar",
+  delivered: "Levererad",
+  cancelled: "Avbruten",
+}
+
+const PAYMENT_LABELS: Record<string, string> = {
+  paid: "Betald",
+  unpaid: "Obetald",
+  refunded: "Återbetald",
+  pending: "Väntar",
+  failed: "Misslyckad",
+}
+
+// Note: "today" is UTC-based. Swedish restaurants in CET/CEST will see the
+// boundary flip 1–2h before local midnight. Revenue/orders/pending count
+// intentionally use this window; Active Tables is decoupled because live
+// service carries across midnight.
 export default async function DashboardPage() {
   const ctx = await getCurrentRestaurant()
   if (!ctx) return redirect("/admin/login")
@@ -19,7 +40,7 @@ export default async function DashboardPage() {
   const supabase = await createServerSupabaseClient()
   const today = new Date().toISOString().split("T")[0]
 
-  const [ordersResult, summary, restaurantResult] = await Promise.all([
+  const [ordersResult, summary, restaurantResult, liveOrdersResult] = await Promise.all([
     supabase
       .from("orders")
       .select("*")
@@ -32,6 +53,15 @@ export default async function DashboardPage() {
       .select("payment_enabled")
       .eq("id", ctx.restaurant.id)
       .maybeSingle(),
+    // Active Tables looks at live orders regardless of the UTC "today" window,
+    // but caps at 24h to avoid counting orphaned orders that never got marked
+    // delivered (stuck-in-"ready" is a common real-world hygiene issue).
+    supabase
+      .from("orders")
+      .select("table_number")
+      .eq("restaurant_id", ctx.restaurant.id)
+      .in("status", ["pending", "confirmed", "preparing", "ready"])
+      .gte("created_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()),
   ])
 
   const orders = (ordersResult.data ?? []) as Pick<Order, "id" | "total_cents" | "status" | "payment_status" | "table_number" | "created_at">[]
@@ -42,24 +72,25 @@ export default async function DashboardPage() {
     .filter(o => (paymentEnabled ? o.payment_status === "paid" : o.status !== "cancelled"))
     .reduce((s, o) => s + o.total_cents, 0)
   const pendingOrders = orders.filter(o => ["pending", "confirmed", "preparing"].includes(o.status)).length
-  const activeTables = new Set(orders.filter(o => !["delivered", "cancelled"].includes(o.status)).map(o => o.table_number)).size
+  const liveTableRows = (liveOrdersResult.data ?? []) as Pick<Order, "table_number">[]
+  const activeTables = new Set(liveTableRows.map(o => o.table_number)).size
   const topSellers = summary.topItems.filter(i => i.quantitySold > 0).slice(0, 5)
   const peakHour = summary.hourly.reduce((best, h) => h.orders > best.orders ? h : best, summary.hourly[0])
 
   const stats = [
-    { title: "Today's Revenue", value: formatPrice(totalRevenue), icon: TrendingUp, color: "text-emerald-600", bg: "bg-emerald-50" },
-    { title: "Orders Today", value: String(orders.length), icon: ShoppingBag, color: "text-blue-600", bg: "bg-blue-50" },
-    { title: "Pending Orders", value: String(pendingOrders), icon: Clock, color: "text-amber-600", bg: "bg-amber-50" },
-    { title: "Active Tables", value: String(activeTables), icon: Table2, color: "text-purple-600", bg: "bg-purple-50" },
+    { title: "Intäkter idag", value: formatPrice(totalRevenue), icon: TrendingUp, color: "text-emerald-600", bg: "bg-emerald-50" },
+    { title: "Beställningar idag", value: String(orders.length), icon: ShoppingBag, color: "text-blue-600", bg: "bg-blue-50" },
+    { title: "Pågående beställningar", value: String(pendingOrders), icon: Clock, color: "text-amber-600", bg: "bg-amber-50" },
+    { title: "Aktiva bord", value: String(activeTables), icon: Table2, color: "text-purple-600", bg: "bg-purple-50" },
   ]
 
   return (
     <div className="p-8">
       <div className="mb-8">
         <h1 className="font-serif text-3xl text-stone-800 font-semibold">
-          Good {getTimeOfDay()}, {ctx.staffName.split(" ")[0]}
+          Hej, {ctx.staffName.split(" ")[0]}
         </h1>
-        <p className="text-stone-500 mt-1">Here's what's happening at {ctx.restaurant.name} today.</p>
+        <p className="text-stone-500 mt-1">Så här ser dagen ut på {ctx.restaurant.name}.</p>
       </div>
 
       {/* Stats grid */}
@@ -88,15 +119,15 @@ export default async function DashboardPage() {
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-stone-800 text-xl flex items-center gap-2">
               <Flame className="h-4 w-4 text-amber-600" />
-              Top sellers — last 7 days
+              Bästsäljare — senaste 7 dagarna
             </CardTitle>
             <Link href="/admin/analytics" className="text-xs text-amber-700 hover:underline flex items-center gap-1">
-              Full analytics <ArrowUpRight className="h-3 w-3" />
+              Full analys <ArrowUpRight className="h-3 w-3" />
             </Link>
           </CardHeader>
           <CardContent>
             {topSellers.length === 0 ? (
-              <p className="text-stone-400 text-center py-8 text-sm">No sales yet — share QR codes with guests to get started.</p>
+              <p className="text-stone-400 text-center py-8 text-sm">Inga sälj än — dela QR-koder med gästerna för att komma igång.</p>
             ) : (
               <div className="space-y-1.5">
                 {topSellers.map((item, i) => (
@@ -119,30 +150,30 @@ export default async function DashboardPage() {
           <CardHeader>
             <CardTitle className="text-stone-800 text-xl flex items-center gap-2">
               <BarChart3 className="h-4 w-4 text-amber-600" />
-              7-day pulse
+              7-dagars puls
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
             <div className="flex justify-between">
-              <span className="text-stone-500">Revenue</span>
+              <span className="text-stone-500">Intäkter</span>
               <span className="font-semibold text-stone-800">{formatPrice(summary.totalRevenueCents)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-stone-500">Orders</span>
+              <span className="text-stone-500">Beställningar</span>
               <span className="font-semibold text-stone-800">{summary.totalOrders}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-stone-500">Avg order</span>
+              <span className="text-stone-500">Snitt per beställning</span>
               <span className="font-semibold text-stone-800">{formatPrice(summary.avgOrderCents)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-stone-500">Peak hour</span>
+              <span className="text-stone-500">Topptimme</span>
               <span className="font-semibold text-stone-800">
                 {peakHour && peakHour.orders > 0 ? `${String(peakHour.hour).padStart(2, "0")}:00` : "—"}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-stone-500">Items / order</span>
+              <span className="text-stone-500">Rätter per beställning</span>
               <span className="font-semibold text-stone-800">{summary.avgItemsPerOrder.toFixed(1)}</span>
             </div>
           </CardContent>
@@ -152,29 +183,29 @@ export default async function DashboardPage() {
       {/* Recent orders table */}
       <Card className="border-stone-200">
         <CardHeader>
-          <CardTitle className="text-stone-800 text-xl">Recent Orders</CardTitle>
+          <CardTitle className="text-stone-800 text-xl">Senaste beställningarna</CardTitle>
         </CardHeader>
         <CardContent>
           {orders.length === 0 ? (
-            <p className="text-stone-400 text-center py-8">No orders yet today.</p>
+            <p className="text-stone-400 text-center py-8">Inga beställningar idag än.</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="text-left text-stone-500 border-b border-stone-100">
-                    <th className="pb-3 font-medium">Table</th>
-                    <th className="pb-3 font-medium">Time</th>
+                    <th className="pb-3 font-medium">Bord</th>
+                    <th className="pb-3 font-medium">Tid</th>
                     <th className="pb-3 font-medium">Status</th>
-                    <th className="pb-3 font-medium">Payment</th>
-                    <th className="pb-3 font-medium text-right">Total</th>
+                    <th className="pb-3 font-medium">Betalning</th>
+                    <th className="pb-3 font-medium text-right">Totalt</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-stone-50">
                   {orders.slice(0, 15).map(order => (
                     <tr key={order.id} className="hover:bg-stone-50 transition-colors">
-                      <td className="py-3 font-medium text-stone-800">Table {order.table_number}</td>
+                      <td className="py-3 font-medium text-stone-800">Bord {order.table_number}</td>
                       <td className="py-3 text-stone-500">
-                        {new Date(order.created_at).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
+                        {new Date(order.created_at).toLocaleTimeString("sv-SE", { hour: "2-digit", minute: "2-digit" })}
                       </td>
                       <td className="py-3">
                         <StatusBadge status={order.status} />
@@ -185,7 +216,7 @@ export default async function DashboardPage() {
                             ? "bg-emerald-100 text-emerald-700"
                             : "bg-stone-100 text-stone-500"
                         }`}>
-                          {order.payment_status}
+                          {PAYMENT_LABELS[order.payment_status] ?? order.payment_status}
                         </span>
                       </td>
                       <td className="py-3 text-right font-medium text-stone-800">
@@ -213,15 +244,8 @@ function StatusBadge({ status }: { status: string }) {
     cancelled: "bg-red-100 text-red-700",
   }
   return (
-    <span className={`text-xs px-2 py-0.5 rounded-full capitalize ${styles[status] ?? styles.pending}`}>
-      {status}
+    <span className={`text-xs px-2 py-0.5 rounded-full ${styles[status] ?? styles.pending}`}>
+      {STATUS_LABELS[status] ?? status}
     </span>
   )
-}
-
-function getTimeOfDay() {
-  const h = new Date().getHours()
-  if (h < 12) return "morning"
-  if (h < 17) return "afternoon"
-  return "evening"
 }

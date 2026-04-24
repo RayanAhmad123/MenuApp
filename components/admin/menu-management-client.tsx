@@ -52,6 +52,12 @@ const ItemSchema = z.object({
 
 type ItemFormValues = z.infer<typeof ItemSchema>
 
+function formatCentsPreview(cents: unknown): string | null {
+  const n = typeof cents === "number" ? cents : Number(cents)
+  if (!Number.isFinite(n) || n <= 0) return null
+  return `= ${formatPrice(Math.round(n))}`
+}
+
 interface Props {
   restaurantId: string
   categories: Category[]
@@ -462,7 +468,10 @@ export function MenuManagementClient({ restaurantId, categories: initCats, menuI
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label>Pris (i ören) *</Label>
-                <Input type="number" {...form.register("priceCents")} placeholder="12000" />
+                <Input type="number" {...form.register("priceCents")} placeholder="t.ex. 12000" />
+                <p className="text-[11px] text-stone-400">
+                  {formatCentsPreview(form.watch("priceCents"))}
+                </p>
                 {form.formState.errors.priceCents && (
                   <p className="text-xs text-red-500">{form.formState.errors.priceCents.message}</p>
                 )}
@@ -471,8 +480,10 @@ export function MenuManagementClient({ restaurantId, categories: initCats, menuI
                 <Label className="flex items-center gap-1">
                   Matkostnad <span className="text-stone-400 text-xs">(valfritt)</span>
                 </Label>
-                <Input type="number" {...form.register("costCents")} placeholder="4000" />
-                <p className="text-[11px] text-stone-400">Låser upp riktig marginalanalys.</p>
+                <Input type="number" {...form.register("costCents")} placeholder="t.ex. 4000" />
+                <p className="text-[11px] text-stone-400">
+                  {formatCentsPreview(form.watch("costCents")) ?? "Låser upp riktig marginalanalys."}
+                </p>
               </div>
             </div>
 

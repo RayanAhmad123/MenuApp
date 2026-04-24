@@ -8,7 +8,6 @@ import {
   Lightbulb,
 } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { formatPrice } from "@/lib/utils"
@@ -17,9 +16,16 @@ import { LineChart, BarChart, Heatmap, QuadrantMatrix, Donut, SparklineChart } f
 import { ItemStatsDrawer } from "./item-stats-drawer"
 import { getItemDeepStats } from "@/lib/actions/analytics"
 
-const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+const WEEKDAYS = ["Sön", "Mån", "Tis", "Ons", "Tor", "Fre", "Lör"]
 const WEEKDAYS_ORDERED = [1, 2, 3, 4, 5, 6, 0] // Mon-Sun
 const CATEGORY_COLORS = ["#d97706", "#2563eb", "#16a34a", "#dc2626", "#9333ea", "#0891b2", "#ca8a04", "#e11d48"]
+
+const QUADRANT_LABELS = {
+  star: "Stjärna",
+  plowhorse: "Dragdjur",
+  puzzle: "Pussel",
+  dog: "Flopp",
+} as const
 
 interface Props {
   restaurantId: string
@@ -83,8 +89,8 @@ export function AnalyticsClient({ restaurantId, summary, initialDays }: Props) {
     <div className="p-8 space-y-6">
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
-          <h1 className="font-serif text-3xl text-stone-800 font-semibold">Analytics</h1>
-          <p className="text-stone-500 mt-1">Per-item insights, peak hours, and menu engineering — the smart way to run a menu.</p>
+          <h1 className="font-serif text-3xl text-stone-800 font-semibold">Analys</h1>
+          <p className="text-stone-500 mt-1">Insikter per rätt, topptimmar och menyteknik — det smarta sättet att driva en meny.</p>
         </div>
         <div className="flex items-center gap-1 bg-stone-100 rounded-lg p-1">
           {[7, 30, 90].map(d => (
@@ -96,7 +102,7 @@ export function AnalyticsClient({ restaurantId, summary, initialDays }: Props) {
                 days === d ? "bg-white text-stone-800 shadow-sm" : "text-stone-500 hover:text-stone-700"
               }`}
             >
-              {d === 7 ? "7 days" : d === 30 ? "30 days" : "90 days"}
+              {d} dagar
             </button>
           ))}
         </div>
@@ -108,7 +114,7 @@ export function AnalyticsClient({ restaurantId, summary, initialDays }: Props) {
           <CardContent className="p-5">
             <div className="flex items-center gap-2 mb-3">
               <Lightbulb className="h-4 w-4 text-amber-600" />
-              <h3 className="font-semibold text-stone-800 text-sm">Suggested actions</h3>
+              <h3 className="font-semibold text-stone-800 text-sm">Föreslagna åtgärder</h3>
             </div>
             <div className="grid md:grid-cols-2 gap-3">
               {insights.map((ins, i) => (
@@ -128,7 +134,7 @@ export function AnalyticsClient({ restaurantId, summary, initialDays }: Props) {
       {/* KPI strip */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <KPICard
-          label="Revenue"
+          label="Intäkter"
           value={formatPrice(summary.totalRevenueCents)}
           delta={revenueDelta}
           icon={TrendingUp}
@@ -136,7 +142,7 @@ export function AnalyticsClient({ restaurantId, summary, initialDays }: Props) {
           color="#d97706"
         />
         <KPICard
-          label="Orders"
+          label="Beställningar"
           value={String(summary.totalOrders)}
           delta={ordersDelta}
           icon={ShoppingBag}
@@ -144,27 +150,27 @@ export function AnalyticsClient({ restaurantId, summary, initialDays }: Props) {
           color="#2563eb"
         />
         <KPICard
-          label="Avg order"
+          label="Snitt per beställning"
           value={formatPrice(summary.avgOrderCents)}
           icon={Target}
-          sub={`${summary.avgItemsPerOrder.toFixed(1)} items / order`}
+          sub={`${summary.avgItemsPerOrder.toFixed(1)} rätter / beställning`}
           color="#16a34a"
         />
         <KPICard
-          label="Unique tables"
+          label="Unika bord"
           value={String(summary.uniqueTables)}
           icon={Users}
-          sub={`${(summary.paidRate * 100).toFixed(0)}% paid`}
+          sub={`${(summary.paidRate * 100).toFixed(0)} % betalda`}
           color="#9333ea"
         />
       </div>
 
       <Tabs defaultValue="overview">
         <TabsList className="bg-stone-100 h-auto p-1">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="menu-engineering">Menu Engineering</TabsTrigger>
-          <TabsTrigger value="items">Items</TabsTrigger>
-          <TabsTrigger value="timing">Peak hours</TabsTrigger>
+          <TabsTrigger value="overview">Översikt</TabsTrigger>
+          <TabsTrigger value="menu-engineering">Menyteknik</TabsTrigger>
+          <TabsTrigger value="items">Rätter</TabsTrigger>
+          <TabsTrigger value="timing">Topptimmar</TabsTrigger>
         </TabsList>
 
         {/* OVERVIEW */}
@@ -172,17 +178,17 @@ export function AnalyticsClient({ restaurantId, summary, initialDays }: Props) {
           <div className="grid lg:grid-cols-3 gap-6">
             <Card className="lg:col-span-2 border-stone-200">
               <CardHeader>
-                <CardTitle className="text-stone-800 text-lg">Revenue trend</CardTitle>
+                <CardTitle className="text-stone-800 text-lg">Intäktstrend</CardTitle>
               </CardHeader>
               <CardContent>
                 {summary.totalRevenueCents === 0 ? (
-                  <EmptyState message="No paid orders in this range" />
+                  <EmptyState message="Inga betalda beställningar i valt intervall" />
                 ) : (
                   <LineChart
                     data={summary.daily.map(d => ({
                       x: 0,
                       y: d.revenueCents,
-                      label: new Date(d.date).toLocaleDateString("en-GB", { day: "numeric", month: "short" }),
+                      label: new Date(d.date).toLocaleDateString("sv-SE", { day: "numeric", month: "short" }),
                       subLabel: formatPrice(d.revenueCents),
                     }))}
                     formatY={n => formatPrice(n)}
@@ -193,14 +199,14 @@ export function AnalyticsClient({ restaurantId, summary, initialDays }: Props) {
 
             <Card className="border-stone-200">
               <CardHeader>
-                <CardTitle className="text-stone-800 text-lg">Category mix</CardTitle>
+                <CardTitle className="text-stone-800 text-lg">Kategorifördelning</CardTitle>
               </CardHeader>
               <CardContent>
                 {summary.categoryBreakdown.length === 0 || totalCatRevenue === 0 ? (
-                  <EmptyState message="No category data yet" />
+                  <EmptyState message="Ingen kategoridata än" />
                 ) : (
                   <Donut
-                    centerLabel="revenue"
+                    centerLabel="intäkter"
                     centerValue={formatPrice(totalCatRevenue)}
                     slices={summary.categoryBreakdown.slice(0, 6).map((c, i) => ({
                       label: c.name,
@@ -218,7 +224,7 @@ export function AnalyticsClient({ restaurantId, summary, initialDays }: Props) {
               <CardHeader>
                 <CardTitle className="text-stone-800 text-lg flex items-center gap-2">
                   <Award className="h-4 w-4 text-amber-600" />
-                  Top performers
+                  Bästsäljare
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -256,12 +262,12 @@ export function AnalyticsClient({ restaurantId, summary, initialDays }: Props) {
                     )
                   }
                   if (summary.items.length === 0) {
-                    return <EmptyState message="Add menu items to get started." />
+                    return <EmptyState message="Lägg till rätter för att komma igång." />
                   }
                   return (
                     <div className="py-6 text-center">
-                      <p className="text-stone-500 text-sm">No sales in the last {summary.periodDays} day{summary.periodDays === 1 ? "" : "s"}.</p>
-                      <p className="text-stone-400 text-xs mt-1">Top sellers will appear here once guests start ordering.</p>
+                      <p className="text-stone-500 text-sm">Inga sälj de senaste {summary.periodDays} {summary.periodDays === 1 ? "dagen" : "dagarna"}.</p>
+                      <p className="text-stone-400 text-xs mt-1">Bästsäljare visas här när gäster börjar beställa.</p>
                     </div>
                   )
                 })()}
@@ -272,12 +278,12 @@ export function AnalyticsClient({ restaurantId, summary, initialDays }: Props) {
               <CardHeader>
                 <CardTitle className="text-stone-800 text-lg flex items-center gap-2">
                   <AlertTriangle className="h-4 w-4 text-red-600" />
-                  Needs attention
+                  Kräver uppmärksamhet
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 {summary.bottomItems.length === 0 ? (
-                  <EmptyState message="Add menu items to review." />
+                  <EmptyState message="Lägg till rätter att granska." />
                 ) : (
                   <div className="space-y-1.5">
                     {summary.bottomItems.slice(0, 5).map(item => (
@@ -306,7 +312,7 @@ export function AnalyticsClient({ restaurantId, summary, initialDays }: Props) {
                             )}
                           </p>
                           <p className="text-xs text-stone-500">
-                            {item.quantitySold === 0 ? "No sales" : formatPrice(item.revenueCents)}
+                            {item.quantitySold === 0 ? "Inga sälj" : formatPrice(item.revenueCents)}
                           </p>
                         </div>
                         <ArrowUpRight className="h-3.5 w-3.5 text-stone-300" />
@@ -326,10 +332,10 @@ export function AnalyticsClient({ restaurantId, summary, initialDays }: Props) {
               <CardContent className="p-4 flex items-start gap-3">
                 <Info className="h-4 w-4 text-blue-600 flex-shrink-0 mt-0.5" />
                 <div className="text-sm">
-                  <p className="text-stone-800 font-medium">Using revenue as the profit axis.</p>
+                  <p className="text-stone-800 font-medium">Använder intäkter som vinstaxel.</p>
                   <p className="text-stone-600 mt-0.5">
-                    Set item costs in Menu management to unlock true margin-based menu engineering.
-                    Food cost is typically 25–35% of menu price.
+                    Ange matkostnad i menyhanteringen för att låsa upp riktig marginalbaserad menyteknik.
+                    Matkostnad är typiskt 25–35 % av menypriset.
                   </p>
                 </div>
               </CardContent>
@@ -342,23 +348,23 @@ export function AnalyticsClient({ restaurantId, summary, initialDays }: Props) {
                 <div>
                   <CardTitle className="text-stone-800 text-lg flex items-center gap-2">
                     <Sparkles className="h-4 w-4 text-amber-600" />
-                    Menu engineering matrix
+                    Menyteknikmatris
                   </CardTitle>
                   <p className="text-sm text-stone-500 mt-1">
-                    The classic Kasavana–Smith framework: popularity × {summary.hasCostData ? "contribution margin" : "revenue"}.
+                    Den klassiska Kasavana–Smith-modellen: popularitet × {summary.hasCostData ? "bidragsmarginal" : "intäkter"}.
                   </p>
                 </div>
                 <div className="text-xs text-stone-500 grid grid-cols-2 gap-x-4 gap-y-1">
-                  <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-green-600" /> Star: {quadrantCounts.star ?? 0}</div>
-                  <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-amber-600" /> Plowhorse: {quadrantCounts.plowhorse ?? 0}</div>
-                  <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-blue-600" /> Puzzle: {quadrantCounts.puzzle ?? 0}</div>
-                  <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-red-600" /> Dog: {quadrantCounts.dog ?? 0}</div>
+                  <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-green-600" /> Stjärna: {quadrantCounts.star ?? 0}</div>
+                  <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-amber-600" /> Dragdjur: {quadrantCounts.plowhorse ?? 0}</div>
+                  <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-blue-600" /> Pussel: {quadrantCounts.puzzle ?? 0}</div>
+                  <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-red-600" /> Flopp: {quadrantCounts.dog ?? 0}</div>
                 </div>
               </div>
             </CardHeader>
             <CardContent>
               {summary.matrix.length === 0 ? (
-                <EmptyState message="Add menu items and record orders to see the matrix" />
+                <EmptyState message="Lägg till rätter och registrera beställningar för att se matrisen" />
               ) : (
                 <>
                   <QuadrantMatrix
@@ -369,30 +375,30 @@ export function AnalyticsClient({ restaurantId, summary, initialDays }: Props) {
                       y: p.profitScore,
                       quadrant: p.quadrant,
                     }))}
-                    xAxisLabel="← Slow-sellers          Popularity          Best-sellers →"
-                    yAxisLabel={summary.hasCostData ? "Profit →" : "Revenue →"}
+                    xAxisLabel="← Långsamsäljare          Popularitet          Bästsäljare →"
+                    yAxisLabel={summary.hasCostData ? "Vinst →" : "Intäkter →"}
                     onPointClick={openItemDrawer}
                   />
                   <div className="grid md:grid-cols-4 gap-3 mt-6 text-sm">
                     <QuadrantGuide
                       color="#16a34a"
-                      name="Stars"
-                      action="Protect. Feature prominently, keep descriptions sharp, don't discount."
+                      name="Stjärnor"
+                      action="Skydda. Lyft fram, håll beskrivningar skarpa, rabattera inte."
                     />
                     <QuadrantGuide
                       color="#d97706"
-                      name="Plowhorses"
-                      action="Popular but low profit. Gently raise prices or trim portion sizes."
+                      name="Dragdjur"
+                      action="Populära men låg vinst. Höj priset varsamt eller trimma portionen."
                     />
                     <QuadrantGuide
                       color="#2563eb"
-                      name="Puzzles"
-                      action="Profitable but slow. Better photos, reposition higher on menu, bundle."
+                      name="Pussel"
+                      action="Lönsamma men långsamma. Bättre bilder, flytta högre på menyn, paketera."
                     />
                     <QuadrantGuide
                       color="#dc2626"
-                      name="Dogs"
-                      action="Remove, replace, or reinvent. Low demand and low profit."
+                      name="Floppar"
+                      action="Ta bort, byt ut eller gör om. Låg efterfrågan och låg vinst."
                     />
                   </div>
                 </>
@@ -405,21 +411,21 @@ export function AnalyticsClient({ restaurantId, summary, initialDays }: Props) {
         <TabsContent value="items" className="mt-4">
           <Card className="border-stone-200">
             <CardHeader>
-              <CardTitle className="text-stone-800 text-lg">All items — click any row for deep stats</CardTitle>
+              <CardTitle className="text-stone-800 text-lg">Alla rätter — klicka på en rad för djupstatistik</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead className="bg-stone-50 text-stone-500 border-y border-stone-100">
                     <tr>
-                      <th className="text-left font-medium py-2.5 px-4">Item</th>
-                      <th className="text-left font-medium py-2.5 px-4">Category</th>
-                      <th className="text-right font-medium py-2.5 px-4">Price</th>
-                      <th className="text-right font-medium py-2.5 px-4">Sold</th>
-                      <th className="text-right font-medium py-2.5 px-4">Revenue</th>
-                      <th className="text-right font-medium py-2.5 px-4">Margin</th>
-                      <th className="text-right font-medium py-2.5 px-4">Orders</th>
-                      <th className="text-center font-medium py-2.5 px-4">Grade</th>
+                      <th className="text-left font-medium py-2.5 px-4">Rätt</th>
+                      <th className="text-left font-medium py-2.5 px-4">Kategori</th>
+                      <th className="text-right font-medium py-2.5 px-4">Pris</th>
+                      <th className="text-right font-medium py-2.5 px-4">Sålda</th>
+                      <th className="text-right font-medium py-2.5 px-4">Intäkter</th>
+                      <th className="text-right font-medium py-2.5 px-4">Marginal</th>
+                      <th className="text-right font-medium py-2.5 px-4">Beställningar</th>
+                      <th className="text-center font-medium py-2.5 px-4">Betyg</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-stone-50">
@@ -457,7 +463,7 @@ export function AnalyticsClient({ restaurantId, summary, initialDays }: Props) {
                     })}
                   </tbody>
                 </table>
-                {summary.items.length === 0 && <EmptyState message="No menu items yet" />}
+                {summary.items.length === 0 && <EmptyState message="Inga rätter än" />}
               </div>
             </CardContent>
           </Card>
@@ -470,18 +476,18 @@ export function AnalyticsClient({ restaurantId, summary, initialDays }: Props) {
               <CardHeader>
                 <CardTitle className="text-stone-800 text-lg flex items-center gap-2">
                   <Clock className="h-4 w-4 text-amber-600" />
-                  Orders by hour
+                  Beställningar per timme
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 {peakHour && peakHour.orders > 0 && (
                   <div className="mb-3 flex items-center gap-3 flex-wrap text-sm">
                     <Badge variant="secondary" className="bg-amber-100 text-amber-800">
-                      Peak: {formatHour(peakHour.hour)} — {peakHour.orders} orders
+                      Topp: {formatHour(peakHour.hour)} — {peakHour.orders} beställningar
                     </Badge>
                     {quietHour.orders > 0 && quietHour.hour !== peakHour.hour && (
                       <Badge variant="secondary" className="bg-stone-100 text-stone-600">
-                        Quietest: {formatHour(quietHour.hour)}
+                        Lugnast: {formatHour(quietHour.hour)}
                       </Badge>
                     )}
                   </div>
@@ -499,7 +505,7 @@ export function AnalyticsClient({ restaurantId, summary, initialDays }: Props) {
               <CardHeader>
                 <CardTitle className="text-stone-800 text-lg flex items-center gap-2">
                   <Clock className="h-4 w-4 text-amber-600" />
-                  Weekday × hour heatmap
+                  Veckodag × timme-värmekarta
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -516,7 +522,7 @@ export function AnalyticsClient({ restaurantId, summary, initialDays }: Props) {
                   cellSize={18}
                 />
                 <p className="text-xs text-stone-400 mt-3">
-                  Darker = more orders. Use this to schedule staff and push happy-hour offers during quiet cells.
+                  Mörkare = fler beställningar. Använd för schemaläggning och för att köra happy hour under lugnare tider.
                 </p>
               </CardContent>
             </Card>
@@ -558,7 +564,7 @@ function KPICard({
           {delta !== undefined ? (
             <span className={`text-xs font-medium flex items-center gap-0.5 ${delta >= 0 ? "text-emerald-600" : "text-red-600"}`}>
               {delta >= 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
-              {Math.abs(delta).toFixed(0)}% vs previous
+              {Math.abs(delta).toFixed(0)}% mot föregående
             </span>
           ) : sub ? (
             <span className="text-xs text-stone-500">{sub}</span>
@@ -593,7 +599,7 @@ function QuadrantBadge({ quadrant }: { quadrant: "star" | "plowhorse" | "puzzle"
     puzzle: "bg-blue-100 text-blue-700",
     dog: "bg-red-100 text-red-700",
   }
-  return <span className={`text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded ${styles[quadrant]}`}>{quadrant}</span>
+  return <span className={`text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded ${styles[quadrant]}`}>{QUADRANT_LABELS[quadrant]}</span>
 }
 
 function EmptyState({ message }: { message: string }) {
@@ -615,8 +621,8 @@ function buildInsights(s: AnalyticsSummary): Array<{ emoji: string; title: strin
   if (unsold.length > 0 && s.totalItemsSold > 0) {
     out.push({
       emoji: "🗑️",
-      title: `${unsold.length} item${unsold.length > 1 ? "s" : ""} had zero sales`,
-      body: `Consider removing or rewriting descriptions for: ${unsold.slice(0, 3).map(i => i.name).join(", ")}${unsold.length > 3 ? "…" : ""}`,
+      title: `${unsold.length} ${unsold.length === 1 ? "rätt" : "rätter"} utan sälj`,
+      body: `Överväg att ta bort eller skriva om beskrivningar för: ${unsold.slice(0, 3).map(i => i.name).join(", ")}${unsold.length > 3 ? "…" : ""}`,
     })
   }
 
@@ -626,8 +632,8 @@ function buildInsights(s: AnalyticsSummary): Array<{ emoji: string; title: strin
     const top = plowhorses.sort((a, b) => b.quantitySold - a.quantitySold)[0]
     out.push({
       emoji: "📈",
-      title: `Price-raise candidate: ${top.name}`,
-      body: `Sells well (${top.quantitySold}× in ${s.periodDays}d) but profit-thin. A 5–8% price nudge rarely dents volume.`,
+      title: `Prishöjningskandidat: ${top.name}`,
+      body: `Säljer bra (${top.quantitySold}× på ${s.periodDays} d) men tunn marginal. En prishöjning på 5–8 % påverkar sällan volymen.`,
     })
   }
 
@@ -637,8 +643,8 @@ function buildInsights(s: AnalyticsSummary): Array<{ emoji: string; title: strin
     const top = puzzles.sort((a, b) => b.revenueCents - a.revenueCents)[0]
     out.push({
       emoji: "🧩",
-      title: `Hidden gem: ${top.name}`,
-      body: `High profit, low demand. Move it up the menu, add a photo, or tag as "Chef's pick".`,
+      title: `Dold pärla: ${top.name}`,
+      body: `Hög vinst, låg efterfrågan. Flytta upp på menyn, lägg till bild, eller markera som "Kockens val".`,
     })
   }
 
@@ -651,8 +657,8 @@ function buildInsights(s: AnalyticsSummary): Array<{ emoji: string; title: strin
     if (peak.orders >= 3 * quiet.orders) {
       out.push({
         emoji: "⏰",
-        title: `Run a happy hour at ${formatHour(quiet.hour)}`,
-        body: `${formatHour(peak.hour)} does ${Math.round(peak.orders / quiet.orders)}× more orders. Target the gap with a limited-time offer.`,
+        title: `Kör happy hour kl. ${formatHour(quiet.hour)}`,
+        body: `${formatHour(peak.hour)} har ${Math.round(peak.orders / quiet.orders)}× fler beställningar. Fyll gapet med ett tidsbegränsat erbjudande.`,
       })
     }
   }
@@ -661,8 +667,8 @@ function buildInsights(s: AnalyticsSummary): Array<{ emoji: string; title: strin
   if (s.cancelRate > 0.1) {
     out.push({
       emoji: "⚠️",
-      title: `${(s.cancelRate * 100).toFixed(0)}% of orders cancelled`,
-      body: `That's above 10%. Check KDS wait times, payment failures, and out-of-stock items.`,
+      title: `${(s.cancelRate * 100).toFixed(0)} % av beställningarna avbrutna`,
+      body: `Det är över 10 %. Kolla väntetider i köket, misslyckade betalningar och slutsålda rätter.`,
     })
   }
 
@@ -670,8 +676,8 @@ function buildInsights(s: AnalyticsSummary): Array<{ emoji: string; title: strin
   if (!s.hasCostData && s.totalItemsSold > 0) {
     out.push({
       emoji: "💰",
-      title: "Unlock true margin analytics",
-      body: "Add food cost per item in Menu to see real profit — not just revenue — in the engineering matrix.",
+      title: "Lås upp riktig marginalanalys",
+      body: "Ange matkostnad per rätt i menyn för att se riktig vinst — inte bara intäkter — i teknikmatrisen.",
     })
   }
 

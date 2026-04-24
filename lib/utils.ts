@@ -28,11 +28,11 @@ export function timeAgo(dateString: string): string {
   const seconds = Math.floor(
     (new Date().getTime() - new Date(dateString).getTime()) / 1000
   )
-  if (seconds < 60) return `${seconds}s ago`
+  if (seconds < 60) return `${seconds} s sedan`
   const minutes = Math.floor(seconds / 60)
-  if (minutes < 60) return `${minutes}m ago`
+  if (minutes < 60) return `${minutes} min sedan`
   const hours = Math.floor(minutes / 60)
-  return `${hours}h ago`
+  return `${hours} tim sedan`
 }
 
 export function generateSessionId(): string {

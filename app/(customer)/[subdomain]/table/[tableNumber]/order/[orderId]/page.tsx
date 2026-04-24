@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useState, useCallback, useMemo } from "react"
+import { useEffect, useState, useCallback, useMemo, useRef } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
 import { CheckCircle2, Clock, ChefHat, CheckCheck, Truck, Bell, ArrowLeft } from "lucide-react"
@@ -19,6 +19,8 @@ const ORDER_STEPS = [
 const stepIndex = (status: string) =>
   ORDER_STEPS.findIndex(s => s.key === status)
 
+type LiveState = "connecting" | "live" | "reconnecting"
+
 export default function OrderStatusPage() {
   const params = useParams()
   const orderId = params.orderId as string
@@ -27,7 +29,11 @@ export default function OrderStatusPage() {
 
   const [order, setOrder] = useState<OrderWithItems | null>(null)
   const [loading, setLoading] = useState(true)
+  const [liveState, setLiveState] = useState<LiveState>("connecting")
   const supabase = useMemo(() => createClient(), [])
+  // Track the latest fetch across re-renders so visibility/realtime handlers
+  // always call the current version without retriggering the subscribe effect.
+  const fetchRef = useRef<() => Promise<void>>(() => Promise.resolve())
 
   const fetchOrder = useCallback(async () => {
     const { data } = await supabase
@@ -40,6 +46,10 @@ export default function OrderStatusPage() {
   }, [supabase, orderId])
 
   useEffect(() => {
+    fetchRef.current = fetchOrder
+  }, [fetchOrder])
+
+  useEffect(() => {
     fetchOrder()
 
     const channel = supabase
@@ -49,14 +59,28 @@ export default function OrderStatusPage() {
         schema: "public",
         table: "orders",
         filter: `id=eq.${orderId}`,
-      }, fetchOrder)
-      .subscribe()
+      }, () => { fetchRef.current() })
+      .subscribe(status => {
+        if (status === "SUBSCRIBED") setLiveState("live")
+        else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED") setLiveState("reconnecting")
+      })
 
-    const interval = setInterval(fetchOrder, 5000)
+    // Poll more aggressively than before so that if the websocket stalls, the
+    // status catches up within a few seconds. Browsers throttle intervals on
+    // hidden tabs automatically — on wake we refetch immediately (below).
+    const interval = setInterval(() => { fetchRef.current() }, 3000)
+
+    const onVisible = () => {
+      if (document.visibilityState === "visible") fetchRef.current()
+    }
+    document.addEventListener("visibilitychange", onVisible)
+    window.addEventListener("focus", onVisible)
 
     return () => {
       supabase.removeChannel(channel)
       clearInterval(interval)
+      document.removeEventListener("visibilitychange", onVisible)
+      window.removeEventListener("focus", onVisible)
     }
   }, [supabase, orderId, fetchOrder])
 
@@ -90,7 +114,8 @@ export default function OrderStatusPage() {
               <ArrowLeft className="h-5 w-5" />
             </Button>
           </Link>
-          <h1 className="font-serif text-xl text-stone-50">Beställningsstatus</h1>
+          <h1 className="font-serif text-xl text-stone-50 flex-1">Beställningsstatus</h1>
+          <LiveIndicator state={liveState} />
         </div>
       </header>
 
@@ -194,5 +219,22 @@ export default function OrderStatusPage() {
         </Button>
       </main>
     </div>
+  )
+}
+
+function LiveIndicator({ state }: { state: LiveState }) {
+  if (state === "live") {
+    return (
+      <span className="inline-flex items-center gap-1.5 text-[11px] text-emerald-400">
+        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+        Live
+      </span>
+    )
+  }
+  return (
+    <span className="inline-flex items-center gap-1.5 text-[11px] text-stone-500">
+      <span className="w-1.5 h-1.5 rounded-full bg-stone-600" />
+      {state === "connecting" ? "Ansluter…" : "Återansluter…"}
+    </span>
   )
 }
