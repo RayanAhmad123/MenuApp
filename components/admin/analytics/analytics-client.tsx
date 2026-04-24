@@ -222,37 +222,49 @@ export function AnalyticsClient({ restaurantId, summary, initialDays }: Props) {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {summary.topItems.filter(i => i.quantitySold > 0).length === 0 ? (
-                  <EmptyState message="No sold items yet" />
-                ) : (
-                  <div className="space-y-1.5">
-                    {summary.topItems.filter(i => i.quantitySold > 0).slice(0, 5).map((item, i) => (
-                      <button
-                        key={item.itemId}
-                        onClick={() => openItemDrawer(item.itemId)}
-                        className="flex items-center gap-3 w-full text-left hover:bg-stone-50 rounded-lg px-2 py-2 transition-colors"
-                      >
-                        <span className="text-xs font-bold text-stone-400 w-4">{i + 1}</span>
-                        {item.imageUrl ? (
-                          <div className="w-9 h-9 rounded-lg overflow-hidden flex-shrink-0">
-                            <Image src={item.imageUrl} alt={item.name} width={36} height={36} className="w-full h-full object-cover" />
-                          </div>
-                        ) : (
-                          <div className="w-9 h-9 rounded-lg bg-stone-100 flex-shrink-0" />
-                        )}
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-stone-800 truncate">{item.name}</p>
-                          <p className="text-xs text-stone-500">{item.categoryName ?? "—"}</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sm font-semibold text-stone-800">{item.quantitySold}×</p>
-                          <p className="text-xs text-stone-500">{formatPrice(item.revenueCents)}</p>
-                        </div>
-                        <ArrowUpRight className="h-3.5 w-3.5 text-stone-300" />
-                      </button>
-                    ))}
-                  </div>
-                )}
+                {(() => {
+                  const sold = summary.topItems.filter(i => i.quantitySold > 0).slice(0, 5)
+                  if (sold.length > 0) {
+                    return (
+                      <div className="space-y-1.5">
+                        {sold.map((item, i) => (
+                          <button
+                            key={item.itemId}
+                            onClick={() => openItemDrawer(item.itemId)}
+                            className="flex items-center gap-3 w-full text-left hover:bg-stone-50 rounded-lg px-2 py-2 transition-colors"
+                          >
+                            <span className="text-xs font-bold text-stone-400 w-4">{i + 1}</span>
+                            {item.imageUrl ? (
+                              <div className="w-9 h-9 rounded-lg overflow-hidden flex-shrink-0">
+                                <Image src={item.imageUrl} alt={item.name} width={36} height={36} className="w-full h-full object-cover" />
+                              </div>
+                            ) : (
+                              <div className="w-9 h-9 rounded-lg bg-stone-100 flex-shrink-0" />
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-stone-800 truncate">{item.name}</p>
+                              <p className="text-xs text-stone-500">{item.categoryName ?? "—"}</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-sm font-semibold text-stone-800">{item.quantitySold}×</p>
+                              <p className="text-xs text-stone-500">{formatPrice(item.revenueCents)}</p>
+                            </div>
+                            <ArrowUpRight className="h-3.5 w-3.5 text-stone-300" />
+                          </button>
+                        ))}
+                      </div>
+                    )
+                  }
+                  if (summary.items.length === 0) {
+                    return <EmptyState message="Add menu items to get started." />
+                  }
+                  return (
+                    <div className="py-6 text-center">
+                      <p className="text-stone-500 text-sm">No sales in the last {summary.periodDays} day{summary.periodDays === 1 ? "" : "s"}.</p>
+                      <p className="text-stone-400 text-xs mt-1">Top sellers will appear here once guests start ordering.</p>
+                    </div>
+                  )
+                })()}
               </CardContent>
             </Card>
 
@@ -265,7 +277,7 @@ export function AnalyticsClient({ restaurantId, summary, initialDays }: Props) {
               </CardHeader>
               <CardContent>
                 {summary.bottomItems.length === 0 ? (
-                  <EmptyState message="All items performing" />
+                  <EmptyState message="Add menu items to review." />
                 ) : (
                   <div className="space-y-1.5">
                     {summary.bottomItems.slice(0, 5).map(item => (
@@ -286,8 +298,16 @@ export function AnalyticsClient({ restaurantId, summary, initialDays }: Props) {
                           <p className="text-xs text-stone-500">{item.categoryName ?? "—"}</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-sm font-semibold text-stone-800">{item.quantitySold}×</p>
-                          <p className="text-xs text-stone-500">{formatPrice(item.revenueCents)}</p>
+                          <p className="text-sm font-semibold text-stone-800">
+                            {item.quantitySold === 0 ? (
+                              <span className="text-red-600">0×</span>
+                            ) : (
+                              <>{item.quantitySold}×</>
+                            )}
+                          </p>
+                          <p className="text-xs text-stone-500">
+                            {item.quantitySold === 0 ? "No sales" : formatPrice(item.revenueCents)}
+                          </p>
                         </div>
                         <ArrowUpRight className="h-3.5 w-3.5 text-stone-300" />
                       </button>

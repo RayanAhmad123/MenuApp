@@ -322,9 +322,15 @@ export async function getAnalyticsSummary(
     })
 
   const topItems = [...itemStats].sort((a, b) => b.quantitySold - a.quantitySold).slice(0, 10)
+  // "Needs attention": zero-sold items come first (they're the most actionable),
+  // then the slowest-selling items. This surfaces real problem items even on
+  // restaurants with little or no sales activity yet.
   const bottomItems = [...itemStats]
-    .filter(s => s.quantitySold > 0)
-    .sort((a, b) => a.quantitySold - b.quantitySold)
+    .sort((a, b) => {
+      if (a.quantitySold === 0 && b.quantitySold !== 0) return -1
+      if (b.quantitySold === 0 && a.quantitySold !== 0) return 1
+      return a.quantitySold - b.quantitySold
+    })
     .slice(0, 5)
 
   return {
@@ -361,28 +367,34 @@ export async function getItemDeepStats(
   const mi = rows[0]?.menu_items
   const supabase = await createServerSupabaseClient()
 
-  // Fallback: fetch menu item metadata directly if no sales in range
+  // Fallback: fetch menu item metadata directly if no sales in range.
+  // Use maybeSingle so zero-row results don't log an error; split the category
+  // lookup into a separate query to avoid nested-relation edge cases.
   let menuItemMeta: OrderItemRow["menu_items"] | null = mi ?? null
   if (!menuItemMeta) {
-    const { data } = await supabase
+    const { data: miData } = await supabase
       .from("menu_items")
-      .select("id, name, category_id, image_url, price_cents, cost_cents, categories ( id, name )")
+      .select("id, name, category_id, image_url, price_cents, cost_cents")
       .eq("id", menuItemId)
-      .single()
-    if (data) {
-      const d = data as unknown as {
-        id: string; name: string; category_id: string | null; image_url: string | null;
-        price_cents: number; cost_cents: number | null;
-        categories: { id: string; name: string } | null;
+      .maybeSingle()
+    if (miData) {
+      let category: { id: string; name: string } | null = null
+      if (miData.category_id) {
+        const { data: catData } = await supabase
+          .from("categories")
+          .select("id, name")
+          .eq("id", miData.category_id)
+          .maybeSingle()
+        if (catData) category = catData
       }
       menuItemMeta = {
-        id: d.id,
-        name: d.name,
-        category_id: d.category_id,
-        image_url: d.image_url,
-        price_cents: d.price_cents,
-        cost_cents: d.cost_cents,
-        categories: d.categories,
+        id: miData.id,
+        name: miData.name,
+        category_id: miData.category_id,
+        image_url: miData.image_url,
+        price_cents: miData.price_cents,
+        cost_cents: miData.cost_cents,
+        categories: category,
       }
     }
   }

@@ -1,6 +1,6 @@
 "use client"
 import Image from "next/image"
-import { X, TrendingUp, ShoppingBag, Award, Link2, Receipt, Percent } from "lucide-react"
+import { X, TrendingUp, ShoppingBag, Award, Link2, Receipt, Percent, Inbox } from "lucide-react"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { formatPrice } from "@/lib/utils"
 import type { ItemDeepStat } from "@/lib/actions/analytics"
@@ -27,6 +27,18 @@ export function ItemStatsDrawer({ open, loading, detail, onClose }: Props) {
 
         {loading && (
           <div className="p-16 text-center text-stone-400">Loading item insights…</div>
+        )}
+
+        {!loading && !detail && (
+          <div className="p-12 text-center">
+            <div className="w-12 h-12 rounded-full bg-stone-100 flex items-center justify-center mx-auto mb-3">
+              <Inbox className="h-5 w-5 text-stone-400" />
+            </div>
+            <h3 className="font-semibold text-stone-800 text-base">No stats available yet</h3>
+            <p className="text-stone-500 text-sm mt-1">
+              Once this item is ordered, you'll see units sold, revenue, margin, peak hours and attach rates here.
+            </p>
+          </div>
         )}
 
         {!loading && detail && (
