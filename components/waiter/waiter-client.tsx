@@ -55,6 +55,7 @@ interface Props {
   initialTableOrders: TableBillingOrder[]
   yellowThreshold: number
   redThreshold: number
+  paymentEnabled: boolean
 }
 
 // ── Constants ────────────────────────────────────────────────────────────────
@@ -77,7 +78,7 @@ const PING_ICON_COLORS: Record<string, string> = {
 export function StaffClient({
   restaurantId, staffName,
   initialPings, initialPendingOrders, initialActiveOrders, initialTableOrders,
-  yellowThreshold, redThreshold,
+  yellowThreshold, redThreshold, paymentEnabled,
 }: Props) {
   const [pings, setPings] = useState<TablePing[]>(initialPings)
   const [pendingOrders, setPendingOrders] = useState<PendingOrder[]>(initialPendingOrders)
@@ -449,39 +450,41 @@ export function StaffClient({
           )}
         </div>
 
-        {/* Billing sidebar */}
-        <div className="w-56 border-l border-stone-200 bg-white flex flex-col overflow-hidden flex-shrink-0">
-          <div className="px-4 py-3 border-b border-stone-100">
-            <h2 className="text-xs font-semibold text-stone-500 uppercase tracking-wide">Bord & Notor</h2>
-          </div>
-          <div className="flex-1 overflow-y-auto">
-            {tableSummaries.length === 0 ? (
-              <p className="text-xs text-stone-400 text-center py-8 px-4">Inga aktiva bord idag.</p>
-            ) : (
-              <div className="divide-y divide-stone-100">
-                {tableSummaries.map(({ table_number, totalCents, paidCents, orders }) => (
-                  <button
-                    key={table_number}
-                    onClick={() => { setViewTable(table_number); setSelectedItemIds(new Set()) }}
-                    className="w-full flex items-center justify-between px-4 py-3 hover:bg-stone-50 transition-colors text-left"
-                  >
-                    <div>
-                      <p className="font-semibold text-stone-800 text-sm">Bord {table_number}</p>
-                      <p className="text-xs text-stone-500 mt-0.5">{orders.length} beställning{orders.length !== 1 ? "ar" : ""}</p>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <div className="text-right">
-                        <p className="text-sm font-semibold text-stone-800">{formatPrice(totalCents)}</p>
-                        {paidCents > 0 && <p className="text-xs text-emerald-600">{formatPrice(paidCents)} betalt</p>}
+        {/* Billing sidebar — only when payment feature is enabled */}
+        {paymentEnabled && (
+          <div className="w-56 border-l border-stone-200 bg-white flex flex-col overflow-hidden flex-shrink-0">
+            <div className="px-4 py-3 border-b border-stone-100">
+              <h2 className="text-xs font-semibold text-stone-500 uppercase tracking-wide">Bord & Notor</h2>
+            </div>
+            <div className="flex-1 overflow-y-auto">
+              {tableSummaries.length === 0 ? (
+                <p className="text-xs text-stone-400 text-center py-8 px-4">Inga aktiva bord idag.</p>
+              ) : (
+                <div className="divide-y divide-stone-100">
+                  {tableSummaries.map(({ table_number, totalCents, paidCents, orders }) => (
+                    <button
+                      key={table_number}
+                      onClick={() => { setViewTable(table_number); setSelectedItemIds(new Set()) }}
+                      className="w-full flex items-center justify-between px-4 py-3 hover:bg-stone-50 transition-colors text-left"
+                    >
+                      <div>
+                        <p className="font-semibold text-stone-800 text-sm">Bord {table_number}</p>
+                        <p className="text-xs text-stone-500 mt-0.5">{orders.length} beställning{orders.length !== 1 ? "ar" : ""}</p>
                       </div>
-                      <ChevronRight className="h-4 w-4 text-stone-300 flex-shrink-0" />
-                    </div>
-                  </button>
-                ))}
-              </div>
-            )}
+                      <div className="flex items-center gap-1.5">
+                        <div className="text-right">
+                          <p className="text-sm font-semibold text-stone-800">{formatPrice(totalCents)}</p>
+                          {paidCents > 0 && <p className="text-xs text-emerald-600">{formatPrice(paidCents)} betalt</p>}
+                        </div>
+                        <ChevronRight className="h-4 w-4 text-stone-300 flex-shrink-0" />
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Billing modal */}

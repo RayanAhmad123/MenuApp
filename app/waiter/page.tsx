@@ -62,7 +62,7 @@ export default async function WaiterPage() {
       .order("created_at", { ascending: true }),
     supabase
       .from("restaurants")
-      .select("yellow_threshold_minutes, red_threshold_minutes")
+      .select("yellow_threshold_minutes, red_threshold_minutes, payment_enabled")
       .eq("id", staff.restaurant_id)
       .single(),
   ])
@@ -77,6 +77,7 @@ export default async function WaiterPage() {
       initialTableOrders={tableOrders ?? []}
       yellowThreshold={restaurant?.yellow_threshold_minutes ?? 10}
       redThreshold={restaurant?.red_threshold_minutes ?? 20}
+      paymentEnabled={restaurant?.payment_enabled ?? true}
     />
   )
 }
