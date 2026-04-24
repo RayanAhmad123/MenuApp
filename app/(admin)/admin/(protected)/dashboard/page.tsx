@@ -19,7 +19,7 @@ export default async function DashboardPage() {
   const supabase = await createServerSupabaseClient()
   const today = new Date().toISOString().split("T")[0]
 
-  const [ordersResult, summary] = await Promise.all([
+  const [ordersResult, summary, restaurantResult] = await Promise.all([
     supabase
       .from("orders")
       .select("*")
@@ -27,10 +27,20 @@ export default async function DashboardPage() {
       .gte("created_at", `${today}T00:00:00`)
       .order("created_at", { ascending: false }),
     getAnalyticsSummary(ctx.restaurant.id, 7),
+    supabase
+      .from("restaurants")
+      .select("payment_enabled")
+      .eq("id", ctx.restaurant.id)
+      .maybeSingle(),
   ])
 
   const orders = (ordersResult.data ?? []) as Pick<Order, "id" | "total_cents" | "status" | "payment_status" | "table_number" | "created_at">[]
-  const totalRevenue = orders.filter(o => o.payment_status === "paid").reduce((s, o) => s + o.total_cents, 0)
+  // When a restaurant has payments disabled (cash/POS), every non-cancelled
+  // order counts toward revenue — otherwise Today's Revenue is stuck at zero.
+  const paymentEnabled = restaurantResult.data?.payment_enabled ?? true
+  const totalRevenue = orders
+    .filter(o => (paymentEnabled ? o.payment_status === "paid" : o.status !== "cancelled"))
+    .reduce((s, o) => s + o.total_cents, 0)
   const pendingOrders = orders.filter(o => ["pending", "confirmed", "preparing"].includes(o.status)).length
   const activeTables = new Set(orders.filter(o => !["delivered", "cancelled"].includes(o.status)).map(o => o.table_number)).size
   const topSellers = summary.topItems.filter(i => i.quantitySold > 0).slice(0, 5)

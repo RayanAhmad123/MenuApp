@@ -146,8 +146,21 @@ export async function getAnalyticsSummary(
 ): Promise<AnalyticsSummary> {
   const { orders, items } = await fetchOrdersAndItems(restaurantId, days)
 
-  // Also fetch cancelled orders for cancel-rate
   const supabase = await createServerSupabaseClient()
+
+  // When payments are disabled, restaurants settle through other channels
+  // (cash, external POS). Treat every non-cancelled order as revenue — otherwise
+  // the analytics tab shows zero for restaurants that don't use Stripe.
+  const { data: restaurantRow } = await supabase
+    .from("restaurants")
+    .select("payment_enabled")
+    .eq("id", restaurantId)
+    .maybeSingle()
+  const paymentEnabled = restaurantRow?.payment_enabled ?? true
+  const isRevenueOrder = (o: OrderRow) =>
+    paymentEnabled ? o.payment_status === "paid" : true
+
+  // Also fetch cancelled orders for cancel-rate
   const { count: cancelledCount } = await supabase
     .from("orders")
     .select("id", { count: "exact", head: true })
@@ -156,9 +169,9 @@ export async function getAnalyticsSummary(
     .gte("created_at", sinceISO(days))
 
   const totalOrders = orders.length
-  const paidOrders = orders.filter(o => o.payment_status === "paid").length
+  const paidOrders = orders.filter(isRevenueOrder).length
   const totalRevenueCents = orders
-    .filter(o => o.payment_status === "paid")
+    .filter(isRevenueOrder)
     .reduce((s, o) => s + o.total_cents, 0)
   const totalItemsSold = items.reduce((s, i) => s + i.quantity, 0)
   const avgOrderCents = totalOrders > 0
@@ -186,7 +199,7 @@ export async function getAnalyticsSummary(
     const bucket = dailyMap.get(key)
     if (bucket) {
       bucket.orders++
-      if (o.payment_status === "paid") bucket.revenueCents += o.total_cents
+      if (isRevenueOrder(o)) bucket.revenueCents += o.total_cents
     }
   }
   const daily = Array.from(dailyMap.values())
@@ -196,7 +209,7 @@ export async function getAnalyticsSummary(
   for (const o of orders) {
     const h = new Date(o.created_at).getHours()
     hourly[h].orders++
-    if (o.payment_status === "paid") hourly[h].revenueCents += o.total_cents
+    if (isRevenueOrder(o)) hourly[h].revenueCents += o.total_cents
   }
 
   // Weekday × hour heatmap cells
@@ -464,9 +477,18 @@ export async function getItemDeepStats(
   const sortedByQty = Array.from(allItemQuantities.entries()).sort((a, b) => b[1] - a[1])
   const rank = sortedByQty.findIndex(([id]) => id === menuItemId) + 1
 
+  // Mirror the payment-enabled logic from getAnalyticsSummary so the drawer
+  // shows meaningful share-of-revenue for restaurants that don't use Stripe.
+  const { data: restaurantRow } = await supabase
+    .from("restaurants")
+    .select("payment_enabled")
+    .eq("id", restaurantId)
+    .maybeSingle()
+  const paymentEnabled = restaurantRow?.payment_enabled ?? true
+
   const totalOrdersInRange = orders.length
   const totalRevenueInRange = orders
-    .filter(o => o.payment_status === "paid")
+    .filter(o => paymentEnabled ? o.payment_status === "paid" : true)
     .reduce((s, o) => s + o.total_cents, 0)
 
   return {
