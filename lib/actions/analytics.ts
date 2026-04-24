@@ -112,39 +112,92 @@ async function fetchOrdersAndItems(restaurantId: string, days: number) {
   const supabase = await createServerSupabaseClient()
   const since = sinceISO(days)
 
-  const { data: ordersData } = await supabase
-    .from("orders")
-    .select("id, created_at, table_number, status, payment_status, total_cents")
-    .eq("restaurant_id", restaurantId)
-    .gte("created_at", since)
-    .neq("status", "cancelled")
+  // Fetch orders, order_items, menu_items, and categories in parallel.
+  // Stitching in JS instead of PostgREST nested selects avoids the silent-
+  // failure modes we hit before (nested relation resolution, schema cache
+  // mismatch on new columns, URL-length limits on large .in() filters).
+  const [ordersResult, menuItemsResult, categoriesResult] = await Promise.all([
+    supabase
+      .from("orders")
+      .select("id, created_at, table_number, status, payment_status, total_cents")
+      .eq("restaurant_id", restaurantId)
+      .gte("created_at", since)
+      .neq("status", "cancelled"),
+    supabase
+      .from("menu_items")
+      .select("id, name, category_id, image_url, price_cents, cost_cents")
+      .eq("restaurant_id", restaurantId),
+    supabase
+      .from("categories")
+      .select("id, name")
+      .eq("restaurant_id", restaurantId),
+  ])
 
-  const orders = (ordersData ?? []) as OrderRow[]
+  const orders = (ordersResult.data ?? []) as OrderRow[]
   const orderIds = orders.map(o => o.id)
+
+  // Build lookup maps
+  const categoryMap = new Map<string, { id: string; name: string }>()
+  for (const c of categoriesResult.data ?? []) categoryMap.set(c.id, c)
+
+  type MenuItemLite = {
+    id: string; name: string; category_id: string | null; image_url: string | null;
+    price_cents: number; cost_cents: number | null;
+  }
+  const menuItemMap = new Map<string, OrderItemRow["menu_items"]>()
+  for (const m of (menuItemsResult.data ?? []) as MenuItemLite[]) {
+    menuItemMap.set(m.id, {
+      id: m.id,
+      name: m.name,
+      category_id: m.category_id,
+      image_url: m.image_url,
+      price_cents: m.price_cents,
+      cost_cents: m.cost_cents,
+      categories: m.category_id ? categoryMap.get(m.category_id) ?? null : null,
+    })
+  }
 
   let items: OrderItemRow[] = []
   if (orderIds.length > 0) {
-    const { data: itemsData } = await supabase
-      .from("order_items")
-      .select(`
-        order_id, menu_item_id, quantity, item_price_cents,
-        menu_items (
-          id, name, category_id, image_url, price_cents, cost_cents,
-          categories ( id, name )
-        )
-      `)
-      .in("order_id", orderIds)
-    items = (itemsData ?? []) as unknown as OrderItemRow[]
+    // Supabase .in() URL has a length limit — chunk defensively for large
+    // restaurants with many orders in the range.
+    const CHUNK = 200
+    const chunks: string[][] = []
+    for (let i = 0; i < orderIds.length; i += CHUNK) {
+      chunks.push(orderIds.slice(i, i + CHUNK))
+    }
+    const rawItemsChunks = await Promise.all(
+      chunks.map(ids =>
+        supabase
+          .from("order_items")
+          .select("order_id, menu_item_id, quantity, item_price_cents")
+          .in("order_id", ids)
+      )
+    )
+    type RawOrderItem = {
+      order_id: string
+      menu_item_id: string
+      quantity: number
+      item_price_cents: number
+    }
+    const rawItems: RawOrderItem[] = rawItemsChunks.flatMap(r => (r.data ?? []) as RawOrderItem[])
+    items = rawItems.map(r => ({
+      order_id: r.order_id,
+      menu_item_id: r.menu_item_id,
+      quantity: r.quantity,
+      item_price_cents: r.item_price_cents,
+      menu_items: menuItemMap.get(r.menu_item_id) ?? null,
+    }))
   }
 
-  return { orders, items, since }
+  return { orders, items, since, menuItemMap, categoryMap }
 }
 
 export async function getAnalyticsSummary(
   restaurantId: string,
   days: number = 30
 ): Promise<AnalyticsSummary> {
-  const { orders, items } = await fetchOrdersAndItems(restaurantId, days)
+  const { orders, items, menuItemMap } = await fetchOrdersAndItems(restaurantId, days)
 
   const supabase = await createServerSupabaseClient()
 
@@ -263,35 +316,25 @@ export async function getAnalyticsSummary(
     ordersContaining: ordersSet.size,
   }))
 
-  // Include items with zero sales too — fetch all menu items
-  const { data: allMenuItems } = await supabase
-    .from("menu_items")
-    .select("id, name, category_id, image_url, price_cents, cost_cents, categories ( id, name )")
-    .eq("restaurant_id", restaurantId)
-
+  // Include items with zero sales too — menuItemMap already has the full catalog
   const seen = new Set(itemStats.map(s => s.itemId))
-  for (const mi of (allMenuItems ?? []) as unknown as Array<{
-    id: string; name: string; category_id: string | null; image_url: string | null;
-    price_cents: number; cost_cents: number | null;
-    categories: { id: string; name: string } | null;
-  }>) {
-    if (!seen.has(mi.id)) {
-      itemStats.push({
-        itemId: mi.id,
-        name: mi.name,
-        categoryId: mi.category_id,
-        categoryName: mi.categories?.name ?? null,
-        imageUrl: mi.image_url,
-        priceCents: mi.price_cents,
-        costCents: mi.cost_cents,
-        quantitySold: 0,
-        revenueCents: 0,
-        marginCents: mi.cost_cents !== null ? 0 : null,
-        ordersContaining: 0,
-        lastOrderedAt: null,
-      })
-    }
-  }
+  Array.from(menuItemMap.values()).forEach(mi => {
+    if (!mi || seen.has(mi.id)) return
+    itemStats.push({
+      itemId: mi.id,
+      name: mi.name,
+      categoryId: mi.category_id,
+      categoryName: mi.categories?.name ?? null,
+      imageUrl: mi.image_url,
+      priceCents: mi.price_cents,
+      costCents: mi.cost_cents,
+      quantitySold: 0,
+      revenueCents: 0,
+      marginCents: mi.cost_cents !== null ? 0 : null,
+      ordersContaining: 0,
+      lastOrderedAt: null,
+    })
+  })
 
   // Category breakdown
   const catMap = new Map<string, CategoryStat>()
@@ -375,15 +418,15 @@ export async function getItemDeepStats(
   menuItemId: string,
   days: number = 30
 ): Promise<ItemDeepStat | null> {
-  const { orders, items } = await fetchOrdersAndItems(restaurantId, days)
+  const { orders, items, menuItemMap } = await fetchOrdersAndItems(restaurantId, days)
   const rows = items.filter(i => i.menu_item_id === menuItemId)
-  const mi = rows[0]?.menu_items
   const supabase = await createServerSupabaseClient()
 
-  // Fallback: fetch menu item metadata directly if no sales in range.
-  // Use maybeSingle so zero-row results don't log an error; split the category
-  // lookup into a separate query to avoid nested-relation edge cases.
-  let menuItemMeta: OrderItemRow["menu_items"] | null = mi ?? null
+  // menuItemMap already contains every menu item for this restaurant, so items
+  // with no sales in the current range still resolve here. Only fall back to
+  // a direct lookup if somehow this item isn't in the restaurant's menu cache
+  // (e.g. soft-deleted or cross-restaurant).
+  let menuItemMeta: OrderItemRow["menu_items"] | null = menuItemMap.get(menuItemId) ?? null
   if (!menuItemMeta) {
     const { data: miData } = await supabase
       .from("menu_items")
@@ -519,10 +562,12 @@ export async function getItemStatsMap(
   days: number = 30
 ): Promise<Record<string, { quantitySold: number; revenueCents: number; ordersContaining: number }>> {
   const { items } = await fetchOrdersAndItems(restaurantId, days)
+  // Key by menu_item_id (direct column) rather than the joined menu_items.id —
+  // direct columns are always present, joined rows can be null.
   const map: Record<string, { quantitySold: number; revenueCents: number; ordersContaining: Set<string> }> = {}
   for (const r of items) {
-    if (!r.menu_items) continue
-    const k = r.menu_items.id
+    const k = r.menu_item_id
+    if (!k) continue
     if (!map[k]) map[k] = { quantitySold: 0, revenueCents: 0, ordersContaining: new Set() }
     map[k].quantitySold += r.quantity
     map[k].revenueCents += r.item_price_cents * r.quantity
