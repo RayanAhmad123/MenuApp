@@ -181,12 +181,60 @@ async function fetchOrdersAndItems(restaurantId: string, days: number) {
       item_price_cents: number
     }
     const rawItems: RawOrderItem[] = rawItemsChunks.flatMap(r => (r.data ?? []) as RawOrderItem[])
+
+    // Backfill menuItemMap for any items that were ordered but didn't appear
+    // in the by-restaurant_id query (deleted/soft-deleted items, cross-restaurant
+    // data inconsistencies, RLS edge cases). Without this, those orders show up
+    // in revenue but their items are silently dropped from the analytics tables —
+    // which is exactly what makes "Bästsäljare" and "Kategorifördelning" show
+    // empty even though sales clearly happened.
+    const missingIds = Array.from(new Set(
+      rawItems.map(r => r.menu_item_id).filter(id => id && !menuItemMap.has(id))
+    ))
+    if (missingIds.length > 0) {
+      const idChunks: string[][] = []
+      for (let i = 0; i < missingIds.length; i += CHUNK) {
+        idChunks.push(missingIds.slice(i, i + CHUNK))
+      }
+      const fallbackChunks = await Promise.all(
+        idChunks.map(ids =>
+          supabase
+            .from("menu_items")
+            .select("id, name, category_id, image_url, price_cents, cost_cents")
+            .in("id", ids)
+        )
+      )
+      const fallbackItems = fallbackChunks.flatMap(r => (r.data ?? []) as MenuItemLite[])
+      for (const m of fallbackItems) {
+        if (menuItemMap.has(m.id)) continue
+        menuItemMap.set(m.id, {
+          id: m.id,
+          name: m.name,
+          category_id: m.category_id,
+          image_url: m.image_url,
+          price_cents: m.price_cents,
+          cost_cents: m.cost_cents,
+          categories: m.category_id ? categoryMap.get(m.category_id) ?? null : null,
+        })
+      }
+    }
+
     items = rawItems.map(r => ({
       order_id: r.order_id,
       menu_item_id: r.menu_item_id,
       quantity: r.quantity,
       item_price_cents: r.item_price_cents,
-      menu_items: menuItemMap.get(r.menu_item_id) ?? null,
+      menu_items: menuItemMap.get(r.menu_item_id) ?? {
+        // Last-resort placeholder so the item still contributes to top-sellers /
+        // revenue even when the menu_item row is gone entirely.
+        id: r.menu_item_id,
+        name: "Borttagen rätt",
+        category_id: null,
+        image_url: null,
+        price_cents: r.item_price_cents,
+        cost_cents: null,
+        categories: null,
+      },
     }))
   }
 
@@ -336,19 +384,23 @@ export async function getAnalyticsSummary(
     })
   })
 
-  // Category breakdown
+  // Category breakdown — bucket items without a category under "Övrigt" so the
+  // donut still renders for restaurants where some items aren't categorised
+  // (or where the menu_item row was deleted but orders remain).
   const catMap = new Map<string, CategoryStat>()
+  const UNCATEGORIZED_KEY = "__uncategorized__"
   for (const s of itemStats) {
-    if (!s.categoryId) continue
-    const k = s.categoryId
-    const existing = catMap.get(k)
+    if (s.quantitySold === 0) continue
+    const key = s.categoryId ?? UNCATEGORIZED_KEY
+    const name = s.categoryName ?? "Övrigt"
+    const existing = catMap.get(key)
     if (existing) {
       existing.quantitySold += s.quantitySold
       existing.revenueCents += s.revenueCents
     } else {
-      catMap.set(k, {
-        categoryId: s.categoryId,
-        name: s.categoryName ?? "Uncategorized",
+      catMap.set(key, {
+        categoryId: s.categoryId ?? UNCATEGORIZED_KEY,
+        name,
         quantitySold: s.quantitySold,
         revenueCents: s.revenueCents,
       })

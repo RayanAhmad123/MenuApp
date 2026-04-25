@@ -2,15 +2,16 @@
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { ShoppingCart, Bell, Leaf, Heart, UtensilsCrossed, ArrowRight, X } from "lucide-react"
+import { ShoppingCart, Bell, Leaf, Heart, UtensilsCrossed, ArrowRight, X, Clock, ChefHat, CheckCheck, Truck, CheckCircle2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { useCart } from "@/hooks/use-cart"
-import { formatPrice } from "@/lib/utils"
+import { formatPrice, timeAgo } from "@/lib/utils"
 import { createTablePing } from "@/lib/actions/orders"
 import { createClient } from "@/lib/supabase/client"
 import { useToast } from "@/hooks/use-toast"
+import { pruneOrderHistory } from "@/lib/order-history"
 import type { Category, MenuItem } from "@/types/database"
 
 interface MenuItemWithDetails extends MenuItem {
@@ -34,17 +35,24 @@ interface Props {
 
 const PING_COOLDOWN_MS = 60_000
 
+type RecentOrder = {
+  id: string
+  status: string
+  payment_status: string
+  total_cents: number
+  created_at: string
+}
+
 export function CustomerMenuClient({ restaurant, subdomain, categories, menuItems, tableNumber }: Props) {
   const [activeCategory, setActiveCategory] = useState<string>(categories[0]?.id ?? "")
   const [selectedItem, setSelectedItem] = useState<MenuItemWithDetails | null>(null)
-  const [activeOrderId, setActiveOrderId] = useState<string | null>(null)
+  const [recentOrders, setRecentOrders] = useState<RecentOrder[]>([])
   const [pingCooldownUntil, setPingCooldownUntil] = useState<number>(0)
   const [now, setNow] = useState(() => Date.now())
   const { items, addItem, itemCount } = useCart()
   const { toast } = useToast()
 
   const filteredItems = menuItems.filter(item => item.category_id === activeCategory)
-  const storageKey = `menuapp-active-order-${subdomain}-${tableNumber}`
   const pingStorageKey = `menuapp-last-ping-${subdomain}-${tableNumber}`
   const cooldownRemaining = Math.max(0, Math.ceil((pingCooldownUntil - now) / 1000))
 
@@ -63,31 +71,49 @@ export function CustomerMenuClient({ restaurant, subdomain, categories, menuItem
     return () => clearInterval(id)
   }, [cooldownRemaining])
 
-  // Restore the active order link if the guest re-enters the menu.
+  // Restore the guest's recent orders so reopening the tab (or rescanning the
+  // QR) brings them back to in-flight orders or recently completed receipts.
   useEffect(() => {
-    const stored = (() => {
-      try { return localStorage.getItem(storageKey) } catch { return null }
-    })()
-    if (!stored) return
+    const history = pruneOrderHistory(subdomain, tableNumber)
+    if (history.length === 0) return
 
     const supabase = createClient()
     supabase
       .from("orders")
-      .select("id, status")
-      .eq("id", stored)
-      .maybeSingle()
+      .select("id, status, payment_status, total_cents, created_at")
+      .in("id", history.map(h => h.orderId))
+      .order("created_at", { ascending: false })
       .then(({ data }) => {
-        if (!data || data.status === "delivered" || data.status === "cancelled") {
-          try { localStorage.removeItem(storageKey) } catch { /* ignore */ }
-          return
-        }
-        setActiveOrderId(data.id)
+        if (!data) return
+        setRecentOrders(data as RecentOrder[])
       })
-  }, [storageKey])
+  }, [subdomain, tableNumber])
 
-  function dismissActiveOrder() {
-    setActiveOrderId(null)
-    try { localStorage.removeItem(storageKey) } catch { /* ignore */ }
+  // Live-update recent order statuses so the badge changes from "Tillagas"
+  // to "Klar" without a manual refresh.
+  useEffect(() => {
+    if (recentOrders.length === 0) return
+    const supabase = createClient()
+    const channel = supabase
+      .channel(`menu-recent-orders-${subdomain}-${tableNumber}`)
+      .on("postgres_changes", {
+        event: "UPDATE",
+        schema: "public",
+        table: "orders",
+        filter: `id=in.(${recentOrders.map(o => o.id).join(",")})`,
+      }, payload => {
+        const updated = payload.new as RecentOrder
+        setRecentOrders(prev => prev.map(o => o.id === updated.id ? { ...o, ...updated } : o))
+      })
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [recentOrders.length, subdomain, tableNumber])
+
+  function dismissOrder(orderId: string) {
+    setRecentOrders(prev => prev.filter(o => o.id !== orderId))
+    void import("@/lib/order-history").then(({ removeFromOrderHistory }) =>
+      removeFromOrderHistory(subdomain, tableNumber, orderId)
+    )
   }
 
   async function handlePingWaiter() {
@@ -108,7 +134,7 @@ export function CustomerMenuClient({ restaurant, subdomain, categories, menuItem
     <div className="menu-page min-h-screen">
       {/* Header */}
       <header className="sticky top-0 z-40 bg-stone-950/95 backdrop-blur-md border-b border-stone-800">
-        <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             {restaurant.logo_url && (
               <Image
@@ -158,7 +184,7 @@ export function CustomerMenuClient({ restaurant, subdomain, categories, menuItem
 
       {/* Category tabs */}
       <div className="sticky top-[73px] z-30 bg-stone-950/90 backdrop-blur-md border-b border-stone-800">
-        <div className="max-w-5xl mx-auto px-4">
+        <div className="max-w-7xl mx-auto px-4">
           <div className="flex gap-1 overflow-x-auto py-3 scrollbar-hide">
             {categories.map(cat => (
               <button
@@ -177,35 +203,31 @@ export function CustomerMenuClient({ restaurant, subdomain, categories, menuItem
         </div>
       </div>
 
-      {/* Active order banner */}
-      {activeOrderId && (
-        <div className="max-w-5xl mx-auto px-4 pt-4">
-          <div className="flex items-center gap-3 bg-amber-950/60 border border-amber-800 rounded-xl px-4 py-3">
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-amber-200">Du har en aktiv beställning</p>
-              <p className="text-xs text-amber-400/70">Följ status i realtid.</p>
+      {/* Recent orders for this table session */}
+      {recentOrders.length > 0 && (
+        <div className="max-w-7xl mx-auto px-4 pt-4">
+          <div className="bg-stone-900/80 border border-stone-800 rounded-xl overflow-hidden">
+            <div className="px-4 py-2.5 border-b border-stone-800 flex items-center justify-between">
+              <p className="text-xs font-semibold uppercase tracking-wider text-stone-500">Dina beställningar</p>
+              <span className="text-[10px] text-stone-600">Senaste 6 timmarna</span>
             </div>
-            <Link
-              href={`/${subdomain}/table/${tableNumber}/order/${activeOrderId}`}
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-amber-500 text-stone-900 text-sm font-semibold hover:bg-amber-400 transition-colors"
-            >
-              Visa
-              <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
-            <button
-              onClick={dismissActiveOrder}
-              aria-label="Dölj"
-              className="text-amber-400/60 hover:text-amber-300 transition-colors"
-            >
-              <X className="h-4 w-4" />
-            </button>
+            <ul className="divide-y divide-stone-800">
+              {recentOrders.map(order => (
+                <RecentOrderRow
+                  key={order.id}
+                  order={order}
+                  href={`/${subdomain}/table/${tableNumber}/order/${order.id}`}
+                  onDismiss={() => dismissOrder(order.id)}
+                />
+              ))}
+            </ul>
           </div>
         </div>
       )}
 
       {/* Menu items grid */}
-      <main className="max-w-5xl mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      <main className="max-w-7xl mx-auto px-4 py-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
           {filteredItems.map(item => (
             <MenuItemCard
               key={item.id}
@@ -246,6 +268,55 @@ export function CustomerMenuClient({ restaurant, subdomain, categories, menuItem
         </div>
       )}
     </div>
+  )
+}
+
+const STATUS_PRESENT: Record<string, { label: string; tone: string; Icon: React.ComponentType<{ className?: string }> }> = {
+  pending:   { label: "Mottagen",   tone: "text-amber-300 bg-amber-950/60 border-amber-800",   Icon: Clock },
+  confirmed: { label: "Bekräftad",  tone: "text-amber-300 bg-amber-950/60 border-amber-800",   Icon: CheckCircle2 },
+  preparing: { label: "Tillagas",   tone: "text-amber-300 bg-amber-950/60 border-amber-800",   Icon: ChefHat },
+  ready:     { label: "Klar",       tone: "text-blue-300 bg-blue-950/60 border-blue-800",       Icon: CheckCheck },
+  delivered: { label: "Levererad",  tone: "text-emerald-300 bg-emerald-950/60 border-emerald-800", Icon: Truck },
+  cancelled: { label: "Avbruten",   tone: "text-stone-400 bg-stone-800 border-stone-700",       Icon: X },
+}
+
+function RecentOrderRow({
+  order, href, onDismiss,
+}: {
+  order: RecentOrder
+  href: string
+  onDismiss: () => void
+}) {
+  const meta = STATUS_PRESENT[order.status] ?? STATUS_PRESENT.pending
+  const Icon = meta.Icon
+  const closed = order.status === "delivered" || order.status === "cancelled"
+  return (
+    <li className="flex items-center gap-3 px-4 py-3">
+      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[11px] font-medium ${meta.tone}`}>
+        <Icon className="h-3 w-3" />
+        {meta.label}
+      </span>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm text-stone-200">{formatPrice(order.total_cents)}</p>
+        <p className="text-xs text-stone-500">{timeAgo(order.created_at)}</p>
+      </div>
+      <Link
+        href={href}
+        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-amber-500 text-stone-900 text-xs font-semibold hover:bg-amber-400 transition-colors"
+      >
+        {closed ? "Visa kvitto" : "Följ"}
+        <ArrowRight className="h-3 w-3" />
+      </Link>
+      {closed && (
+        <button
+          onClick={onDismiss}
+          aria-label="Dölj"
+          className="text-stone-500 hover:text-stone-300 transition-colors"
+        >
+          <X className="h-4 w-4" />
+        </button>
+      )}
+    </li>
   )
 }
 

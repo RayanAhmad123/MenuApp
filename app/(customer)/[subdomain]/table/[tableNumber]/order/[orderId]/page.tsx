@@ -2,11 +2,14 @@
 import { useEffect, useState, useCallback, useMemo, useRef } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
-import { CheckCircle2, Clock, ChefHat, CheckCheck, Truck, Bell, ArrowLeft, Plus } from "lucide-react"
+import { CheckCircle2, Clock, ChefHat, CheckCheck, Truck, Bell, ArrowLeft, Plus, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { createClient } from "@/lib/supabase/client"
 import { formatPrice, timeAgo } from "@/lib/utils"
+import { useToast } from "@/hooks/use-toast"
 import type { OrderWithItems } from "@/types/database"
+
+const PING_COOLDOWN_MS = 60_000
 
 const ORDER_STEPS = [
   { key: "pending", label: "Beställning mottagen", icon: Clock },
@@ -30,10 +33,16 @@ export default function OrderStatusPage() {
   const [order, setOrder] = useState<OrderWithItems | null>(null)
   const [loading, setLoading] = useState(true)
   const [liveState, setLiveState] = useState<LiveState>("connecting")
+  const [pingCooldownUntil, setPingCooldownUntil] = useState<number>(0)
+  const [now, setNow] = useState(() => Date.now())
   const supabase = useMemo(() => createClient(), [])
+  const { toast } = useToast()
   // Track the latest fetch across re-renders so visibility/realtime handlers
   // always call the current version without retriggering the subscribe effect.
   const fetchRef = useRef<() => Promise<void>>(() => Promise.resolve())
+
+  const pingStorageKey = `menuapp-last-ping-${subdomain}-${tableNumber}`
+  const cooldownRemaining = Math.max(0, Math.ceil((pingCooldownUntil - now) / 1000))
 
   const fetchOrder = useCallback(async () => {
     const { data } = await supabase
@@ -41,13 +50,34 @@ export default function OrderStatusPage() {
       .select(`*, order_items(*, menu_items(name, image_url), order_item_modifiers(*, modifiers(name)))`)
       .eq("id", orderId)
       .single()
-    if (data) setOrder(data as unknown as OrderWithItems)
+    if (data) {
+      setOrder(data as unknown as OrderWithItems)
+      // Any successful fetch (realtime push, poll, focus) means our pipe to the
+      // server is healthy. Mark the indicator live so a flaky websocket doesn't
+      // leave "Återansluter…" hanging forever even though data is flowing.
+      setLiveState("live")
+    }
     setLoading(false)
   }, [supabase, orderId])
 
   useEffect(() => {
     fetchRef.current = fetchOrder
   }, [fetchOrder])
+
+  useEffect(() => {
+    const stored = (() => {
+      try { return Number(localStorage.getItem(pingStorageKey) ?? "0") } catch { return 0 }
+    })()
+    if (stored && stored + PING_COOLDOWN_MS > Date.now()) {
+      setPingCooldownUntil(stored + PING_COOLDOWN_MS)
+    }
+  }, [pingStorageKey])
+
+  useEffect(() => {
+    if (cooldownRemaining <= 0) return
+    const id = setInterval(() => setNow(Date.now()), 1000)
+    return () => clearInterval(id)
+  }, [cooldownRemaining])
 
   useEffect(() => {
     fetchOrder()
@@ -222,14 +252,34 @@ export default function OrderStatusPage() {
           </Link>
           <Button
             variant="outline"
-            className="w-full border-stone-700 text-stone-400 hover:text-stone-200 hover:bg-stone-800"
+            disabled={cooldownRemaining > 0}
+            className="w-full border-stone-700 text-stone-400 hover:text-stone-200 hover:bg-stone-800 disabled:opacity-60 disabled:cursor-not-allowed"
             onClick={async () => {
+              if (cooldownRemaining > 0) return
               const { createTablePing } = await import("@/lib/actions/orders")
-              await createTablePing(order.restaurant_id, order.table_number, "assistance", order.id)
+              const { error } = await createTablePing(order.restaurant_id, order.table_number, "assistance", order.id)
+              if (error) {
+                toast({ title: "Kunde inte tillkalla servitör", variant: "destructive" })
+                return
+              }
+              const until = Date.now() + PING_COOLDOWN_MS
+              setPingCooldownUntil(until)
+              setNow(Date.now())
+              try { localStorage.setItem(pingStorageKey, String(Date.now())) } catch { /* ignore */ }
+              toast({ title: "Servitör tillkallad", description: "Någon kommer strax." })
             }}
           >
-            <Bell className="h-4 w-4 mr-2" />
-            Tillkalla servitör
+            {cooldownRemaining > 0 ? (
+              <>
+                <Check className="h-4 w-4 mr-2 text-emerald-400" />
+                Servitör tillkallad · {cooldownRemaining}s
+              </>
+            ) : (
+              <>
+                <Bell className="h-4 w-4 mr-2" />
+                Tillkalla servitör
+              </>
+            )}
           </Button>
         </div>
       </main>

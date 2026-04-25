@@ -93,14 +93,16 @@ export function AnalyticsClient({ restaurantId, summary, initialDays }: Props) {
           <h1 className="font-serif text-3xl text-stone-800 font-semibold">Analys</h1>
           <p className="text-stone-500 mt-1">Insikter per rätt, topptimmar och menyteknik — det smarta sättet att driva en meny.</p>
         </div>
-        <div className="flex items-center gap-1 bg-stone-100 rounded-lg p-1">
+        <div className="flex items-center gap-1 bg-stone-100 rounded-full p-1">
           {[7, 30, 90].map(d => (
             <button
               key={d}
               onClick={() => changeRange(d)}
               disabled={pending}
-              className={`text-sm px-3 py-1.5 rounded-md font-medium transition-colors ${
-                days === d ? "bg-white text-stone-800 shadow-sm" : "text-stone-500 hover:text-stone-700"
+              className={`text-sm px-4 py-1.5 rounded-full font-medium transition-colors ${
+                days === d
+                  ? "bg-amber-500 text-stone-900 shadow-sm"
+                  : "text-stone-500 hover:text-stone-700 hover:bg-stone-200/50"
               }`}
             >
               {d} dagar

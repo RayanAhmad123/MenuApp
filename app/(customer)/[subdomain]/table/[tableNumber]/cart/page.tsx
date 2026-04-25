@@ -11,6 +11,7 @@ import { useCart } from "@/hooks/use-cart"
 import { placeOrder } from "@/lib/actions/orders"
 import { formatPrice } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
+import { appendOrderHistory } from "@/lib/order-history"
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
 
@@ -58,6 +59,7 @@ export default function CartPage() {
         } catch {
           // Private mode / quota — non-critical
         }
+        appendOrderHistory(subdomain, tableNumber, result.orderId)
       }
       if (!restaurant.payment_enabled) {
         // No payment needed — go straight to order confirmation
