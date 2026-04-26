@@ -21,6 +21,9 @@ export default function CartPage() {
   const [clientSecret, setClientSecret] = useState<string | null>(null)
   const [orderId, setOrderId] = useState<string | null>(null)
   const [isPlacingOrder, setIsPlacingOrder] = useState(false)
+  // Flag set the moment a no-payment order is placed so we don't render the
+  // empty-cart screen between clearCart() and the router push completing.
+  const [redirecting, setRedirecting] = useState(false)
   const { toast } = useToast()
   const router = useRouter()
 
@@ -60,7 +63,10 @@ export default function CartPage() {
         }
       }
       if (!restaurant.payment_enabled) {
-        // No payment needed — go straight to order confirmation
+        // No payment needed — go straight to order confirmation. Mark
+        // `redirecting` first so the empty-cart fallback doesn't briefly render
+        // between clearCart() (which empties items) and the router push.
+        setRedirecting(true)
         clearCart()
         router.push(`/${subdomain}/table/${tableNumber}/order/${result.orderId}`)
         return
@@ -72,6 +78,17 @@ export default function CartPage() {
     } finally {
       setIsPlacingOrder(false)
     }
+  }
+
+  if (redirecting) {
+    return (
+      <div className="menu-page min-h-screen flex items-center justify-center">
+        <div className="text-stone-400 text-center">
+          <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p>Skickar din beställning...</p>
+        </div>
+      </div>
+    )
   }
 
   if (itemCount === 0 && !clientSecret) {

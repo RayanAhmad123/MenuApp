@@ -206,11 +206,15 @@ export function CustomerMenuClient({ restaurant, subdomain, categories, menuItem
       {/* Menu items grid */}
       <main className="max-w-5xl mx-auto px-4 py-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {filteredItems.map(item => (
+          {filteredItems.map((item, idx) => (
             <MenuItemCard
               key={item.id}
               item={item}
               onSelect={() => setSelectedItem(item)}
+              // First batch loads eagerly so the user sees images immediately
+              // when the category opens, instead of waiting on lazy loading
+              // that doesn't trigger until scroll.
+              priority={idx < 6}
             />
           ))}
         </div>
@@ -249,7 +253,7 @@ export function CustomerMenuClient({ restaurant, subdomain, categories, menuItem
   )
 }
 
-function MenuItemCard({ item, onSelect }: { item: MenuItemWithDetails; onSelect: () => void }) {
+function MenuItemCard({ item, onSelect, priority = false }: { item: MenuItemWithDetails; onSelect: () => void; priority?: boolean }) {
   const hasDietary = item.is_vegan || (item.is_vegetarian && !item.is_vegan) || item.is_gluten_free
   return (
     <button
@@ -263,6 +267,9 @@ function MenuItemCard({ item, onSelect }: { item: MenuItemWithDetails; onSelect:
             src={item.image_url}
             alt={item.name}
             fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            priority={priority}
+            loading={priority ? "eager" : "lazy"}
             className="object-cover group-hover:scale-105 transition-transform duration-300"
           />
         ) : (

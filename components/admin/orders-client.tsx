@@ -166,9 +166,10 @@ export function OrdersClient({
               }`}
             >
               <div className="flex items-center justify-between mb-1">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 flex-wrap">
                   <span className="font-semibold text-stone-800">Bord {order.table_number}</span>
                   <StatusBadge status={order.status} />
+                  {order.payment_status === "paid" && <PaidBadge />}
                 </div>
                 <span className="font-semibold text-stone-800">{formatPrice(order.total_cents)}</span>
               </div>
@@ -191,9 +192,12 @@ export function OrdersClient({
         <div className="w-80 flex-shrink-0">
           <Card className="border-stone-200 sticky top-8">
             <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-4 gap-2 flex-wrap">
                 <h2 className="font-serif text-lg text-stone-800">Bord {selected.table_number}</h2>
-                <StatusBadge status={selected.status} />
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <StatusBadge status={selected.status} />
+                  {selected.payment_status === "paid" && <PaidBadge />}
+                </div>
               </div>
               <p className="text-xs text-stone-500 mb-4">{formatDate(selected.created_at)}</p>
 
@@ -316,6 +320,17 @@ export function OrdersClient({
         </AlertDialogContent>
       </AlertDialog>
     </div>
+  )
+}
+
+function PaidBadge() {
+  return (
+    <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-medium">
+      <svg className="w-3 h-3" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+        <path fillRule="evenodd" d="M16.704 5.296a1 1 0 010 1.414l-7.5 7.5a1 1 0 01-1.414 0l-3.5-3.5a1 1 0 111.414-1.414L8.5 12.086l6.79-6.79a1 1 0 011.414 0z" clipRule="evenodd" />
+      </svg>
+      Betald
+    </span>
   )
 }
 

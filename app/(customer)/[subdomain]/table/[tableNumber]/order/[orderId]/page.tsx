@@ -2,11 +2,14 @@
 import { useEffect, useState, useCallback, useMemo, useRef } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
-import { CheckCircle2, Clock, ChefHat, CheckCheck, Truck, Bell, ArrowLeft, Plus } from "lucide-react"
+import { CheckCircle2, Clock, ChefHat, CheckCheck, Truck, Bell, ArrowLeft, Plus, XCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { createClient } from "@/lib/supabase/client"
 import { formatPrice, timeAgo } from "@/lib/utils"
+import { useToast } from "@/hooks/use-toast"
 import type { OrderWithItems } from "@/types/database"
+
+const PING_COOLDOWN_MS = 60_000
 
 const ORDER_STEPS = [
   { key: "pending", label: "Beställning mottagen", icon: Clock },
@@ -30,7 +33,13 @@ export default function OrderStatusPage() {
   const [order, setOrder] = useState<OrderWithItems | null>(null)
   const [loading, setLoading] = useState(true)
   const [liveState, setLiveState] = useState<LiveState>("connecting")
+  const [pingCooldownUntil, setPingCooldownUntil] = useState<number>(0)
+  const [now, setNow] = useState(() => Date.now())
+  const [callingWaiter, setCallingWaiter] = useState(false)
   const supabase = useMemo(() => createClient(), [])
+  const { toast } = useToast()
+  const pingStorageKey = `menuapp-last-ping-${subdomain}-${tableNumber}`
+  const cooldownRemaining = Math.max(0, Math.ceil((pingCooldownUntil - now) / 1000))
   // Track the latest fetch across re-renders so visibility/realtime handlers
   // always call the current version without retriggering the subscribe effect.
   const fetchRef = useRef<() => Promise<void>>(() => Promise.resolve())
@@ -49,9 +58,27 @@ export default function OrderStatusPage() {
     fetchRef.current = fetchOrder
   }, [fetchOrder])
 
+  // Restore the ping cooldown from localStorage so it survives navigation between
+  // the menu and the order status page.
+  useEffect(() => {
+    const stored = (() => {
+      try { return Number(localStorage.getItem(pingStorageKey) ?? "0") } catch { return 0 }
+    })()
+    if (stored && stored + PING_COOLDOWN_MS > Date.now()) {
+      setPingCooldownUntil(stored + PING_COOLDOWN_MS)
+    }
+  }, [pingStorageKey])
+
+  useEffect(() => {
+    if (cooldownRemaining <= 0) return
+    const id = setInterval(() => setNow(Date.now()), 1000)
+    return () => clearInterval(id)
+  }, [cooldownRemaining])
+
   useEffect(() => {
     fetchOrder()
 
+    let hasBeenLive = false
     const channel = supabase
       .channel(`order-status-${orderId}`)
       .on("postgres_changes", {
@@ -59,10 +86,29 @@ export default function OrderStatusPage() {
         schema: "public",
         table: "orders",
         filter: `id=eq.${orderId}`,
-      }, () => { fetchRef.current() })
+      }, payload => {
+        // Apply the new status from the realtime payload immediately so the
+        // UI never visually skips a stage between events; refetch in the
+        // background to keep the rest of the order in sync (items, totals).
+        const next = payload.new as Partial<OrderWithItems> | undefined
+        if (next?.status) {
+          setOrder(prev => prev ? { ...prev, status: next.status as OrderWithItems["status"], payment_status: next.payment_status ?? prev.payment_status } : prev)
+        }
+        fetchRef.current()
+      })
       .subscribe(status => {
-        if (status === "SUBSCRIBED") setLiveState("live")
-        else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED") setLiveState("reconnecting")
+        if (status === "SUBSCRIBED") {
+          hasBeenLive = true
+          setLiveState("live")
+        } else if (
+          hasBeenLive &&
+          (status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED")
+        ) {
+          // Only show "Återansluter…" once we've actually been live — avoids
+          // flashing the indicator during the initial subscribe handshake or
+          // the unmount-time CLOSED transition.
+          setLiveState("reconnecting")
+        }
       })
 
     // Poll more aggressively than before so that if the websocket stalls, the
@@ -103,8 +149,82 @@ export default function OrderStatusPage() {
     )
   }
 
+  if (order.status === "cancelled") {
+    return (
+      <div className="menu-page min-h-screen">
+        <header className="sticky top-0 z-40 bg-stone-950/95 backdrop-blur-md border-b border-stone-800">
+          <div className="max-w-2xl mx-auto px-4 py-4 flex items-center gap-3">
+            <Link href={`/${subdomain}/table/${tableNumber}`}>
+              <Button variant="ghost" size="icon" className="text-stone-400 hover:text-stone-200">
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+            </Link>
+            <h1 className="font-serif text-xl text-stone-50 flex-1">Beställningsstatus</h1>
+          </div>
+        </header>
+        <main className="max-w-2xl mx-auto px-4 py-12 space-y-6 text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-950 border border-red-800 mb-2">
+            <XCircle className="h-8 w-8 text-red-400" />
+          </div>
+          <div className="space-y-2">
+            <h2 className="font-serif text-2xl text-stone-50">Din beställning avvisades</h2>
+            <p className="text-stone-400 text-sm">
+              Restaurangen kunde inte ta emot din beställning. Du har inte debiterats.
+            </p>
+            <p className="text-stone-500 text-xs">Bord {tableNumber} · {timeAgo(order.created_at)}</p>
+          </div>
+
+          <div className="bg-stone-900 border border-stone-800 rounded-2xl overflow-hidden text-left">
+            <div className="p-4 border-b border-stone-800">
+              <h3 className="font-serif text-stone-100 font-medium">Avvisad beställning</h3>
+            </div>
+            <div className="divide-y divide-stone-800">
+              {order.order_items.map(item => (
+                <div key={item.id} className="p-4 flex items-start gap-3">
+                  <span className="text-stone-500 font-semibold text-sm w-5 flex-shrink-0 mt-0.5">
+                    {item.quantity}×
+                  </span>
+                  <div className="flex-1">
+                    <p className="text-stone-300 text-sm font-medium line-through">{item.menu_items.name}</p>
+                  </div>
+                  <span className="text-stone-500 text-sm line-through">
+                    {formatPrice(item.item_price_cents * item.quantity)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <Link href={`/${subdomain}/table/${tableNumber}`}>
+            <Button variant="amber" size="xl" className="w-full">
+              <Plus className="h-4 w-4 mr-2" />
+              Lägg ny beställning
+            </Button>
+          </Link>
+        </main>
+      </div>
+    )
+  }
+
   const currentStep = stepIndex(order.status)
   const waitEstimate = estimateWait(order.status)
+
+  async function handleCallWaiter() {
+    if (!order || cooldownRemaining > 0 || callingWaiter) return
+    setCallingWaiter(true)
+    const { createTablePing } = await import("@/lib/actions/orders")
+    const { error } = await createTablePing(order.restaurant_id, order.table_number, "assistance", order.id)
+    setCallingWaiter(false)
+    if (error) {
+      toast({ title: "Kunde inte tillkalla servitör", variant: "destructive" })
+      return
+    }
+    const until = Date.now() + PING_COOLDOWN_MS
+    setPingCooldownUntil(until)
+    setNow(Date.now())
+    try { localStorage.setItem(pingStorageKey, String(Date.now())) } catch { /* ignore */ }
+    toast({ title: "Servitör är på väg!", description: "Någon kommer strax." })
+  }
 
   return (
     <div className="menu-page min-h-screen">
@@ -222,14 +342,16 @@ export default function OrderStatusPage() {
           </Link>
           <Button
             variant="outline"
-            className="w-full border-stone-700 text-stone-400 hover:text-stone-200 hover:bg-stone-800"
-            onClick={async () => {
-              const { createTablePing } = await import("@/lib/actions/orders")
-              await createTablePing(order.restaurant_id, order.table_number, "assistance", order.id)
-            }}
+            className="w-full border-stone-700 text-stone-400 hover:text-stone-200 hover:bg-stone-800 disabled:opacity-60 disabled:cursor-not-allowed"
+            onClick={handleCallWaiter}
+            disabled={cooldownRemaining > 0 || callingWaiter}
           >
             <Bell className="h-4 w-4 mr-2" />
-            Tillkalla servitör
+            {cooldownRemaining > 0
+              ? `Servitör tillkallad (${cooldownRemaining}s)`
+              : callingWaiter
+              ? "Tillkallar..."
+              : "Tillkalla servitör"}
           </Button>
         </div>
       </main>
@@ -261,10 +383,17 @@ function LiveIndicator({ state }: { state: LiveState }) {
       </span>
     )
   }
-  return (
-    <span className="inline-flex items-center gap-1.5 text-[11px] text-stone-500">
-      <span className="w-1.5 h-1.5 rounded-full bg-stone-600" />
-      {state === "connecting" ? "Ansluter…" : "Återansluter…"}
-    </span>
-  )
+  // Hide the indicator entirely while the initial connection is in flight —
+  // the websocket usually subscribes within a few hundred ms, so flashing
+  // "Ansluter…" is just noise. Only show "Återansluter…" once the channel has
+  // actually errored or dropped after being live.
+  if (state === "reconnecting") {
+    return (
+      <span className="inline-flex items-center gap-1.5 text-[11px] text-amber-500">
+        <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+        Återansluter…
+      </span>
+    )
+  }
+  return null
 }
