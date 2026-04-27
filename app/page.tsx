@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import { useForm, ValidationError } from "@formspree/react"
 import ScrollStory from "@/components/ScrollStory"
 import { JsonLd } from "@/components/seo/JsonLd"
 import {
@@ -600,17 +601,12 @@ function Contact() {
     phone: "",
     message: "",
   })
-  const [submitted, setSubmitted] = useState(false)
+  const [state, handleSubmit, reset] = useForm("mojyoejk")
 
   function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
-  }
-
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    setSubmitted(true)
   }
 
   return (
@@ -630,7 +626,7 @@ function Contact() {
 
         <div className="grid lg:grid-cols-5 gap-6">
           <div className="lg:col-span-3 bg-white border border-stone-200 rounded-3xl p-7 shadow-sm">
-            {submitted ? (
+            {state.succeeded ? (
               <div className="h-full flex flex-col items-center justify-center text-center py-10 gap-4">
                 <div className="w-14 h-14 rounded-full bg-amber-500 flex items-center justify-center">
                   <CheckCircle2 className="h-7 w-7 text-white" strokeWidth={2.5} />
@@ -643,7 +639,7 @@ function Contact() {
                 </p>
                 <button
                   onClick={() => {
-                    setSubmitted(false)
+                    reset()
                     setForm({
                       name: "",
                       restaurant: "",
@@ -709,11 +705,17 @@ function Contact() {
                     className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 text-stone-950 text-sm placeholder-stone-400 focus:outline-none focus:border-stone-950 focus:bg-white transition-colors resize-none"
                   />
                 </div>
+                <ValidationError
+                  errors={state.errors}
+                  className="text-red-600 text-xs"
+                />
                 <button
                   type="submit"
-                  className="w-full py-3.5 bg-stone-950 text-white font-semibold rounded-full hover:bg-stone-800 transition-colors text-sm flex items-center justify-center gap-2"
+                  disabled={state.submitting}
+                  className="w-full py-3.5 bg-stone-950 text-white font-semibold rounded-full hover:bg-stone-800 transition-colors text-sm flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  Skicka meddelande <ArrowRight className="h-4 w-4" />
+                  {state.submitting ? "Skickar..." : "Skicka meddelande"}
+                  <ArrowRight className="h-4 w-4" />
                 </button>
               </form>
             )}
