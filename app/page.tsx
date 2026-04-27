@@ -383,20 +383,20 @@ function Intelligence() {
             </svg>
             <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 mt-4 pt-4 border-t border-stone-200 text-[11px]">
               <div className="flex items-start gap-1.5">
-                <span className="mt-1 h-2 w-2 rounded-full bg-green-600 shrink-0" />
-                <p className="text-stone-600 leading-snug"><span className="font-semibold text-stone-950">Star</span> — säljer bra, hög marginal. Lyft fram.</p>
-              </div>
-              <div className="flex items-start gap-1.5">
-                <span className="mt-1 h-2 w-2 rounded-full bg-amber-600 shrink-0" />
-                <p className="text-stone-600 leading-snug"><span className="font-semibold text-stone-950">Plowhorse</span> — populär men låg marginal. Höj pris.</p>
-              </div>
-              <div className="flex items-start gap-1.5">
                 <span className="mt-1 h-2 w-2 rounded-full bg-blue-600 shrink-0" />
                 <p className="text-stone-600 leading-snug"><span className="font-semibold text-stone-950">Puzzle</span> — bra marginal, säljer dåligt. Marknadsför.</p>
               </div>
               <div className="flex items-start gap-1.5">
+                <span className="mt-1 h-2 w-2 rounded-full bg-green-600 shrink-0" />
+                <p className="text-stone-600 leading-snug"><span className="font-semibold text-stone-950">Star</span> — säljer bra, hög marginal. Lyft fram.</p>
+              </div>
+              <div className="flex items-start gap-1.5">
                 <span className="mt-1 h-2 w-2 rounded-full bg-red-600 shrink-0" />
                 <p className="text-stone-600 leading-snug"><span className="font-semibold text-stone-950">Dog</span> — låg på båda. Överväg att ta bort.</p>
+              </div>
+              <div className="flex items-start gap-1.5">
+                <span className="mt-1 h-2 w-2 rounded-full bg-amber-600 shrink-0" />
+                <p className="text-stone-600 leading-snug"><span className="font-semibold text-stone-950">Plowhorse</span> — populär men låg marginal. Höj pris.</p>
               </div>
             </div>
           </div>
