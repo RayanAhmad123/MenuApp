@@ -13,9 +13,9 @@ export function organizationSchema() {
     url: SITE_URL,
     logo: {
       "@type": "ImageObject",
-      url: `${SITE_URL}/logo.svg`,
-      width: 512,
-      height: 512,
+      url: `${SITE_URL}/logo-512.png`,
+      width: 1080,
+      height: 1080,
     },
     description:
       "Servera är en svensk plattform för digital meny, QR-beställning och kontaktlös betalning för restauranger.",

@@ -11,6 +11,31 @@ import {
   websiteSchema,
   faqSchema,
 } from "@/lib/seo/structured-data"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import {
+  QrCode,
+  MonitorCheck,
+  BellRing,
+  LayoutGrid,
+  Globe,
+  BarChart3,
+  CheckCircle2,
+  ChevronRight,
+  Mail,
+  ArrowRight,
+  Zap,
+  Smartphone,
+  Clock,
+  Store,
+  Menu,
+  X,
+} from "lucide-react"
 
 const LANDING_FAQ = [
   {
@@ -44,32 +69,6 @@ const LANDING_FAQ = [
       "Ja. Du kan ha din meny på flera språk, bra för restauranger i turisttäta områden som Stockholm, Göteborg och Malmö.",
   },
 ]
-
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import {
-  QrCode,
-  MonitorCheck,
-  BellRing,
-  LayoutGrid,
-  Globe,
-  BarChart3,
-  CheckCircle2,
-  ChevronRight,
-  Mail,
-  ArrowRight,
-  Zap,
-  Smartphone,
-  Clock,
-  Store,
-  Menu,
-  X,
-} from "lucide-react"
 
 // ─── Nav ────────────────────────────────────────────────────────────────────
 
