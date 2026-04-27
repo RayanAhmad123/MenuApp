@@ -63,21 +63,12 @@ export const metadata: Metadata = {
     title: "Servera — Digital meny & QR-beställning för restauranger",
     description:
       "Premium digital meny- och beställningsplattform för moderna restauranger. QR-meny, mobilbeställning och realtidsuppdateringar — på minuter.",
-    images: [
-      {
-        url: "/logo.svg",
-        width: 1200,
-        height: 630,
-        alt: "Servera — Digital meny för restauranger",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Servera — Digital meny & QR-beställning för restauranger",
     description:
       "Premium digital meny- och beställningsplattform för moderna restauranger.",
-    images: ["/logo.svg"],
   },
   robots: {
     index: true,
