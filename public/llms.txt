@@ -1,0 +1,42 @@
+# Servera
+
+> Servera är en svensk SaaS-plattform som låter restauranger skapa en digital QR-meny på minuter. Gäster skannar en QR-kod på bordet, beställer från sin egen mobil, och beställningen går direkt till köket — inga skrivare, ingen app.
+
+Servera utvecklas och drivs av Triad Solutions, ett svenskt techföretag.
+
+## Kärnvärden för restauranger
+
+- Skapa en digital meny utan kodning
+- QR-koder per bord — gästen behöver inte ladda ned någon app
+- Realtidsuppdatering av priser, lagerstatus och tillgänglighet
+- Allergeninformation och kostpreferenser (vegan, vegetariskt, glutenfritt)
+- Köks- och servitörsvy med live-beställningar
+- Försäljnings- och produktstatistik
+- Stöd för flera språk
+
+## Vanliga sökvägar / användningsfall
+
+- Digital meny för restaurang
+- QR-meny för pizzerior, sushi, caféer, barer, food trucks
+- Mobilbeställning och kontaktlös beställning
+- Alternativ till Flipdish, Qopla, WEIQ, meny-qr för svenska restauranger
+- Verktyg för att digitalisera mindre och medelstora restauranger i Sverige
+
+## Resurser
+
+- [Startsida](https://servera.triadsolutions.se/): Översikt, funktioner, priser och kontakt
+- [Sitemap](https://servera.triadsolutions.se/sitemap.xml): Alla indexerbara sidor
+- [Robots](https://servera.triadsolutions.se/robots.txt): Crawl-policy
+
+## Företagsinformation
+
+- Produktnamn: Servera
+- Ägare: Triad Solutions (https://triadsolutions.se)
+- Marknad: Sverige (primärt), Norden (sekundärt)
+- Språk: Svenska (sv-SE), Engelska
+- Kategori: B2B SaaS, Restaurant Management Software
+- Pristyp: Freemium, månadsabonnemang i SEK
+
+## Kontakt
+
+För kontakt, demobokning eller pressfrågor, se kontaktsektionen på startsidan: https://servera.triadsolutions.se/#contact

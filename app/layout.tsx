@@ -1,15 +1,111 @@
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
+import { Inter, Playfair_Display } from "next/font/google"
 import "./globals.css"
 import { Providers } from "@/components/providers"
 import { Toaster } from "@/components/ui/toaster"
 
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+  variable: "--font-inter",
+})
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  display: "swap",
+  variable: "--font-playfair",
+})
+
+const SITE_URL = "https://servera.triadsolutions.se"
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://servera.triadsolutions.se"),
+  metadataBase: new URL(SITE_URL),
   title: {
     template: "%s | Servera",
-    default: "Servera — Restaurang-plattform för QR-beställning",
+    default: "Servera — Digital meny & QR-beställning för restauranger",
   },
-  description: "Servera — premium digital menu- och beställningsplattform för moderna restauranger.",
+  description:
+    "Servera är en svensk plattform för digital meny, QR-beställning och kontaktlös betalning. Skapa en QR-meny på minuter, uppdatera priser i realtid och öka ordervärdet med smartare gästupplevelse.",
+  applicationName: "Servera",
+  keywords: [
+    "digital meny",
+    "QR meny",
+    "QR-meny restaurang",
+    "digital meny restaurang",
+    "QR kod meny",
+    "restaurangsystem",
+    "beställning via mobil",
+    "kontaktlös beställning",
+    "digital menytavla",
+    "menyhantering restaurang",
+    "Servera",
+    "Triad Solutions",
+  ],
+  authors: [{ name: "Triad Solutions", url: "https://triadsolutions.se" }],
+  creator: "Triad Solutions",
+  publisher: "Triad Solutions",
+  category: "Business Software",
+  alternates: {
+    canonical: "/",
+    languages: {
+      "sv-SE": "/",
+      "x-default": "/",
+    },
+  },
+  openGraph: {
+    type: "website",
+    locale: "sv_SE",
+    url: SITE_URL,
+    siteName: "Servera",
+    title: "Servera — Digital meny & QR-beställning för restauranger",
+    description:
+      "Premium digital meny- och beställningsplattform för moderna restauranger. QR-meny, mobilbeställning och realtidsuppdateringar — på minuter.",
+    images: [
+      {
+        url: "/logo.svg",
+        width: 1200,
+        height: 630,
+        alt: "Servera — Digital meny för restauranger",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Servera — Digital meny & QR-beställning för restauranger",
+    description:
+      "Premium digital meny- och beställningsplattform för moderna restauranger.",
+    images: ["/logo.svg"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+  icons: {
+    icon: "/icon.svg",
+    apple: "/logo.svg",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+}
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#fafaf9" },
+    { media: "(prefers-color-scheme: dark)", color: "#0c0a09" },
+  ],
+  width: "device-width",
+  initialScale: 1,
 }
 
 export default function RootLayout({
@@ -18,15 +114,11 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="sv" suppressHydrationWarning>
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap"
-          rel="stylesheet"
-        />
-      </head>
+    <html
+      lang="sv"
+      className={`${inter.variable} ${playfair.variable}`}
+      suppressHydrationWarning
+    >
       <body>
         <Providers>
           {children}

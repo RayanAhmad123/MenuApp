@@ -3,6 +3,47 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import ScrollStory from "@/components/ScrollStory"
+import { JsonLd } from "@/components/seo/JsonLd"
+import {
+  organizationSchema,
+  softwareApplicationSchema,
+  websiteSchema,
+  faqSchema,
+} from "@/lib/seo/structured-data"
+
+const LANDING_FAQ = [
+  {
+    question: "Vad är en digital meny / QR-meny?",
+    answer:
+      "En digital meny är en webbaserad meny som gästen öppnar i mobilen, oftast genom att skanna en QR-kod på bordet. Servera ger dig en komplett QR-meny som du kan uppdatera i realtid utan att trycka om något — perfekt för restauranger, caféer, pizzerior och barer i Sverige.",
+  },
+  {
+    question: "Hur snabbt kan jag komma igång med Servera?",
+    answer:
+      "De flesta restauranger är igång på under 30 minuter. Du skapar ett konto, lägger in dina kategorier och rätter, väljer en QR-design och skriver ut bordskoderna. Ingen integration mot kassasystem krävs för att starta.",
+  },
+  {
+    question: "Vad kostar Servera för en restaurang?",
+    answer:
+      "Servera har en gratis plan för mindre verksamheter och betalplaner som skalar med antal bord och beställningar. Se aktuella priser på vår prissida.",
+  },
+  {
+    question: "Behöver gästen ladda ner en app för att beställa?",
+    answer:
+      "Nej. Servera-menyn öppnas direkt i mobilens webbläsare när gästen skannar QR-koden. Det krävs ingen app, ingen registrering och inga inloggningar.",
+  },
+  {
+    question: "Kan jag visa allergener och kostpreferenser i menyn?",
+    answer:
+      "Ja. Varje rätt kan märkas med allergener (gluten, mjölk, nötter osv.) samt vegan, vegetariskt och glutenfritt. Informationen visas tydligt för gästen och uppfyller branschens krav på allergeninformation.",
+  },
+  {
+    question: "Fungerar Servera för flera språk?",
+    answer:
+      "Ja. Du kan ha din meny på flera språk, bra för restauranger i turisttäta områden som Stockholm, Göteborg och Malmö.",
+  },
+]
+
 import {
   Dialog,
   DialogContent,
@@ -957,6 +998,10 @@ export default function HomePage() {
       className="font-sans antialiased bg-stone-50"
       style={{ scrollBehavior: "smooth" }}
     >
+      <JsonLd id="ld-organization" data={organizationSchema()} />
+      <JsonLd id="ld-website" data={websiteSchema()} />
+      <JsonLd id="ld-software" data={softwareApplicationSchema()} />
+      <JsonLd id="ld-faq" data={faqSchema(LANDING_FAQ)} />
       <Nav />
       <Hero />
       <ScrollStory />
