@@ -4,6 +4,7 @@ import { Providers } from "@/components/providers"
 import { Toaster } from "@/components/ui/toaster"
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://servera.triadsolutions.se"),
   title: {
     template: "%s | Servera",
     default: "Servera — Restaurang-plattform för QR-beställning",
