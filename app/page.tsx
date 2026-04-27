@@ -342,15 +342,9 @@ function Intelligence() {
         <div className="relative">
           <div className="absolute -inset-4 bg-amber-500/10 blur-3xl rounded-full pointer-events-none" />
           <div className="relative bg-stone-50 border border-stone-200 rounded-3xl p-6 shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <p className="text-xs text-stone-500 font-semibold uppercase tracking-wider">Menyanalys</p>
-                <p className="font-serif text-lg text-stone-950 font-bold">Popularitet × Marginal</p>
-              </div>
-              <div className="flex gap-2 text-[10px] font-medium">
-                <span className="px-2 py-0.5 rounded bg-green-100 text-green-700">Stars: 4</span>
-                <span className="px-2 py-0.5 rounded bg-amber-100 text-amber-700">Plow: 3</span>
-              </div>
+            <div className="mb-4">
+              <p className="text-xs text-stone-500 font-semibold uppercase tracking-wider">Menyanalys</p>
+              <p className="font-serif text-lg text-stone-950 font-bold">Popularitet × Marginal</p>
             </div>
             <svg viewBox="0 0 300 240" className="w-full h-auto">
               <rect x="20" y="10" width="130" height="110" fill="#2563eb" fillOpacity="0.06" />
