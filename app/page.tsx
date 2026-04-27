@@ -763,165 +763,121 @@ function PrivacyPolicyDialog() {
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col bg-white text-stone-800">
         <DialogHeader className="text-left">
-          <DialogTitle className="text-stone-950">Integritetspolicy</DialogTitle>
+          <DialogTitle className="text-stone-950">Integritetspolicy – Servera</DialogTitle>
           <p className="text-xs text-stone-500 mt-1">
-            Senast uppdaterad: 27 april 2026
+            Senast uppdaterad: 2026-04-12
           </p>
         </DialogHeader>
 
         <div className="overflow-y-auto pr-2 -mr-2 space-y-5 text-sm leading-relaxed text-stone-700">
-          <p>
-            Triad Solutions AB (&quot;Servera&quot;, &quot;vi&quot;, &quot;oss&quot;) värnar om din
-            integritet. Den här policyn beskriver vilka personuppgifter vi
-            behandlar, varför vi behandlar dem och vilka rättigheter du har
-            enligt EU:s dataskyddsförordning (GDPR).
-          </p>
-
           <section className="space-y-1.5">
-            <h3 className="font-semibold text-stone-950">1. Personuppgiftsansvarig</h3>
+            <h3 className="font-semibold text-stone-950">1. Allmänt</h3>
             <p>
-              Triad Solutions AB är personuppgiftsansvarig för behandlingen av
-              dina personuppgifter. Kontakta oss på{" "}
-              <a
-                href="mailto:kontakt@triadsolutions.se"
-                className="text-amber-600 hover:underline"
-              >
-                kontakt@triadsolutions.se
-              </a>{" "}
-              vid frågor.
+              Denna policy beskriver hur Servera samlar in och använder
+              personuppgifter som delas med oss via vår hemsida. Vårt mål är
+              att vara så transparenta som möjligt med hur vi hanterar din
+              information.
             </p>
           </section>
 
           <section className="space-y-1.5">
-            <h3 className="font-semibold text-stone-950">2. Vilka uppgifter vi samlar in</h3>
+            <h3 className="font-semibold text-stone-950">2. Vilka uppgifter samlar vi in?</h3>
+            <p>
+              När du använder vår hemsida eller kontaktar oss kan vi komma att
+              samla in följande uppgifter:
+            </p>
             <ul className="list-disc list-outside pl-5 space-y-1">
               <li>
-                <strong>Kontoinformation</strong> för restauranger: namn,
-                e-postadress, telefonnummer, organisationsnummer och
-                faktureringsuppgifter.
+                <strong>Kontaktuppgifter:</strong> Namn, e-postadress,
+                telefonnummer och eventuellt företagsnamn som du anger i vårt
+                kontaktformulär.
               </li>
               <li>
-                <strong>Beställningsdata</strong> från gäster: vald rätt,
-                kvantitet, eventuella tillval, bordsnummer och tidpunkt. Inga
-                namn eller kontaktuppgifter krävs av gästen.
+                <strong>Meddelandehistorik:</strong> Den information du själv
+                väljer att skriva i ditt meddelande till oss.
               </li>
               <li>
-                <strong>Betalningsdata</strong> behandlas av vår
-                betalningsleverantör. Vi lagrar aldrig kortuppgifter.
-              </li>
-              <li>
-                <strong>Teknisk information</strong>: IP-adress, enhetstyp,
-                webbläsare och cookies för säkerhet, drift och analys.
-              </li>
-              <li>
-                <strong>Supportkommunikation</strong>: meddelanden du skickar
-                till oss via formulär eller e-post.
+                <strong>Teknisk data:</strong> IP-adress, typ av enhet och
+                webbläsare samt hur du interagerar med sidan (via cookies).
               </li>
             </ul>
           </section>
 
           <section className="space-y-1.5">
-            <h3 className="font-semibold text-stone-950">3. Ändamål och rättslig grund</h3>
+            <h3 className="font-semibold text-stone-950">3. Varför samlar vi in dessa uppgifter?</h3>
+            <p>Vi behandlar din data för att:</p>
+            <ul className="list-disc list-outside pl-5 space-y-1">
+              <li>Kunna återkoppla på dina frågor och förfrågningar.</li>
+              <li>Etablera en affärskontakt om du visat intresse för våra tjänster.</li>
+              <li>Förbättra användarupplevelsen på vår hemsida genom statistik och analys.</li>
+            </ul>
+          </section>
+
+          <section className="space-y-1.5">
+            <h3 className="font-semibold text-stone-950">4. Rättslig grund</h3>
+            <p>
+              Vi behandlar dina personuppgifter med stöd av intresseavvägning.
+              Vi bedömer att vårt berättigade intresse av att kunna svara på
+              dina frågor och kommunicera med dig som visat intresse för oss
+              väger tyngre än det eventuella integritetsintrång som
+              behandlingen innebär.
+            </p>
+          </section>
+
+          <section className="space-y-1.5">
+            <h3 className="font-semibold text-stone-950">5. Hur länge sparar vi din data?</h3>
             <ul className="list-disc list-outside pl-5 space-y-1">
               <li>
-                Tillhandahålla tjänsten (avtal, art. 6.1 b GDPR).
+                <strong>Kontaktförfrågningar:</strong> Vi sparar dina
+                uppgifter så länge det är nödvändigt för att hjälpa dig med
+                ditt ärende. Om kontakten inte leder till ett kundförhållande
+                raderas uppgifterna efter 12 månader.
               </li>
               <li>
-                Fakturering och bokföring (rättslig förpliktelse, art. 6.1 c).
-              </li>
-              <li>
-                Säkerhet, bedrägeribekämpning och driftsstabilitet (berättigat
-                intresse, art. 6.1 f).
-              </li>
-              <li>
-                Produktförbättring och statistik på aggregerad nivå (berättigat
-                intresse, art. 6.1 f).
-              </li>
-              <li>
-                Marknadsföring sker enbart efter ditt samtycke (art. 6.1 a).
+                <strong>Analysdata:</strong> Information från cookies rensas
+                regelbundet enligt de inställningar som finns i våra
+                analysverktyg.
               </li>
             </ul>
           </section>
 
           <section className="space-y-1.5">
-            <h3 className="font-semibold text-stone-950">4. Hur länge vi sparar uppgifter</h3>
+            <h3 className="font-semibold text-stone-950">6. Vilka delar vi informationen med?</h3>
             <p>
-              Beställningsdata sparas i upp till 24 månader för analys och
-              support. Bokföringsmaterial sparas i 7 år enligt bokföringslagen.
-              Kontouppgifter raderas inom 90 dagar efter att avtalet upphört,
-              om inget annat krävs enligt lag.
+              Vi säljer aldrig dina uppgifter. Vi använder dock vissa
+              underleverantörer för att hemsidan ska fungera:
             </p>
-          </section>
-
-          <section className="space-y-1.5">
-            <h3 className="font-semibold text-stone-950">5. Mottagare och underbiträden</h3>
-            <p>
-              Vi delar uppgifter endast med betrodda underbiträden som behövs
-              för att leverera tjänsten — bland annat hosting (Vercel),
-              databas (Supabase) samt betalningsleverantör. Samtliga är bundna
-              av personuppgiftsbiträdesavtal. Vi säljer aldrig dina uppgifter.
-            </p>
-          </section>
-
-          <section className="space-y-1.5">
-            <h3 className="font-semibold text-stone-950">6. Överföringar utanför EU/EES</h3>
-            <p>
-              Vissa underbiträden kan behandla uppgifter utanför EU/EES. När så
-              sker säkerställer vi skyddet genom EU-kommissionens
-              standardavtalsklausuler eller motsvarande lagliga
-              överföringsmekanism.
-            </p>
-          </section>
-
-          <section className="space-y-1.5">
-            <h3 className="font-semibold text-stone-950">7. Cookies</h3>
-            <p>
-              Vi använder nödvändiga cookies för inloggning och säkerhet samt
-              valfria cookies för analys. Du kan när som helst återkalla ditt
-              samtycke till valfria cookies via inställningarna i din
-              webbläsare.
-            </p>
-          </section>
-
-          <section className="space-y-1.5">
-            <h3 className="font-semibold text-stone-950">8. Dina rättigheter</h3>
-            <p>Enligt GDPR har du rätt att:</p>
             <ul className="list-disc list-outside pl-5 space-y-1">
-              <li>begära ett registerutdrag över dina personuppgifter,</li>
-              <li>begära rättelse av felaktiga uppgifter,</li>
-              <li>begära radering eller begränsning av behandlingen,</li>
-              <li>invända mot behandling som sker med stöd av berättigat intresse,</li>
-              <li>begära dataportabilitet, samt</li>
-              <li>återkalla ett tidigare lämnat samtycke.</li>
+              <li>
+                <strong>Webbhotell:</strong> Där hemsidan och dess data lagras.
+              </li>
+              <li>
+                <strong>E-postleverantör:</strong> För att ta emot och skicka
+                meddelanden till dig.
+              </li>
+              <li>
+                <strong>Analysverktyg:</strong> Google Analytics, för att se
+                hur många som besöker sidan.
+              </li>
+            </ul>
+          </section>
+
+          <section className="space-y-1.5">
+            <h3 className="font-semibold text-stone-950">7. Dina rättigheter</h3>
+            <p>Du har när som helst rätt att:</p>
+            <ul className="list-disc list-outside pl-5 space-y-1">
+              <li>Begära ut ett registerutdrag på den data vi har om dig.</li>
+              <li>Be oss rätta felaktiga uppgifter.</li>
+              <li>Be oss radera din information ur våra system.</li>
             </ul>
             <p>
-              Skicka begäran till{" "}
+              För att utöva dina rättigheter, kontakta oss på:{" "}
               <a
                 href="mailto:kontakt@triadsolutions.se"
                 className="text-amber-600 hover:underline"
               >
                 kontakt@triadsolutions.se
               </a>
-              . Du har även rätt att lämna klagomål till
-              Integritetsskyddsmyndigheten (IMY).
-            </p>
-          </section>
-
-          <section className="space-y-1.5">
-            <h3 className="font-semibold text-stone-950">9. Säkerhet</h3>
-            <p>
-              Vi använder kryptering i transit (TLS) och i vila, åtkomstkontroll,
-              loggning och regelbundna säkerhetsgenomgångar för att skydda dina
-              uppgifter.
-            </p>
-          </section>
-
-          <section className="space-y-1.5">
-            <h3 className="font-semibold text-stone-950">10. Ändringar</h3>
-            <p>
-              Vi kan komma att uppdatera den här policyn. Vid väsentliga
-              förändringar informerar vi via tjänsten eller e-post. Den senaste
-              versionen finns alltid tillgänglig här.
             </p>
           </section>
         </div>
