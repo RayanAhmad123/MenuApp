@@ -5,10 +5,10 @@ import { Toaster } from "@/components/ui/toaster"
 
 export const metadata: Metadata = {
   title: {
-    template: "%s | MenuApp",
-    default: "MenuApp — Restaurant Menu Platform",
+    template: "%s | Servera",
+    default: "Servera — Restaurang-plattform för QR-beställning",
   },
-  description: "The premium digital menu platform for modern restaurants.",
+  description: "Servera — premium digital menu- och beställningsplattform för moderna restauranger.",
 }
 
 export default function RootLayout({

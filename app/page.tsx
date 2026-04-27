@@ -4,6 +4,13 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import ScrollStory from "@/components/ScrollStory"
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import {
   UtensilsCrossed,
   QrCode,
   MonitorCheck,
@@ -56,7 +63,7 @@ function Nav() {
             <UtensilsCrossed className="h-4 w-4 text-amber-400" />
           </div>
           <span className="font-serif text-xl text-stone-950 font-bold tracking-tight">
-            MenuApp
+            Servera
           </span>
         </a>
 
@@ -259,7 +266,7 @@ function Features() {
             Funktioner
           </div>
           <h2 className="font-serif text-4xl sm:text-5xl text-stone-950 font-bold tracking-tight leading-[1.05] mb-4">
-            Allt du behöver. <span className="italic text-amber-500">Inget du inte.</span>
+            Enkelt för er. <span className="italic text-amber-500">Smidigt för gästen.</span>
           </h2>
           <p className="text-stone-600 text-lg leading-relaxed">
             Från köket till gästsalen — varje del av matupplevelsen är täckt.
@@ -374,7 +381,24 @@ function Intelligence() {
               <circle cx="50" cy="190" r="6" fill="#dc2626" stroke="white" strokeWidth="2" />
               <circle cx="90" cy="170" r="6" fill="#dc2626" stroke="white" strokeWidth="2" />
             </svg>
-            <p className="text-xs text-stone-500 mt-3 text-center">Intäkt, timing och kombinationer analyseras per rätt.</p>
+            <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 mt-4 pt-4 border-t border-stone-200 text-[11px]">
+              <div className="flex items-start gap-1.5">
+                <span className="mt-1 h-2 w-2 rounded-full bg-green-600 shrink-0" />
+                <p className="text-stone-600 leading-snug"><span className="font-semibold text-stone-950">Star</span> — säljer bra, hög marginal. Lyft fram.</p>
+              </div>
+              <div className="flex items-start gap-1.5">
+                <span className="mt-1 h-2 w-2 rounded-full bg-amber-600 shrink-0" />
+                <p className="text-stone-600 leading-snug"><span className="font-semibold text-stone-950">Plowhorse</span> — populär men låg marginal. Höj pris.</p>
+              </div>
+              <div className="flex items-start gap-1.5">
+                <span className="mt-1 h-2 w-2 rounded-full bg-blue-600 shrink-0" />
+                <p className="text-stone-600 leading-snug"><span className="font-semibold text-stone-950">Puzzle</span> — bra marginal, säljer dåligt. Marknadsför.</p>
+              </div>
+              <div className="flex items-start gap-1.5">
+                <span className="mt-1 h-2 w-2 rounded-full bg-red-600 shrink-0" />
+                <p className="text-stone-600 leading-snug"><span className="font-semibold text-stone-950">Dog</span> — låg på båda. Överväg att ta bort.</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -406,7 +430,7 @@ function Pricing() {
       period: "kr/mån",
       desc: "För växande restauranger med fler platser.",
       features: [
-        "3 restauranger",
+        "1 restaurang",
         "Obegränsat antal bord",
         "Allt i Start",
         "Avancerad statistik",
@@ -567,7 +591,7 @@ function Contact() {
             Redo att <span className="italic text-amber-500">uppgradera</span>?
           </h2>
           <p className="text-stone-600 text-lg leading-relaxed">
-            Berätta lite om din restaurang så hör vi av oss inom 24 timmar.
+            Berätta lite om din restaurang så hör vi av oss.
           </p>
         </div>
 
@@ -582,7 +606,7 @@ function Contact() {
                   Meddelande skickat!
                 </h3>
                 <p className="text-stone-600 max-w-xs">
-                  Tack för att du hörde av dig. Vi återkommer inom 24 timmar.
+                  Tack för att du hörde av dig. Vi återkommer så snart vi kan.
                 </p>
                 <button
                   onClick={() => {
@@ -669,14 +693,11 @@ function Contact() {
               </div>
               <h3 className="font-serif text-xl font-bold mb-1">Skriv till oss</h3>
               <a
-                href="mailto:menu@hirly.app"
+                href="mailto:kontakt@triadsolutions.se"
                 className="text-amber-400 text-sm hover:underline"
               >
-                menu@hirly.app
+                kontakt@triadsolutions.se
               </a>
-              <p className="text-stone-400 text-xs mt-2">
-                Vi svarar inom 24 timmar.
-              </p>
             </div>
             <div className="bg-white border border-stone-200 rounded-3xl p-6 shadow-sm">
               <h3 className="text-stone-950 font-semibold mb-3">
@@ -727,6 +748,188 @@ function Field({
   )
 }
 
+// ─── Privacy policy dialog ──────────────────────────────────────────────────
+
+function PrivacyPolicyDialog() {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <button
+          type="button"
+          className="text-stone-400 text-sm hover:text-amber-400 transition-colors text-left"
+        >
+          Integritetspolicy
+        </button>
+      </DialogTrigger>
+      <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col bg-white text-stone-800">
+        <DialogHeader className="text-left">
+          <DialogTitle className="text-stone-950">Integritetspolicy</DialogTitle>
+          <p className="text-xs text-stone-500 mt-1">
+            Senast uppdaterad: 27 april 2026
+          </p>
+        </DialogHeader>
+
+        <div className="overflow-y-auto pr-2 -mr-2 space-y-5 text-sm leading-relaxed text-stone-700">
+          <p>
+            Triad Solutions AB (&quot;Servera&quot;, &quot;vi&quot;, &quot;oss&quot;) värnar om din
+            integritet. Den här policyn beskriver vilka personuppgifter vi
+            behandlar, varför vi behandlar dem och vilka rättigheter du har
+            enligt EU:s dataskyddsförordning (GDPR).
+          </p>
+
+          <section className="space-y-1.5">
+            <h3 className="font-semibold text-stone-950">1. Personuppgiftsansvarig</h3>
+            <p>
+              Triad Solutions AB är personuppgiftsansvarig för behandlingen av
+              dina personuppgifter. Kontakta oss på{" "}
+              <a
+                href="mailto:kontakt@triadsolutions.se"
+                className="text-amber-600 hover:underline"
+              >
+                kontakt@triadsolutions.se
+              </a>{" "}
+              vid frågor.
+            </p>
+          </section>
+
+          <section className="space-y-1.5">
+            <h3 className="font-semibold text-stone-950">2. Vilka uppgifter vi samlar in</h3>
+            <ul className="list-disc list-outside pl-5 space-y-1">
+              <li>
+                <strong>Kontoinformation</strong> för restauranger: namn,
+                e-postadress, telefonnummer, organisationsnummer och
+                faktureringsuppgifter.
+              </li>
+              <li>
+                <strong>Beställningsdata</strong> från gäster: vald rätt,
+                kvantitet, eventuella tillval, bordsnummer och tidpunkt. Inga
+                namn eller kontaktuppgifter krävs av gästen.
+              </li>
+              <li>
+                <strong>Betalningsdata</strong> behandlas av vår
+                betalningsleverantör. Vi lagrar aldrig kortuppgifter.
+              </li>
+              <li>
+                <strong>Teknisk information</strong>: IP-adress, enhetstyp,
+                webbläsare och cookies för säkerhet, drift och analys.
+              </li>
+              <li>
+                <strong>Supportkommunikation</strong>: meddelanden du skickar
+                till oss via formulär eller e-post.
+              </li>
+            </ul>
+          </section>
+
+          <section className="space-y-1.5">
+            <h3 className="font-semibold text-stone-950">3. Ändamål och rättslig grund</h3>
+            <ul className="list-disc list-outside pl-5 space-y-1">
+              <li>
+                Tillhandahålla tjänsten (avtal, art. 6.1 b GDPR).
+              </li>
+              <li>
+                Fakturering och bokföring (rättslig förpliktelse, art. 6.1 c).
+              </li>
+              <li>
+                Säkerhet, bedrägeribekämpning och driftsstabilitet (berättigat
+                intresse, art. 6.1 f).
+              </li>
+              <li>
+                Produktförbättring och statistik på aggregerad nivå (berättigat
+                intresse, art. 6.1 f).
+              </li>
+              <li>
+                Marknadsföring sker enbart efter ditt samtycke (art. 6.1 a).
+              </li>
+            </ul>
+          </section>
+
+          <section className="space-y-1.5">
+            <h3 className="font-semibold text-stone-950">4. Hur länge vi sparar uppgifter</h3>
+            <p>
+              Beställningsdata sparas i upp till 24 månader för analys och
+              support. Bokföringsmaterial sparas i 7 år enligt bokföringslagen.
+              Kontouppgifter raderas inom 90 dagar efter att avtalet upphört,
+              om inget annat krävs enligt lag.
+            </p>
+          </section>
+
+          <section className="space-y-1.5">
+            <h3 className="font-semibold text-stone-950">5. Mottagare och underbiträden</h3>
+            <p>
+              Vi delar uppgifter endast med betrodda underbiträden som behövs
+              för att leverera tjänsten — bland annat hosting (Vercel),
+              databas (Supabase) samt betalningsleverantör. Samtliga är bundna
+              av personuppgiftsbiträdesavtal. Vi säljer aldrig dina uppgifter.
+            </p>
+          </section>
+
+          <section className="space-y-1.5">
+            <h3 className="font-semibold text-stone-950">6. Överföringar utanför EU/EES</h3>
+            <p>
+              Vissa underbiträden kan behandla uppgifter utanför EU/EES. När så
+              sker säkerställer vi skyddet genom EU-kommissionens
+              standardavtalsklausuler eller motsvarande lagliga
+              överföringsmekanism.
+            </p>
+          </section>
+
+          <section className="space-y-1.5">
+            <h3 className="font-semibold text-stone-950">7. Cookies</h3>
+            <p>
+              Vi använder nödvändiga cookies för inloggning och säkerhet samt
+              valfria cookies för analys. Du kan när som helst återkalla ditt
+              samtycke till valfria cookies via inställningarna i din
+              webbläsare.
+            </p>
+          </section>
+
+          <section className="space-y-1.5">
+            <h3 className="font-semibold text-stone-950">8. Dina rättigheter</h3>
+            <p>Enligt GDPR har du rätt att:</p>
+            <ul className="list-disc list-outside pl-5 space-y-1">
+              <li>begära ett registerutdrag över dina personuppgifter,</li>
+              <li>begära rättelse av felaktiga uppgifter,</li>
+              <li>begära radering eller begränsning av behandlingen,</li>
+              <li>invända mot behandling som sker med stöd av berättigat intresse,</li>
+              <li>begära dataportabilitet, samt</li>
+              <li>återkalla ett tidigare lämnat samtycke.</li>
+            </ul>
+            <p>
+              Skicka begäran till{" "}
+              <a
+                href="mailto:kontakt@triadsolutions.se"
+                className="text-amber-600 hover:underline"
+              >
+                kontakt@triadsolutions.se
+              </a>
+              . Du har även rätt att lämna klagomål till
+              Integritetsskyddsmyndigheten (IMY).
+            </p>
+          </section>
+
+          <section className="space-y-1.5">
+            <h3 className="font-semibold text-stone-950">9. Säkerhet</h3>
+            <p>
+              Vi använder kryptering i transit (TLS) och i vila, åtkomstkontroll,
+              loggning och regelbundna säkerhetsgenomgångar för att skydda dina
+              uppgifter.
+            </p>
+          </section>
+
+          <section className="space-y-1.5">
+            <h3 className="font-semibold text-stone-950">10. Ändringar</h3>
+            <p>
+              Vi kan komma att uppdatera den här policyn. Vid väsentliga
+              förändringar informerar vi via tjänsten eller e-post. Den senaste
+              versionen finns alltid tillgänglig här.
+            </p>
+          </section>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 // ─── Footer ───────────────────────────────────────────────────────────────────
 
 function Footer() {
@@ -740,7 +943,7 @@ function Footer() {
                 <UtensilsCrossed className="h-4 w-4 text-stone-950" />
               </div>
               <span className="font-serif text-xl text-white font-bold tracking-tight">
-                MenuApp
+                Servera
               </span>
             </div>
             <p className="text-stone-400 text-sm max-w-xs leading-relaxed">
@@ -777,19 +980,14 @@ function Footer() {
             </h4>
             <ul className="space-y-2.5">
               <li>
-                <a
-                  href="#"
-                  className="text-stone-400 text-sm hover:text-amber-400 transition-colors"
-                >
-                  Integritetspolicy
-                </a>
+                <PrivacyPolicyDialog />
               </li>
               <li>
                 <a
-                  href="mailto:menu@hirly.app"
+                  href="mailto:kontakt@triadsolutions.se"
                   className="text-stone-400 text-sm hover:text-amber-400 transition-colors"
                 >
-                  menu@hirly.app
+                  kontakt@triadsolutions.se
                 </a>
               </li>
             </ul>
@@ -797,7 +995,7 @@ function Footer() {
         </div>
 
         <div className="border-t border-stone-800 pt-6 text-xs text-stone-500">
-          © 2026 MenuApp. Alla rättigheter förbehållna.
+          © 2026 Servera. Alla rättigheter förbehållna.
         </div>
       </div>
     </footer>
