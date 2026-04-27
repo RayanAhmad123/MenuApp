@@ -25,6 +25,8 @@ Servera utvecklas och drivs av Triad Solutions, ett svenskt techföretag.
 ## Resurser
 
 - [Startsida](https://servera.triadsolutions.se/): Översikt, funktioner, priser och kontakt
+- [Priser](https://servera.triadsolutions.se/priser): Planer, priser i SEK, FAQ
+- [Fullständig kontext (llms-full.txt)](https://servera.triadsolutions.se/llms-full.txt): Hela produktbeskrivningen för LLM-crawlers
 - [Sitemap](https://servera.triadsolutions.se/sitemap.xml): Alla indexerbara sidor
 - [Robots](https://servera.triadsolutions.se/robots.txt): Crawl-policy
 

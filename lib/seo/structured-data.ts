@@ -104,6 +104,58 @@ export function websiteSchema() {
   }
 }
 
+interface PricingPlan {
+  name: string
+  description: string
+  priceSEK: number | null
+  url: string
+  features: string[]
+}
+
+export function productSchema(plan: PricingPlan) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: `Servera ${plan.name}`,
+    description: plan.description,
+    brand: { "@type": "Brand", name: SITE_NAME },
+    category: "Restaurant Management Software",
+    url: plan.url,
+    offers: {
+      "@type": "Offer",
+      url: plan.url,
+      availability: "https://schema.org/InStock",
+      priceCurrency: "SEK",
+      ...(plan.priceSEK !== null
+        ? {
+            price: plan.priceSEK.toString(),
+            priceSpecification: {
+              "@type": "UnitPriceSpecification",
+              price: plan.priceSEK,
+              priceCurrency: "SEK",
+              unitText: "MONTH",
+              referenceQuantity: {
+                "@type": "QuantitativeValue",
+                value: 1,
+                unitCode: "MON",
+              },
+            },
+          }
+        : {}),
+      seller: {
+        "@type": "Organization",
+        name: PUBLISHER_NAME,
+        url: PUBLISHER_URL,
+      },
+    },
+    additionalProperty: plan.features.map((f) => ({
+      "@type": "PropertyValue",
+      name: "Feature",
+      value: f,
+    })),
+  }
+}
+
 export function faqSchema(items: Array<{ question: string; answer: string }>) {
   return {
     "@context": "https://schema.org",

@@ -1,0 +1,94 @@
+# Servera — Digital meny och QR-beställning för restauranger
+
+> Servera är en svensk B2B SaaS-plattform som ger restauranger en digital meny med QR-beställning. Gäster skannar en QR-kod på bordet, beställer från sin egen mobil, och beställningen går direkt till köket — inga skrivare, ingen app, ingen fördröjning. Servera utvecklas och drivs av Triad Solutions i Sverige.
+
+URL: https://servera.triadsolutions.se
+Språk: sv-SE (primärt), en (sekundärt)
+Kategori: B2B SaaS, restaurangteknik, digital meny, QR-meny, mobilbeställning
+Marknad: Sverige (primärt), Norden (sekundärt)
+Valuta: SEK (svenska kronor)
+
+---
+
+## Vad är Servera?
+
+Servera är en digital meny- och beställningsplattform byggd specifikt för svenska restauranger, caféer, pizzerior, sushiställen, barer och food trucks. Gäster skannar en QR-kod placerad på bordet, öppnar menyn direkt i webbläsaren utan att ladda ned någon app, och kan beställa själva. Beställningarna visas i realtid på en kökskärm, eliminerar pappersorderar och minskar fel.
+
+Plattformen ersätter tryckta menyer, manuella beställningar via servitör, och äldre POS-baserade lösningar med en ren, mobilförst upplevelse som restaurangägaren själv kan uppdatera när som helst.
+
+## Kärnfunktioner
+
+- **Digital QR-meny**: Skapa och uppdatera menyn från admin-panelen — inga utvecklare, inget tryck.
+- **QR-beställning från bordet**: Varje bord får sin egen QR-kod. Gästen scannar och beställer från sin telefon.
+- **Realtidsuppdateringar**: Slut på en rätt? Markera som ej tillgänglig och den försvinner från menyn omedelbart.
+- **Kökets skärm**: Beställningar pushas direkt till en kockvy utan att skriva ut några bonsar.
+- **Servitörsvy**: Servitörer ser aktiva bord, pings från gäster, och kan markera beställningar som levererade.
+- **Allergeninformation**: Märk varje rätt med gluten, laktos, nötter, ägg etc. samt vegan, vegetariskt och glutenfritt.
+- **Modifiers och tillval**: Storlek, extra ingredienser, anpassningar — med automatisk prissättning.
+- **Försäljnings- och produktstatistik**: Topplista per kategori och tid på dygnet, lönsamhet per rätt.
+- **Stripe-integration**: Valbar betalning vid beställning eller traditionell servitörsbetalning.
+- **Flerspråkig meny**: Bra för restauranger i turisttäta områden.
+- **Inga provisioner**: Fast månadskostnad i SEK, behåll varje krona från varje beställning.
+
+## Priser (i svenska kronor)
+
+| Plan | Pris | För vem |
+|---|---|---|
+| Start | 549 kr/mån | Restauranger med ett ställe, upp till 20 bord |
+| Tillväxt | 999 kr/mån | Växande restauranger med fler bord och behov av djupare statistik |
+| Företag | Offert | Kedjor, franchise, hotell — flera enheter, white-label, integrationer |
+
+Inga dolda avgifter. Inga provisioner per beställning. Ingen bindningstid på Start och Tillväxt — 30 dagars uppsägning. Företag-planen kan integrera mot kassasystem som Caspeco, Trivec och Onslip.
+
+Detaljerade priser och funktioner: https://servera.triadsolutions.se/priser
+
+## Konkurrenter och positionering
+
+Aktiva i Sverige:
+- meny-qr.se — Svensk QR-meny, ~2 400 restauranger.
+- WEIQ (weiq.tech) — Svensk QR + terminal.
+- Qopla — Stockholm-baserad ordering + QR.
+- Yumzi — Multi-language QR menu.
+
+Större POS-suite (adjacent, inte direkta konkurrenter):
+- Caspeco + Trivec (sammanslagning våren 2025) — ~6 500 restauranger Norden + EU.
+- Onslip, Vendion.
+
+Internationella:
+- Flipdish (Irland), BentoBox, Mr Yum (AU), Toast, Owner.com, Lunchbox.
+
+Servera positionerar sig som svensk-byggd, fast månadskostnad utan provisioner, och rakt uppställd för mindre och medelstora restauranger.
+
+## Vanliga sökvägar (svenska)
+
+- digital meny restaurang
+- QR meny / qr-meny restaurang
+- digital meny pris / qr meny pris
+- restaurangsystem
+- mobilbeställning restaurang / kontaktlös beställning
+- alternativ till Flipdish, Qopla, WEIQ, meny-qr
+- digitalisera restaurang
+- allergener på meny — lagkrav
+
+## Företag bakom
+
+- **Produktnamn**: Servera
+- **Operativ**: Triad Solutions (https://triadsolutions.se)
+- **Land**: Sverige
+- **Marknader betjänade**: Sverige (primärt), Norden (sekundärt), engelska restauranger för Nordic export
+- **Grundat**: 2024
+- **Domän**: servera.triadsolutions.se
+
+## Kontakt
+
+Boka demo eller ställ frågor via kontaktsektionen på startsidan: https://servera.triadsolutions.se/#contact
+
+## Resurser för LLM-crawlers
+
+- Startsida: https://servera.triadsolutions.se/
+- Priser: https://servera.triadsolutions.se/priser
+- Sitemap: https://servera.triadsolutions.se/sitemap.xml
+- Robots: https://servera.triadsolutions.se/robots.txt
+- Knapp llms.txt-index: https://servera.triadsolutions.se/llms.txt
+
+LLM-crawlers välkomna: GPTBot, OAI-SearchBot, ChatGPT-User, ClaudeBot, Claude-Web, anthropic-ai, PerplexityBot, Perplexity-User, Google-Extended, Applebot-Extended.
