@@ -9,6 +9,7 @@ import {
   menuSchema,
   breadcrumbSchema,
 } from "@/lib/seo/structured-data"
+import { tenantUrl } from "@/lib/tenant"
 
 export const revalidate = 300
 
@@ -36,7 +37,7 @@ export async function generateMetadata({
     }
   }
 
-  const url = `${SITE_URL}/${params.subdomain}/table/${params.tableNumber}`
+  const url = tenantUrl(params.subdomain, `/table/${params.tableNumber}`)
   const title = `${restaurant.name} — Meny`
   const description = restaurant.address
     ? `Beställ direkt från bordet hos ${restaurant.name} (${restaurant.address}). Bläddra i menyn, se priser och allergener, och beställ från mobilen — drivs av Servera.`
@@ -114,7 +115,7 @@ export default async function MenuPage({ params }: PageProps) {
     .eq("is_available", true)
     .order("display_order")
 
-  const restaurantUrl = `${SITE_URL}/${params.subdomain}/table/${params.tableNumber}`
+  const restaurantUrl = tenantUrl(params.subdomain, `/table/${params.tableNumber}`)
   const restaurantLd = restaurantSchema({
     name: restaurant.name,
     subdomain: params.subdomain,

@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { updateRestaurant } from "@/lib/actions/restaurant"
 import { useToast } from "@/hooks/use-toast"
+import { tenantUrl } from "@/lib/tenant"
 import type { Restaurant } from "@/types/database"
 
 const SettingsSchema = z.object({
@@ -71,7 +72,7 @@ export function SettingsClient({ restaurant }: { restaurant: Restaurant }) {
               <Label>Subdomän</Label>
               <Input value={restaurant.subdomain} disabled className="bg-stone-50 text-stone-500" />
               <p className="text-xs text-stone-500">
-                Din meny-URL: <span className="font-mono">{typeof window !== "undefined" ? window.location.origin : ""}/{restaurant.subdomain}/table/1</span>
+                Din meny-URL: <span className="font-mono">{tenantUrl(restaurant.subdomain, "/table/1")}</span>
               </p>
             </div>
             <Button type="submit" variant="amber" disabled={isSubmitting}>

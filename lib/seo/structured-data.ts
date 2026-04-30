@@ -1,3 +1,5 @@
+import { tenantUrl } from "@/lib/tenant"
+
 export const SITE_URL = "https://servera.triadsolutions.se"
 export const SITE_NAME = "Servera"
 export const PUBLISHER_NAME = "Triad Solutions"
@@ -195,7 +197,7 @@ interface RestaurantSchemaInput {
 }
 
 export function restaurantSchema(input: RestaurantSchemaInput) {
-  const url = `${SITE_URL}/${input.subdomain}/table/1`
+  const url = tenantUrl(input.subdomain, "/table/1")
   return {
     "@context": "https://schema.org",
     "@type": "Restaurant",

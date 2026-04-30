@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { useToast } from "@/hooks/use-toast"
 import { createClient } from "@/lib/supabase/client"
+import { tenantUrl } from "@/lib/tenant"
 import type { QrCode as QrCodeType } from "@/types/database"
 
 interface Props {
@@ -37,9 +38,8 @@ export function QrCodesClient({ restaurantId, restaurantSubdomain, initialQrCode
   useEffect(() => {
     async function generateAll() {
       const urls: Record<number, string> = {}
-      const baseUrl = window.location.origin
       for (const qr of qrCodes) {
-        const url = `${baseUrl}/${restaurantSubdomain}/table/${qr.table_number}`
+        const url = tenantUrl(restaurantSubdomain, `/table/${qr.table_number}`)
         try {
           urls[qr.table_number] = await QRCode.toDataURL(url, {
             width: 300,
@@ -181,7 +181,7 @@ export function QrCodesClient({ restaurantId, restaurantSubdomain, initialQrCode
         <p>
           Mönster för gästmenylänk:{" "}
           <code className="font-mono bg-amber-100 px-1.5 py-0.5 rounded text-xs">
-            {typeof window !== "undefined" ? window.location.origin : ""}/{restaurantSubdomain}/table/[nummer]
+            {tenantUrl(restaurantSubdomain, "/table/[nummer]")}
           </code>
         </p>
       </div>

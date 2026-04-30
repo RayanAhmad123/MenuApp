@@ -1,9 +1,17 @@
 import { createServerClient } from "@supabase/ssr"
 import { NextResponse, type NextRequest } from "next/server"
 import type { Database } from "@/types/database"
+import { cookieDomainForHost } from "@/lib/tenant"
 
-export async function updateSession(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({ request })
+export async function updateSession(request: NextRequest, rewriteUrl?: URL | null) {
+  const cookieDomain = cookieDomainForHost(request.headers.get("host"))
+
+  const buildResponse = () =>
+    rewriteUrl
+      ? NextResponse.rewrite(rewriteUrl, { request })
+      : NextResponse.next({ request })
+
+  let supabaseResponse = buildResponse()
 
   const supabase = createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -17,9 +25,12 @@ export async function updateSession(request: NextRequest) {
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value)
           )
-          supabaseResponse = NextResponse.next({ request })
+          supabaseResponse = buildResponse()
           cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
+            supabaseResponse.cookies.set(name, value, {
+              ...options,
+              ...(cookieDomain ? { domain: cookieDomain } : {}),
+            })
           )
         },
       },

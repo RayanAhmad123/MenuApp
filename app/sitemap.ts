@@ -3,6 +3,7 @@ import { createPublicSupabaseClient } from "@/lib/supabase/public"
 import { COMPARISON_SLUGS } from "@/lib/seo/comparisons"
 import { CITY_SLUGS } from "@/lib/seo/cities"
 import { RESTAURANT_TYPE_SLUGS } from "@/lib/seo/restaurant-types"
+import { tenantUrl } from "@/lib/tenant"
 
 const BASE_URL = "https://servera.triadsolutions.se"
 
@@ -57,7 +58,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     if (data) {
       restaurantEntries = data.map((r) => ({
-        url: `${BASE_URL}/${r.subdomain}/table/1`,
+        url: tenantUrl(r.subdomain, "/table/1"),
         lastModified: r.created_at ? new Date(r.created_at) : now,
         changeFrequency: "weekly" as const,
         priority: 0.6,
