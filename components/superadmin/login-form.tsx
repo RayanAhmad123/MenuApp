@@ -1,6 +1,5 @@
 "use client"
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -11,7 +10,6 @@ export function SuperadminLoginForm() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
-  const router = useRouter()
   const { toast } = useToast()
   const supabase = createClient()
 
@@ -22,8 +20,7 @@ export function SuperadminLoginForm() {
     if (error) {
       toast({ title: "Inloggning misslyckades", description: error.message, variant: "destructive" })
     } else {
-      router.push("/superadmin/dashboard")
-      router.refresh()
+      window.location.href = "/superadmin/dashboard"
     }
     setLoading(false)
   }
