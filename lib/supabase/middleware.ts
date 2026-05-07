@@ -70,5 +70,14 @@ export async function updateSession(request: NextRequest, rewriteUrl?: URL | nul
     }
   }
 
+  // Protect superadmin routes
+  if (pathname.startsWith("/superadmin") && !pathname.startsWith("/superadmin/login")) {
+    if (!user) {
+      const url = request.nextUrl.clone()
+      url.pathname = "/superadmin/login"
+      return NextResponse.redirect(url)
+    }
+  }
+
   return supabaseResponse
 }
