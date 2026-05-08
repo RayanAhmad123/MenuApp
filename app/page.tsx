@@ -926,7 +926,7 @@ function Footer() {
   return (
     <footer className="bg-stone-950 text-stone-400">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-14">
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-8 mb-10">
           <div className="lg:col-span-2">
             <div className="flex items-center gap-2.5 mb-3">
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -946,20 +946,102 @@ function Footer() {
               Produkt
             </h4>
             <ul className="space-y-2.5">
-              {[
-                { label: "Funktioner", href: "#features" },
-                { label: "Priser", href: "#pricing" },
-                { label: "Kontakt", href: "#contact" },
-              ].map(({ label, href }) => (
-                <li key={label}>
-                  <a
-                    href={href}
-                    className="text-stone-400 text-sm hover:text-amber-400 transition-colors"
-                  >
-                    {label}
-                  </a>
-                </li>
-              ))}
+              <li>
+                <Link
+                  href="/funktioner"
+                  className="text-stone-400 text-sm hover:text-amber-400 transition-colors"
+                >
+                  Funktioner
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/sa-fungerar-det"
+                  className="text-stone-400 text-sm hover:text-amber-400 transition-colors"
+                >
+                  Så fungerar det
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/priser"
+                  className="text-stone-400 text-sm hover:text-amber-400 transition-colors"
+                >
+                  Priser
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/om-oss"
+                  className="text-stone-400 text-sm hover:text-amber-400 transition-colors"
+                >
+                  Om oss
+                </Link>
+              </li>
+              <li>
+                <a
+                  href="#contact"
+                  className="text-stone-400 text-sm hover:text-amber-400 transition-colors"
+                >
+                  Kontakt
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="text-white text-xs font-bold uppercase tracking-widest mb-4">
+              Guider
+            </h4>
+            <ul className="space-y-2.5">
+              <li>
+                <Link
+                  href="/digital-meny"
+                  className="text-stone-400 text-sm hover:text-amber-400 transition-colors"
+                >
+                  Digital meny
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/qr-meny"
+                  className="text-stone-400 text-sm hover:text-amber-400 transition-colors"
+                >
+                  QR-meny
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/jamfor"
+                  className="text-stone-400 text-sm hover:text-amber-400 transition-colors"
+                >
+                  Jämför plattformar
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/digital-meny/stockholm"
+                  className="text-stone-400 text-sm hover:text-amber-400 transition-colors"
+                >
+                  Stockholm
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/digital-meny/goteborg"
+                  className="text-stone-400 text-sm hover:text-amber-400 transition-colors"
+                >
+                  Göteborg
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/digital-meny/malmo"
+                  className="text-stone-400 text-sm hover:text-amber-400 transition-colors"
+                >
+                  Malmö
+                </Link>
+              </li>
             </ul>
           </div>
 
