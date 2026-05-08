@@ -188,6 +188,42 @@ export function breadcrumbSchema(
   }
 }
 
+interface CollectionItem {
+  name: string
+  url: string
+  description?: string
+}
+
+export function collectionPageSchema(input: {
+  name: string
+  url: string
+  description: string
+  items: CollectionItem[]
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "@id": `${input.url}#collection`,
+    url: input.url,
+    name: input.name,
+    description: input.description,
+    inLanguage: "sv-SE",
+    isPartOf: { "@id": `${SITE_URL}/#website` },
+    mainEntity: {
+      "@type": "ItemList",
+      itemListOrder: "https://schema.org/ItemListOrderAscending",
+      numberOfItems: input.items.length,
+      itemListElement: input.items.map((item, idx) => ({
+        "@type": "ListItem",
+        position: idx + 1,
+        name: item.name,
+        url: item.url,
+        ...(item.description ? { description: item.description } : {}),
+      })),
+    },
+  }
+}
+
 interface RestaurantSchemaInput {
   name: string
   subdomain: string

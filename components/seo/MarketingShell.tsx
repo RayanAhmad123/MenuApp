@@ -16,15 +16,18 @@ export function MarketingShell({ children }: MarketingShellProps) {
               Servera
             </span>
           </Link>
-          <nav className="hidden md:flex items-center gap-6 text-sm text-stone-600">
-            <Link href="/priser" className="hover:text-stone-950 transition-colors">
-              Priser
-            </Link>
-            <Link href="/#features" className="hover:text-stone-950 transition-colors">
+          <nav className="hidden md:flex items-center gap-5 text-sm text-stone-600">
+            <Link href="/funktioner" className="hover:text-stone-950 transition-colors">
               Funktioner
             </Link>
-            <Link href="/#how-it-works" className="hover:text-stone-950 transition-colors">
+            <Link href="/sa-fungerar-det" className="hover:text-stone-950 transition-colors">
               Så fungerar det
+            </Link>
+            <Link href="/jamfor" className="hover:text-stone-950 transition-colors">
+              Jämför
+            </Link>
+            <Link href="/priser" className="hover:text-stone-950 transition-colors">
+              Priser
             </Link>
           </nav>
           <Link
@@ -38,21 +41,174 @@ export function MarketingShell({ children }: MarketingShellProps) {
 
       {children}
 
-      <footer className="border-t border-stone-800 bg-stone-950 text-stone-500 py-8">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
-          <div>
-            © {new Date().getFullYear()} Servera — en del av Triad Solutions.
+      <footer className="border-t border-stone-800 bg-stone-950 text-stone-500 py-10">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 text-xs mb-8">
+            <div>
+              <div className="text-stone-300 font-semibold mb-3 uppercase tracking-widest text-[10px]">
+                Servera
+              </div>
+              <ul className="space-y-2">
+                <li>
+                  <Link href="/" className="hover:text-stone-300 transition-colors">
+                    Startsida
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/funktioner" className="hover:text-stone-300 transition-colors">
+                    Funktioner
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/sa-fungerar-det" className="hover:text-stone-300 transition-colors">
+                    Så fungerar det
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/priser" className="hover:text-stone-300 transition-colors">
+                    Priser
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/om-oss" className="hover:text-stone-300 transition-colors">
+                    Om oss
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/#contact" className="hover:text-stone-300 transition-colors">
+                    Kontakt
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <div className="text-stone-300 font-semibold mb-3 uppercase tracking-widest text-[10px]">
+                Guider
+              </div>
+              <ul className="space-y-2">
+                <li>
+                  <Link
+                    href="/digital-meny"
+                    className="hover:text-stone-300 transition-colors"
+                  >
+                    Digital meny
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/qr-meny"
+                    className="hover:text-stone-300 transition-colors"
+                  >
+                    QR-meny
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/jamfor"
+                    className="hover:text-stone-300 transition-colors"
+                  >
+                    Jämför plattformar
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <div className="text-stone-300 font-semibold mb-3 uppercase tracking-widest text-[10px]">
+                Restaurangtyper
+              </div>
+              <ul className="space-y-2">
+                <li>
+                  <Link
+                    href="/qr-meny/pizzeria"
+                    className="hover:text-stone-300 transition-colors"
+                  >
+                    Pizzeria
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/qr-meny/sushi"
+                    className="hover:text-stone-300 transition-colors"
+                  >
+                    Sushi
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/qr-meny/cafe"
+                    className="hover:text-stone-300 transition-colors"
+                  >
+                    Café
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/qr-meny/bar"
+                    className="hover:text-stone-300 transition-colors"
+                  >
+                    Bar
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/qr-meny/foodtruck"
+                    className="hover:text-stone-300 transition-colors"
+                  >
+                    Food truck
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/qr-meny/lunchstalle"
+                    className="hover:text-stone-300 transition-colors"
+                  >
+                    Lunchställe
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <div className="text-stone-300 font-semibold mb-3 uppercase tracking-widest text-[10px]">
+                Städer
+              </div>
+              <ul className="space-y-2">
+                <li>
+                  <Link
+                    href="/digital-meny/stockholm"
+                    className="hover:text-stone-300 transition-colors"
+                  >
+                    Stockholm
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/digital-meny/goteborg"
+                    className="hover:text-stone-300 transition-colors"
+                  >
+                    Göteborg
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/digital-meny/malmo"
+                    className="hover:text-stone-300 transition-colors"
+                  >
+                    Malmö
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/digital-meny/uppsala"
+                    className="hover:text-stone-300 transition-colors"
+                  >
+                    Uppsala
+                  </Link>
+                </li>
+              </ul>
+            </div>
           </div>
-          <div className="flex gap-5">
-            <Link href="/" className="hover:text-stone-300 transition-colors">
-              Startsida
-            </Link>
-            <Link href="/priser" className="hover:text-stone-300 transition-colors">
-              Priser
-            </Link>
-            <Link href="/#contact" className="hover:text-stone-300 transition-colors">
-              Kontakt
-            </Link>
+          <div className="border-t border-stone-800 pt-6 text-xs text-stone-500">
+            © {new Date().getFullYear()} Servera — en del av Triad Solutions.
           </div>
         </div>
       </footer>
