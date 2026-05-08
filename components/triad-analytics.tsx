@@ -4,7 +4,7 @@ import { Suspense, useEffect } from "react"
 import { usePathname, useSearchParams } from "next/navigation"
 
 const ENDPOINT = "https://portal.triadsolutions.se/api/analytics/track"
-const APP_SLUG = "Servera"
+const APP_SLUG = "servera"
 
 function Beacon() {
   const pathname = usePathname()
