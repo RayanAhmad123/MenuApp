@@ -4,6 +4,7 @@ import "./globals.css"
 import { Providers } from "@/components/providers"
 import { Toaster } from "@/components/ui/toaster"
 import { Analytics } from "@vercel/analytics/next"
+import { TriadAnalytics } from "@/components/triad-analytics"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -117,6 +118,7 @@ export default function RootLayout({
           <Toaster />
         </Providers>
         <Analytics />
+        <TriadAnalytics />
       </body>
     </html>
   )
