@@ -14,10 +14,10 @@ function Beacon() {
     if (process.env.NODE_ENV !== "production") return
     if (typeof window === "undefined") return
 
-    let sid = window.sessionStorage.getItem("triad_sid")
+    let sid = window.localStorage.getItem("triad_sid")
     if (!sid) {
       sid = (crypto.randomUUID?.() ?? Math.random().toString(36).slice(2)).slice(0, 16)
-      window.sessionStorage.setItem("triad_sid", sid)
+      window.localStorage.setItem("triad_sid", sid)
     }
 
     const qs = searchParams?.toString()
