@@ -1,4 +1,4 @@
-import { type NextRequest } from "next/server"
+import { NextResponse, type NextRequest } from "next/server"
 import { updateSession } from "@/lib/supabase/middleware"
 import { extractSubdomainFromHost, isTenantSubdomain } from "@/lib/tenant"
 
@@ -9,6 +9,12 @@ export async function middleware(request: NextRequest) {
 
   let rewriteUrl: URL | null = null
   if (isTenantSubdomain(sub)) {
+    if (path === "/" || path === "") {
+      const url = request.nextUrl.clone()
+      url.pathname = "/admin/dashboard"
+      return NextResponse.redirect(url)
+    }
+
     const isAdmin = path.startsWith("/admin")
     const isKitchen = path.startsWith("/kitchen")
     const isWaiter = path.startsWith("/waiter")
