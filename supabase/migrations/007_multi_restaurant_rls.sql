@@ -126,7 +126,7 @@ CREATE POLICY "Admin can manage item allergens"
   USING (
     EXISTS (
       SELECT 1 FROM menu_items mi
-      WHERE mi.id = item_allergens.menu_item_id
+      WHERE mi.id = item_allergens.item_id
         AND user_has_role_at(mi.restaurant_id, 'admin')
     )
   );
@@ -162,7 +162,7 @@ CREATE POLICY "Admin can manage item modifier groups"
   USING (
     EXISTS (
       SELECT 1 FROM menu_items mi
-      WHERE mi.id = item_modifier_groups.menu_item_id
+      WHERE mi.id = item_modifier_groups.item_id
         AND user_has_role_at(mi.restaurant_id, 'admin')
     )
   );
