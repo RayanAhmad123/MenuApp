@@ -317,20 +317,20 @@ export function StaffClient({
           {pendingOrders.length > 0 && (
             <section>
               <h2 className="text-xs font-semibold text-indigo-500 uppercase tracking-wide mb-3">Nya beställningar</h2>
-              <div className="space-y-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                 {pendingOrders.map(order => (
-                  <div key={order.id} className="bg-indigo-50 border border-indigo-200 rounded-xl p-4">
-                    <div className="flex items-center justify-between mb-3">
+                  <div key={order.id} className="bg-indigo-50 border border-indigo-200 rounded-xl p-3 flex flex-col">
+                    <div className="flex items-center justify-between mb-2">
                       <div>
-                        <p className="font-bold text-stone-800 text-lg">Bord {order.table_number}</p>
-                        <p className="text-xs text-stone-400 mt-0.5">{elapsed(order.created_at)}</p>
+                        <p className="font-bold text-stone-800 text-base">Bord {order.table_number}</p>
+                        <p className="text-[11px] text-stone-400 mt-0.5">{elapsed(order.created_at)}</p>
                       </div>
-                      <p className="font-semibold text-stone-700">{formatPrice(order.total_cents)}</p>
+                      <p className="font-semibold text-stone-700 text-sm">{formatPrice(order.total_cents)}</p>
                     </div>
-                    <div className="space-y-1 mb-3">
+                    <div className="space-y-0.5 mb-3 flex-1">
                       {order.order_items.map(item => (
                         <div key={item.id}>
-                          <p className="text-sm text-stone-700">
+                          <p className="text-sm text-stone-700 leading-snug">
                             <span className="font-semibold text-indigo-600">{item.quantity}×</span>{" "}{item.menu_items.name}
                           </p>
                           {item.special_requests && (
@@ -340,25 +340,25 @@ export function StaffClient({
                       ))}
                     </div>
                     {order.special_notes && (
-                      <p className="text-xs text-indigo-700 bg-indigo-100 border border-indigo-200 rounded-lg px-3 py-1.5 mb-3">
+                      <p className="text-xs text-indigo-700 bg-indigo-100 border border-indigo-200 rounded-lg px-2.5 py-1 mb-2">
                         {order.special_notes}
                       </p>
                     )}
-                    <div className="flex gap-2">
+                    <div className="flex gap-1.5 mt-auto">
                       <button
                         onClick={() => handleRejectOrder(order.id)}
                         disabled={updatingId === order.id}
-                        className="flex items-center justify-center gap-1.5 px-4 py-2 bg-white border border-stone-300 text-stone-600 font-medium text-sm rounded-lg hover:bg-stone-50 transition-colors disabled:opacity-50"
+                        className="flex items-center justify-center gap-1 px-3 py-1.5 bg-white border border-stone-300 text-stone-600 font-medium text-xs rounded-lg hover:bg-stone-50 transition-colors disabled:opacity-50"
                       >
-                        <X className="h-4 w-4" />
+                        <X className="h-3.5 w-3.5" />
                         Avvisa
                       </button>
                       <button
                         onClick={() => handleApproveOrder(order.id)}
                         disabled={updatingId === order.id}
-                        className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-indigo-500 text-white font-semibold text-sm rounded-lg hover:bg-indigo-400 transition-colors disabled:opacity-50"
+                        className="flex-1 flex items-center justify-center gap-1 py-1.5 bg-indigo-500 text-white font-semibold text-xs rounded-lg hover:bg-indigo-400 transition-colors disabled:opacity-50"
                       >
-                        <CheckCircle2 className="h-4 w-4" />
+                        <CheckCircle2 className="h-3.5 w-3.5" />
                         {updatingId === order.id ? "Uppdaterar…" : "Godkänn → kök"}
                       </button>
                     </div>
@@ -372,7 +372,7 @@ export function StaffClient({
           {pings.length > 0 && (
             <section>
               <h2 className="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-3">Bordsförfrågningar</h2>
-              <div className="space-y-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2">
                 {pings.map(ping => {
                   const Icon = PING_ICONS[ping.ping_type] ?? AlertCircle
                   return (
@@ -402,28 +402,28 @@ export function StaffClient({
           {activeOrders.length > 0 && (
             <section>
               <h2 className="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-3">Aktiva beställningar</h2>
-              <div className="space-y-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                 {activeOrders.map(order => {
                   const mins = elapsedMinutes(order.created_at)
                   const isRed = mins >= redThreshold
                   const isYellow = mins >= yellowThreshold && !isRed
                   return (
-                    <div key={order.id} className={`rounded-xl border p-4 ${
+                    <div key={order.id} className={`rounded-xl border p-3 flex flex-col ${
                       isRed ? "bg-red-50 border-red-300" : isYellow ? "bg-amber-50 border-amber-300" : "bg-white border-stone-200"
                     }`}>
-                      <div className="flex items-center justify-between mb-3">
-                        <p className="font-bold text-stone-800 text-lg">Bord {order.table_number}</p>
-                        <div className="flex items-center gap-1.5">
-                          <Clock className={`h-3.5 w-3.5 ${isRed ? "text-red-500" : isYellow ? "text-amber-500" : "text-stone-400"}`} />
-                          <span className={`text-xs font-medium ${isRed ? "text-red-600" : isYellow ? "text-amber-600" : "text-stone-400"}`}>
-                            {mins}m sedan
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="font-bold text-stone-800 text-base">Bord {order.table_number}</p>
+                        <div className="flex items-center gap-1">
+                          <Clock className={`h-3 w-3 ${isRed ? "text-red-500" : isYellow ? "text-amber-500" : "text-stone-400"}`} />
+                          <span className={`text-[11px] font-medium ${isRed ? "text-red-600" : isYellow ? "text-amber-600" : "text-stone-400"}`}>
+                            {mins}m
                           </span>
                         </div>
                       </div>
-                      <div className="space-y-1 mb-3">
+                      <div className="space-y-0.5 mb-2 flex-1">
                         {order.order_items.map(item => (
                           <div key={item.id}>
-                            <p className="text-sm text-stone-700">
+                            <p className="text-sm text-stone-700 leading-snug">
                               <span className="font-semibold text-amber-600">{item.quantity}×</span>{" "}{item.menu_items.name}
                             </p>
                             {item.special_requests && (
@@ -433,16 +433,16 @@ export function StaffClient({
                         ))}
                       </div>
                       {order.special_notes && (
-                        <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-1.5 mb-3">
+                        <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-1 mb-2">
                           {order.special_notes}
                         </p>
                       )}
                       <button
                         onClick={() => handleMarkDone(order.id)}
                         disabled={updatingId === order.id}
-                        className="w-full py-2 bg-emerald-500 text-white font-semibold text-sm rounded-lg hover:bg-emerald-400 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                        className="w-full py-1.5 bg-emerald-500 text-white font-semibold text-xs rounded-lg hover:bg-emerald-400 transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5 mt-auto"
                       >
-                        <Utensils className="h-4 w-4" />
+                        <Utensils className="h-3.5 w-3.5" />
                         {updatingId === order.id ? "Uppdaterar…" : "Serverad"}
                       </button>
                     </div>
