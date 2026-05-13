@@ -76,6 +76,15 @@ export async function placeOrder(data: z.infer<typeof PlaceOrderSchema>) {
     .single()
 
   if (orderError || !order) {
+    console.error("[placeOrder] orders insert failed", {
+      orderError,
+      hasServiceRoleKey: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY),
+      hasSupabaseUrl: Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL),
+      restaurantId,
+      tableNumber,
+      sessionId,
+      totalCents,
+    })
     return { error: "Failed to create order", orderId: null, clientSecret: null }
   }
 
