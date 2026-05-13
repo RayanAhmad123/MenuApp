@@ -17,36 +17,49 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   if (!user) redirect("/admin/login")
 
-  const { data: staffData } = await supabase
+  // Fetch every staff row this user belongs to. An admin can be a member of
+  // multiple restaurants, so we never use .single() here.
+  const { data: staffRows } = await supabase
     .from("staff")
-    .select("restaurant_id, role, first_name, last_name, restaurants(name, logo_url, subdomain)")
+    .select(
+      "restaurant_id, role, first_name, last_name, restaurants(name, logo_url, subdomain)"
+    )
     .eq("email", user.email!)
     .eq("is_active", true)
-    .single()
 
-  if (!staffData) redirect("/admin/login")
-
-  const staffDataAny = staffData as unknown as {
+  type StaffRow = {
     restaurant_id: string
     role: string
     first_name: string
     last_name: string
     restaurants: { name: string; logo_url: string | null; subdomain: string } | null
   }
-  const restaurant = staffDataAny.restaurants
-  if (!restaurant) redirect("/admin/login")
 
-  // Per-tenant admin: bounce to the user's own subdomain when on the wrong host.
-  // Skipped on local/preview hosts (anything not under triadsolutions.se).
+  const rows = (staffRows ?? []) as unknown as StaffRow[]
+  if (rows.length === 0) redirect("/admin/login")
+
+  // Pick the staff row that matches the host the user is currently on.
+  // If they aren't on a tenant host, or aren't a member of the tenant they
+  // are visiting, fall back to their first restaurant (we redirect there
+  // a few lines down).
   const host = (await headers()).get("host")
   const hostname = host?.split(":")[0].toLowerCase() ?? ""
   const onTriadHost = hostname === ROOT_DOMAIN || hostname.endsWith(`.${ROOT_DOMAIN}`)
-  if (onTriadHost) {
-    const hostSub = extractSubdomainFromHost(host)
-    const onCorrectTenant = isTenantSubdomain(hostSub) && hostSub === restaurant.subdomain
-    if (!onCorrectTenant) {
-      redirect(tenantUrl(restaurant.subdomain, "/admin/dashboard"))
-    }
+  const hostSub = extractSubdomainFromHost(host)
+  const onTenant = onTriadHost && isTenantSubdomain(hostSub)
+
+  const matchingRow = onTenant
+    ? rows.find((r) => r.restaurants?.subdomain === hostSub)
+    : undefined
+  const staffDataAny = matchingRow ?? rows[0]
+  const restaurant = staffDataAny.restaurants
+  if (!restaurant) redirect("/admin/login")
+
+  // On the triadsolutions.se host: if the user isn't a member of the tenant
+  // they are visiting, bounce them to a restaurant they DO have access to.
+  // Local/preview hosts are left alone so dev still works.
+  if (onTriadHost && !matchingRow) {
+    redirect(tenantUrl(restaurant.subdomain, "/admin/dashboard"))
   }
 
   return (

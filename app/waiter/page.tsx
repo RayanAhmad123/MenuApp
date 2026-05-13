@@ -1,7 +1,9 @@
 import type { Metadata } from "next"
+import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { StaffClient } from "@/components/waiter/waiter-client"
+import { extractSubdomainFromHost, isTenantSubdomain } from "@/lib/tenant"
 
 export const metadata: Metadata = { title: "Personalsvy" }
 export const dynamic = 'force-dynamic'
@@ -12,14 +14,32 @@ export default async function WaiterPage() {
 
   if (!user) redirect("/admin/login")
 
-  const { data: staff } = await supabase
+  // Staff can belong to multiple restaurants — don't .single() here, it breaks
+  // for any user who's a member of more than one tenant.
+  const { data: staffRows } = await supabase
     .from("staff")
-    .select("restaurant_id, role, first_name")
+    .select("restaurant_id, role, first_name, restaurants(subdomain)")
     .eq("email", user.email!)
     .eq("is_active", true)
-    .single()
 
-  if (!staff) redirect("/admin/login")
+  type StaffRow = {
+    restaurant_id: string
+    role: string
+    first_name: string
+    restaurants: { subdomain: string } | null
+  }
+
+  const rows = (staffRows ?? []) as unknown as StaffRow[]
+  if (rows.length === 0) redirect("/admin/login")
+
+  // Pick the staff row that matches the current tenant subdomain, otherwise
+  // fall back to the user's first restaurant.
+  const host = (await headers()).get("host")
+  const hostSub = extractSubdomainFromHost(host)
+  const matchingRow = isTenantSubdomain(hostSub)
+    ? rows.find((r) => r.restaurants?.subdomain === hostSub)
+    : undefined
+  const staff = matchingRow ?? rows[0]
 
   const today = new Date().toISOString().split("T")[0]
 
