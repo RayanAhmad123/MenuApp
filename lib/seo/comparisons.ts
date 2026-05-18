@@ -10,6 +10,15 @@ export interface ComparisonContent {
   serveraStrengths: Array<{ title: string; body: string }>
   decisionGuide: Array<{ heading: string; body: string }>
   faq: Array<{ question: string; answer: string }>
+  /**
+   * Side-by-side feature comparison. Competitor cells must reflect only
+   * publicly verifiable claims from the competitor's own website.
+   */
+  comparisonTable?: Array<{
+    feature: string
+    servera: string
+    competitor: string
+  }>
   metaTitle: string
   metaDescription: string
 }
@@ -28,7 +37,7 @@ export const COMPARISONS: Record<string, ComparisonContent> = {
     serveraStrengths: [
       {
         title: "Köks- och servitörsvy ingår",
-        body: "Servera levereras med en dedikerad kockvy och en servitörsvy. Beställningar pushas i realtid utan att skrivas ut, och servitörer ser pings från bord direkt. Det krävs ingen extra hårdvara — en tablet i köket räcker.",
+        body: "Servera levereras med en dedikerad kockvy och en servitörsvy. Beställningar skickas direkt utan att skrivas ut, och servitören ser med en gång när ett bord behöver hjälp. Det krävs ingen extra hårdvara — en surfplatta i köket räcker.",
       },
       {
         title: "Fast pris, inga provisioner",
@@ -88,6 +97,49 @@ export const COMPARISONS: Record<string, ComparisonContent> = {
           "De flesta restauranger är igång på under 30 minuter. Du skapar ett konto, lägger in kategorier och rätter, väljer en QR-design och skriver ut bordskoderna.",
       },
     ],
+    comparisonTable: [
+      {
+        feature: "Digital meny med QR-kod per bord",
+        servera: "Ja",
+        competitor: "Ja",
+      },
+      {
+        feature: "Beställning från bordet i mobilen",
+        servera: "Ja — gästen lägger sin order själv",
+        competitor:
+          "Nej — Meny-QR visar menyn; beställning sker via personalen",
+      },
+      {
+        feature: "Kock- och servitörsvy",
+        servera: "Ingår",
+        competitor: "Ingår ej",
+      },
+      {
+        feature: "Allergen- och kostmärkning per rätt",
+        servera: "Inbyggt",
+        competitor: "Anges i menytexten",
+      },
+      {
+        feature: "Flerspråkig meny",
+        servera: "Ja",
+        competitor: "Ja",
+      },
+      {
+        feature: "Menyanalys",
+        servera: "Ja, i adminpanelen",
+        competitor: "Ja, från betald plan",
+      },
+      {
+        feature: "Prismodell",
+        servera: "Fast pris i SEK, ingen provision per order",
+        competitor: "Fast pris i SEK, ingen provision per order",
+      },
+      {
+        feature: "Publika priser (maj 2026)",
+        servera: "549 kr/mån (Start) · 999 kr/mån (Tillväxt)",
+        competitor: "0 kr (Gratis) · 199 kr/mån · 499 kr/mån",
+      },
+    ],
     metaTitle: "Servera vs Meny-QR — jämförelse av QR-meny för restauranger",
     metaDescription:
       "Jämför Servera och Meny-QR: pris, provisioner, kockvy, allergener och kassasystem-integration. Ärlig guide för svenska restauranger som väljer QR-meny 2026.",
@@ -109,7 +161,7 @@ export const COMPARISONS: Record<string, ComparisonContent> = {
       },
       {
         title: "Köks- och servitörsvy i realtid",
-        body: "Beställningar pushas direkt till en kockskärm. Servitörer ser bordspings live. Inga skrivare, ingen pappersbongning.",
+        body: "Beställningar skickas direkt till en kockskärm. Servitören ser med en gång när ett bord behöver hjälp. Inga skrivare, ingen pappersbongning.",
       },
       {
         title: "Allergener och kostmärkning byggt in",
@@ -165,6 +217,43 @@ export const COMPARISONS: Record<string, ComparisonContent> = {
           "30 dagars uppsägning på Start och Tillväxt-planerna. Ingen bindningstid utöver det.",
       },
     ],
+    comparisonTable: [
+      {
+        feature: "QR-beställning från bordet",
+        servera: "Ja",
+        competitor: "Ja",
+      },
+      {
+        feature: "Köks-/kockskärm",
+        servera: "Ingår",
+        competitor: "Ja, som separat produkt (Köksskärm)",
+      },
+      {
+        feature: "Kassasystem (POS)",
+        servera: "Nej — körs parallellt med din befintliga kassa",
+        competitor: "Ja — komplett kassasystem",
+      },
+      {
+        feature: "Online-beställning, takeaway & leverans",
+        servera: "Nej — fokus på bordsbeställning",
+        competitor: "Ja",
+      },
+      {
+        feature: "Betalning i mobilen",
+        servera: "Ja, via Stripe",
+        competitor: "Ja, via Swish och kort",
+      },
+      {
+        feature: "Prismodell",
+        servera: "Fast pris i SEK, ingen provision per order",
+        competitor: "Offert — pris ej publicerat",
+      },
+      {
+        feature: "Publika priser (maj 2026)",
+        servera: "549 kr/mån (Start) · 999 kr/mån (Tillväxt)",
+        competitor: "Ej publicerade — kontakta Qopla för offert",
+      },
+    ],
     metaTitle: "Servera vs Qopla — vilken plattform passar din restaurang?",
     metaDescription:
       "Jämför Servera och Qopla för svenska restauranger: bredd vs fokus, månadspris, kockvy, takeaway-stöd och kassasystem-integration. Boka kostnadsfri demo.",
@@ -182,7 +271,7 @@ export const COMPARISONS: Record<string, ComparisonContent> = {
     serveraStrengths: [
       {
         title: "Ingen extra hårdvara",
-        body: "Servera kräver inga betalterminaler vid bordet. Allt fungerar i gästens egen mobil — vilket sparar kostnad, ström och underhåll. För kockvyn räcker en vanlig tablet eller skärm.",
+        body: "Servera kräver inga betalterminaler vid bordet. Allt fungerar i gästens egen mobil — vilket sparar kostnad, ström och underhåll. För kockvyn räcker en vanlig surfplatta eller skärm.",
       },
       {
         title: "Stripe-integration ingår",
@@ -242,6 +331,39 @@ export const COMPARISONS: Record<string, ComparisonContent> = {
           "Servera är webb-först. Om du vill kombinera med fysiska kortterminaler behåller du din befintliga terminallösning och låter Servera hantera digital meny + beställningsflödet. Boka demo så går vi igenom uppställningen.",
       },
     ],
+    comparisonTable: [
+      {
+        feature: "QR-beställning från bordet",
+        servera: "Ingår i alla planer",
+        competitor: "Ingår på WEIQ Pro",
+      },
+      {
+        feature: "Köks-/kockvy",
+        servera: "Köksskärm ingår",
+        competitor: "Bongsystem med kvittoskrivare (Star, Epson, SNBC)",
+      },
+      {
+        feature: "Extra hårdvara vid bordet",
+        servera: "Ingen — allt sker i gästens egen mobil",
+        competitor: "Egna betalterminaler ingår",
+      },
+      {
+        feature: "Kassasystem (POS)",
+        servera: "Nej — körs parallellt med din kassa",
+        competitor: "Ja — Skatteverket-certifierat kassasystem",
+      },
+      {
+        feature: "Prismodell",
+        servera: "Fast pris i SEK, ingen provision per order",
+        competitor: "Månadsavgift + transaktionsavgift (t.ex. 0,8 %)",
+      },
+      {
+        feature: "Publika priser (maj 2026)",
+        servera: "549 kr/mån (Start) · 999 kr/mån (Tillväxt)",
+        competitor:
+          "0 kr (Free) · från 250 kr/mån (Easy) · från 750 kr/mån (Pro)",
+      },
+    ],
     metaTitle: "Servera vs WEIQ — webb-QR eller terminal? Jämförelse 2026",
     metaDescription:
       "Servera är webb-baserad QR-meny utan extra hårdvara. WEIQ kombinerar QR med betalterminaler. Jämför pris, hårdvarukostnad och setup för svenska restauranger.",
@@ -269,7 +391,7 @@ COMPARISONS["servera-vs-caspeco"] = {
     },
     {
       title: "Modern, mobilfokuserad gästupplevelse",
-      body: "Servera är byggd från grunden för att menyn ska se rätt ut i gästens mobil. Inga gamla kassasystem-arvslager, ingen skalad-down desktoplösning — bara en snabb webbmeny och en kockvy som funkar på en vanlig tablet.",
+      body: "Servera är byggd från grunden för att menyn ska se rätt ut i gästens mobil. Inga arvslager från gamla kassasystem, ingen nedbantad skrivbordslösning — bara en snabb webbmeny och en kockvy som fungerar på en vanlig surfplatta.",
     },
     {
       title: "Du behåller ditt kassasystem",
@@ -319,6 +441,49 @@ COMPARISONS["servera-vs-caspeco"] = {
       question: "Kan Servera räcka som ensamt system?",
       answer:
         "För mindre verksamheter ja — i kombination med en enkel kassa eller Stripe-betalning. För större verksamheter med behov av schemaläggning, lön, lagerstyrning och avancerad rapportering rekommenderar vi att Servera kompletterar ett befintligt kassasystem snarare än ersätter det.",
+    },
+  ],
+  comparisonTable: [
+    {
+      feature: "QR-beställning från bordet",
+      servera: "Ja",
+      competitor: "Ja, som en av flera försäljningskanaler",
+    },
+    {
+      feature: "Kassasystem (POS)",
+      servera: "Nej — körs parallellt med din befintliga kassa",
+      competitor: "Ja — Caspeco Kassa och Trivec Kassa",
+    },
+    {
+      feature: "Personal: schema, lön, tidrapportering",
+      servera: "Nej",
+      competitor: "Ja",
+    },
+    {
+      feature: "Bordsbokning",
+      servera: "Nej",
+      competitor: "Ja",
+    },
+    {
+      feature: "Analys och lönsamhetsuppföljning",
+      servera: "Orderstatistik i adminpanelen",
+      competitor: "Ja — branschanalys, budget och prognoser",
+    },
+    {
+      feature: "Produktomfång",
+      servera: "Fokuserad QR-meny och bordsbeställning",
+      competitor:
+        "Komplett restaurangsystem (kassa, personal, bokning, analys)",
+    },
+    {
+      feature: "Prismodell",
+      servera: "Fast pris i SEK, ingen provision per order",
+      competitor: "Offert — pris ej publicerat",
+    },
+    {
+      feature: "Publika priser (maj 2026)",
+      servera: "549 kr/mån (Start) · 999 kr/mån (Tillväxt)",
+      competitor: "Ej publicerade — kontakta Caspeco för offert",
     },
   ],
   metaTitle: "Servera vs Caspeco — QR-meny eller komplett kassasystem?",
@@ -399,6 +564,45 @@ COMPARISONS["servera-vs-flipdish"] = {
         "Det beror på behovet. Om du främst vill ha QR-beställning från bordet är Servera fokuserad, billigare och svensk-supportad. Om du vill ha en marknadsplats för takeaway, egen leveransflotta och internationell skalning är en bredare plattform som Flipdish bättre lämpad — till en högre totalkostnad.",
     },
   ],
+  comparisonTable: [
+    {
+      feature: "Produktomfång",
+      servera: "Fokuserad QR-meny och bordsbeställning",
+      competitor:
+        "Bred plattform: online-beställning, egen app och webbplats, POS, kiosk, leverans",
+    },
+    {
+      feature: "Köks-/kockvy",
+      servera: "Köksskärm ingår",
+      competitor: "Kitchen Display System ingår",
+    },
+    {
+      feature: "Egen gäst-app och beställningswebbplats",
+      servera: "Nej — fokus på QR vid bordet",
+      competitor: "Ja",
+    },
+    {
+      feature: "Marknad och support",
+      servera: "Sverige — support på svenska",
+      competitor: "Internationell (Irland-baserad) — support på engelska",
+    },
+    {
+      feature: "Prisvaluta och modell",
+      servera: "Fast pris i SEK, ingen provision per order",
+      competitor: "Pris i EUR per enhet, plus transaktionsavgift",
+    },
+    {
+      feature: "Publika priser (maj 2026)",
+      servera: "549 kr/mån (Start) · 999 kr/mån (Tillväxt)",
+      competitor:
+        "Från €99/mån (årsvis) · €129/mån (månadsvis), per enhet",
+    },
+    {
+      feature: "Onboarding",
+      servera: "Igång på under 30 minuter, självbetjäning",
+      competitor: "Dedikerad onboarding med införandeteam",
+    },
+  ],
   metaTitle: "Servera vs Flipdish — svensk QR-meny eller internationell plattform?",
   metaDescription:
     "Servera är svensk QR-meny från 549 kr/mån utan provisioner. Flipdish är en bred internationell beställningsplattform. Jämför pris, scope och support.",
@@ -425,7 +629,7 @@ COMPARISONS["servera-vs-yumzi"] = {
     },
     {
       title: "Köks- och servitörsvy ingår",
-      body: "Servera levereras med en dedikerad kockvy och en servitörsvy. Beställningar pushas i realtid utan att skrivas ut, och servitörer ser pings från bord direkt.",
+      body: "Servera levereras med en dedikerad kockvy och en servitörsvy. Beställningar skickas direkt utan att skrivas ut, och servitören ser med en gång när ett bord behöver hjälp.",
     },
     {
       title: "Allergener och svenska kostmärkningar inbyggt",
@@ -439,7 +643,7 @@ COMPARISONS["servera-vs-yumzi"] = {
     },
     {
       heading: "Vill du ha en svensk eller internationell leverantör?",
-      body: "Servenrarens leverantör spelar roll för avtalsvillkor (svensk lag eller annan jurisdiktion), faktureringsvaluta, dataskydd (svensk eller EU-bredare lagring) och support. Avgör vilket som är viktigast för dig.",
+      body: "Var leverantören har sin hemvist spelar roll för avtalsvillkor (svensk lag eller annan jurisdiktion), faktureringsvaluta, var data lagras och hur supporten fungerar. Avgör vad som väger tyngst för dig.",
     },
     {
       heading: "Räkna på totalkostnaden",
@@ -475,6 +679,49 @@ COMPARISONS["servera-vs-yumzi"] = {
       question: "Hur snabbt kommer jag igång?",
       answer:
         "På Servera är de flesta restauranger igång under 30 minuter — du skapar konto, lägger in kategorier och rätter, väljer en QR-design och skriver ut bordskoderna.",
+    },
+  ],
+  comparisonTable: [
+    {
+      feature: "Digital meny med QR-kod",
+      servera: "Ja",
+      competitor: "Ja",
+    },
+    {
+      feature: "Beställning från bordet i mobilen",
+      servera: "Ja — gästen lägger sin order själv",
+      competitor:
+        "Nej — Yumzi är en menyskapare för digital meny och tryck",
+    },
+    {
+      feature: "Kock- och servitörsvy",
+      servera: "Ingår",
+      competitor: "Ingår ej",
+    },
+    {
+      feature: "Tryckta menyer (PDF/print)",
+      servera: "Nej — Servera är helt digital",
+      competitor: "Ja",
+    },
+    {
+      feature: "Flerspråkig meny",
+      servera: "Ja",
+      competitor: "Ja — automatiska översättningar",
+    },
+    {
+      feature: "Allergen- och näringsmärkning",
+      servera: "Inbyggt per rätt",
+      competitor: "Ja — allergener och näringsvärden",
+    },
+    {
+      feature: "Prismodell",
+      servera: "Fast pris i SEK, ingen provision per order",
+      competitor: "Pris i SEK, terminbaserat abonnemang",
+    },
+    {
+      feature: "Publika priser (maj 2026)",
+      servera: "549 kr/mån (Start) · 999 kr/mån (Tillväxt)",
+      competitor: "Från 113 kr/mån (2-årsavtal) · 142 kr/mån (årsvis)",
     },
   ],
   metaTitle: "Servera vs Yumzi — svensk eller internationell QR-meny?",

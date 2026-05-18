@@ -45,17 +45,17 @@ const HUB_FAQ = [
   {
     question: "Vad är en QR-meny?",
     answer:
-      "En QR-meny är en restaurangmeny som visas i gästens egen mobil när hen scannar en QR-kod på bordet. Inga appar, inga inloggningar — menyn öppnas direkt i webbläsaren. Servera är en sådan plattform, byggd för svenska restauranger med fast månadskostnad utan provisioner per order.",
+      "En QR-meny är en restaurangmeny som visas i gästens egen mobil när hen skannar en QR-kod på bordet. Inga appar, inga inloggningar — menyn öppnas direkt i webbläsaren. Servera är en sådan plattform, byggd för svenska restauranger med fast månadskostnad utan provisioner per order.",
   },
   {
     question: "Hur fungerar en QR-meny från bordet?",
     answer:
-      "Du sätter en QR-kod på varje bord, klistermärke eller bordsstand. Gästen scannar koden med sin mobilkamera, menyn öppnas i webbläsaren, gästen lägger sin beställning, och köket ser den i realtid på en skärm. Servitören får pings när bordet behöver hjälp.",
+      "Du sätter en QR-kod på varje bord, som klistermärke eller på en bordsstand. Gästen skannar koden med sin mobilkamera, menyn öppnas i webbläsaren, gästen lägger sin beställning, och köket ser den på en skärm. Servitören får en notis när ett bord behöver hjälp.",
   },
   {
     question: "Behöver jag någon särskild hårdvara för en QR-meny?",
     answer:
-      "Nej. Servera körs i webben — gästen använder sin egen mobil, du behöver bara en tablet eller skärm i köket för kockvyn. Ingen betalterminal vid bordet, ingen specialhårdvara. QR-koderna trycker du själv på vanligt papper eller bordsstander.",
+      "Nej. Servera körs i webben — gästen använder sin egen mobil, och du behöver bara en surfplatta eller skärm i köket för kockvyn. Ingen betalterminal vid bordet, ingen specialhårdvara. QR-koderna trycker du själv på vanligt papper eller på bordsstander.",
   },
   {
     question: "Är QR-meny rätt val för min typ av restaurang?",
@@ -134,9 +134,9 @@ export default function QrMenuHubPage() {
       <section className="py-14 sm:py-20">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 space-y-6">
           <p className="text-stone-700 text-lg leading-[1.7]">
-            En QR-meny låter gästen scanna en kod på bordet, se din meny i sin
+            En QR-meny låter gästen skanna en kod på bordet, se din meny i sin
             mobil och beställa direkt — utan app, utan registrering. Köket ser
-            beställningen i realtid på en skärm. Servitören kan fokusera på
+            beställningen på en skärm med en gång. Servitören kan fokusera på
             service istället för att repetera samma frågor om allergener eller
             storlek hela passet.
           </p>
@@ -237,7 +237,7 @@ export default function QrMenuHubPage() {
               </div>
               <div>
                 <h3 className="font-serif text-lg text-stone-950 font-semibold mb-1">
-                  Gästen scannar och beställer
+                  Gästen skannar och beställer
                 </h3>
                 <p className="text-stone-600 text-sm leading-relaxed">
                   Menyn öppnas i webbläsaren. Gästen väljer rätter, lägger till
@@ -255,8 +255,8 @@ export default function QrMenuHubPage() {
                   Köket ser ordern direkt
                 </h3>
                 <p className="text-stone-600 text-sm leading-relaxed">
-                  Beställningen pushas till kockskärmen i realtid. Servitören
-                  får ping när bordet behöver hjälp. Ingen pappersbongning,
+                  Beställningen skickas till kockskärmen direkt. Servitören
+                  får en notis när bordet behöver hjälp. Ingen pappersbongning,
                   inga skrivare, inga missförstånd.
                 </p>
               </div>

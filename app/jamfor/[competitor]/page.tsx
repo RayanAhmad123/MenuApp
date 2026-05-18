@@ -86,6 +86,64 @@ export default function ComparisonPage({
         </div>
       </section>
 
+      {c.comparisonTable && (
+        <section className="py-14 sm:py-20 bg-white border-y border-stone-200">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6">
+            <div className="text-center mb-10">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-stone-50 border border-stone-200 rounded-full text-stone-700 text-[10px] font-bold uppercase tracking-widest mb-5">
+                Sida vid sida
+              </div>
+              <h2 className="font-serif text-3xl sm:text-4xl text-stone-950 font-bold tracking-tight">
+                Servera vs {c.competitorName} — funktionsjämförelse
+              </h2>
+            </div>
+            <div className="overflow-x-auto rounded-2xl border border-stone-200">
+              <table className="w-full border-collapse text-left">
+                <thead>
+                  <tr className="bg-stone-50 border-b border-stone-200">
+                    <th className="p-4 text-[11px] font-bold uppercase tracking-widest text-stone-500">
+                      Funktion
+                    </th>
+                    <th className="p-4 text-[11px] font-bold uppercase tracking-widest text-amber-700">
+                      Servera
+                    </th>
+                    <th className="p-4 text-[11px] font-bold uppercase tracking-widest text-stone-700">
+                      {c.competitorName}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {c.comparisonTable.map((row) => (
+                    <tr
+                      key={row.feature}
+                      className="border-b border-stone-100 align-top last:border-0"
+                    >
+                      <th
+                        scope="row"
+                        className="p-4 text-sm font-semibold text-stone-950"
+                      >
+                        {row.feature}
+                      </th>
+                      <td className="p-4 text-sm text-stone-700">
+                        {row.servera}
+                      </td>
+                      <td className="p-4 text-sm text-stone-600">
+                        {row.competitor}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="mt-4 text-xs leading-relaxed text-stone-500">
+              Jämförelsen bygger på offentlig information från{" "}
+              {c.competitorName}s webbplats i maj 2026 och kan ha ändrats.
+              Kontrollera alltid aktuella villkor direkt med leverantören.
+            </p>
+          </div>
+        </section>
+      )}
+
       <section className="py-14 sm:py-20 bg-white border-y border-stone-200">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">

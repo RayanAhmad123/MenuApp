@@ -25,7 +25,7 @@ const COMMON_FAQ = (singular: string, plural: string) => [
   {
     question: "Behöver gästen ladda ned en app?",
     answer:
-      "Nej. Servera-menyn öppnas direkt i mobilens webbläsare när gästen scannar QR-koden — ingen registrering, ingen inloggning.",
+      "Nej. Servera-menyn öppnas direkt i mobilens webbläsare när gästen skannar QR-koden — ingen registrering, ingen inloggning.",
   },
 ]
 
@@ -35,7 +35,7 @@ export const RESTAURANT_TYPES: Record<string, RestaurantTypeContent> = {
     name: "pizzeria",
     pluralName: "pizzerior",
     intro:
-      "Servera är en digital meny och QR-beställning byggd för svenska pizzerior. Gästen scannar en QR-kod på bordet, väljer pizza med tillval (extra topping, glutenfri botten, halvt-halvt) och skickar beställningen direkt till köket — inga bonsar, inga skrivare, ingen missuppfattning kring 'utan lök'.",
+      "Servera är en digital meny och QR-beställning byggd för svenska pizzerior. Gästen skannar en QR-kod på bordet, väljer pizza med tillval (extra topping, glutenfri botten, halvt-halvt) och skickar beställningen direkt till köket — inga bongar, inga skrivare, ingen missuppfattning kring ”utan lök”.",
     context:
       "Pizzerior i Sverige har två återkommande utmaningar: komplicerade tillval per pizza (kunderna vill anpassa) och hög lunchtopp där servitören står och repeterar samma frågor om allergener och storlek hela passet. Servera löser båda — modifiers byggs in i menyn så gästen själv väljer, och allergeninformation visas automatiskt på varje rätt.",
     whyServeraFits: [
@@ -49,7 +49,7 @@ export const RESTAURANT_TYPES: Record<string, RestaurantTypeContent> = {
       },
       {
         title: "Avlasta köket vid lunchrusning",
-        body: "Beställningar pushas direkt till en kocktablet. Inga skrivare, ingen pappersbongning. Pizzabagaren ser nästa beställning direkt och kan börja jäsa parallellt.",
+        body: "Beställningar skickas direkt till en surfplatta i köket. Inga skrivare, ingen pappersbongning. Pizzabagaren ser nästa beställning på en gång och kan börja jäsa parallellt.",
       },
       {
         title: "Hämtbeställningar via samma QR",
@@ -87,9 +87,9 @@ export const RESTAURANT_TYPES: Record<string, RestaurantTypeContent> = {
     name: "sushiställe",
     pluralName: "sushiställen",
     intro:
-      "Servera är digital meny och QR-beställning för sushiställen — perfekt för verksamheter med långa menyer, stora variantfält (8-bitars, 16-bitars, mix) och intensiv lunchrusning. Gästen scannar bordkoden, bygger sin beställning på sin egen mobil och köket ser ordningsföljden i realtid.",
+      "Servera är digital meny och QR-beställning för sushiställen — perfekt för verksamheter med långa menyer, stora variantfält (8-bitars, 16-bitars, mix) och intensiv lunchrusning. Gästen skannar bordkoden, bygger sin beställning på sin egen mobil och köket ser ordningsföljden i realtid.",
     context:
-      "Sushiställen i Sverige har ofta menyer med 80–150 enskilda rätter. Att hantera detta i tryckt form innebär ofta utdaterade menyer, och i lunchrusning blir handskriven beställning till köket en flaskhals. Servera ger gästen sökbar meny och köket en realtidsvy.",
+      "Sushiställen i Sverige har ofta menyer med 80–150 enskilda rätter. Att hantera detta i tryckt form leder ofta till inaktuella menyer, och i lunchrusningen blir handskrivna beställningar till köket en flaskhals. Servera ger gästen sökbar meny och köket en realtidsvy.",
     whyServeraFits: [
       {
         title: "Hantera långa menyer i kategorier",
@@ -140,7 +140,7 @@ export const RESTAURANT_TYPES: Record<string, RestaurantTypeContent> = {
     name: "café",
     pluralName: "caféer",
     intro:
-      "Servera är en QR-meny byggd för svenska caféer. Gästen scannar koden på bordet, beställer kaffe, fika eller lunch — och slipper kön vid kassan. Caféet ser beställningen i realtid och kan ha kaffet klart när gästen kommer fram.",
+      "Servera är en QR-meny byggd för svenska caféer. Gästen skannar koden på bordet, beställer kaffe, fika eller lunch — och slipper kön vid kassan. Caféet ser beställningen i realtid och kan ha kaffet klart när gästen kommer fram.",
     context:
       "Caféer kämpar ofta med långa kassaköer i lunchrusningen och med gäster som sitter länge med en kopp men inte vågar beställa mer eftersom det innebär kö-väntning igen. QR-beställning från bordet löser båda problemen — gästen beställer från sin plats, betalar i mobilen och får serveringen när det är klart.",
     whyServeraFits: [
@@ -150,7 +150,7 @@ export const RESTAURANT_TYPES: Record<string, RestaurantTypeContent> = {
       },
       {
         title: "Enkel återbeställning",
-        body: "När gästen vill ha en till kopp eller en bulle räcker det att öppna menyn igen i samma flik. Caféer ser ofta 25–40 % uppselling när gästen inte behöver lämna sin plats.",
+        body: "När gästen vill ha en till kopp eller en bulle räcker det att öppna menyn igen i samma flik. Caféer ser ofta 25–40 % merförsäljning när gästen inte behöver lämna sin plats.",
       },
       {
         title: "Snabb uppdatering vid utförsäljning",
@@ -191,25 +191,25 @@ export const RESTAURANT_TYPES: Record<string, RestaurantTypeContent> = {
     name: "bar",
     pluralName: "barer",
     intro:
-      "Servera är en QR-meny för svenska barer och cocktailbarer. Gästerna scannar koden på bordet eller bardisken, bläddrar i drinklistan, och beställer från sin egen mobil — perfekt när det är fullt och bartendern inte hinner ta varje beställning manuellt.",
+      "Servera är en QR-meny för svenska barer och cocktailbarer. Gästerna skannar koden på bordet eller bardisken, bläddrar i drinklistan, och beställer från sin egen mobil — perfekt när det är fullt och bartendern inte hinner ta varje beställning manuellt.",
     context:
       "Barer i fredags- och lördagsrush har ofta 3-djupa köer vid disken. Det innebär missade beställningar, lägre genomsnittsorder och frustrerade gäster. Servera ger gästen möjlighet att beställa och betala från sin plats, så bartendern kan fokusera på att shaka.",
     whyServeraFits: [
       {
         title: "Minska kötrycket vid disken",
-        body: "Gästen scannar bordkoden eller QR vid disken, bläddrar i drinklistan och beställer från sin mobil. Bartendern ser kön i realtid på en skärm.",
+        body: "Gästen skannar bordkoden eller QR vid disken, bläddrar i drinklistan och beställer från sin mobil. Bartendern ser kön i realtid på en skärm.",
       },
       {
         title: "Modifiers för cocktailtillval",
-        body: "Single eller double, garnish, choice of spirit, sockerlag — alla cocktailtillval kan modelleras som modifiers med automatisk prissättning.",
+        body: "Enkel eller dubbel, garnering, val av sprit, sockerlag — alla cocktailtillval kan byggas som modifiers med automatisk prissättning.",
       },
       {
         title: "Stripe-betalning för stängda flikar",
-        body: "Gästen kan betala för varje runda direkt på mobilen — inga öppna flikar att stänga vid stängningstid, inga 'jag glömde betala'-situationer.",
+        body: "Gästen kan betala för varje runda direkt på mobilen — inga öppna flikar att stänga vid stängningstid, inga ”jag glömde betala”-situationer.",
       },
       {
-        title: "Höj genomsnittlig kuvert med uppselling",
-        body: "Servera kan visa rekommendationer per kategori (premium-versioner av drinkar, snacks). Genomsnittlig kuvert tenderar att öka när gästen själv bläddrar i menyn.",
+        title: "Höj snittnotan med merförsäljning",
+        body: "Servera kan visa rekommendationer per kategori, som premiumversioner av drinkar och snacks. Snittnotan tenderar att öka när gästen själv bläddrar i menyn.",
       },
     ],
     exampleSections: [
@@ -242,21 +242,21 @@ export const RESTAURANT_TYPES: Record<string, RestaurantTypeContent> = {
     name: "food truck",
     pluralName: "food trucks",
     intro:
-      "Servera är en QR-meny för food trucks och mobila kök. En QR-affisch på sidan av trucken låter gäster beställa från sin mobil — ingen lång kö framför luckan, ingen handskriven sedel, ingen missförstånd.",
+      "Servera är en QR-meny för food trucks och mobila kök. En QR-affisch på sidan av trucken låter gästen beställa från sin mobil — ingen lång kö framför luckan, ingen handskriven lapp, inget missförstånd.",
     context:
-      "Food trucks har en unik utmaning: en intensiv 1-timmes lunchtopp med en single point of failure i form av en lucka. När kön blir för lång tappar du gäster som går vidare. Med QR-beställning kan flera gäster lägga in sin beställning samtidigt, och köket producerar i en jämnare takt.",
+      "Food trucks har en särskild utmaning: en intensiv lunchtopp där allt passerar genom en enda lucka. När kön blir för lång tappar du gäster som går vidare. Med QR-beställning kan flera gäster lägga in sin beställning samtidigt, och köket producerar i en jämnare takt.",
     whyServeraFits: [
       {
         title: "Eliminera lunchkön",
-        body: "Gäster scannar QR-affischen från trottoaren, beställer i mobilen och kommer bara fram när maten är klar. Trucken kan serva 30–40 % fler kuvert per timme.",
+        body: "Gäster skannar QR-affischen från trottoaren, beställer i mobilen och kommer bara fram när maten är klar. Trucken kan serva 30–40 % fler kuvert per timme.",
       },
       {
-        title: "Realtid-statusuppdatering",
-        body: "Gästen ser om beställningen är 'mottagen', 'tillagas' eller 'klar' — inga frågor till luckan.",
+        title: "Statusuppdatering i realtid",
+        body: "Gästen ser om beställningen är mottagen, under tillagning eller klar — inga frågor till luckan.",
       },
       {
         title: "Förbeställning via Stripe",
-        body: "Gäster i närliggande kontor kan förbeställa kvarter i förväg, betala direkt och hämta utan kö.",
+        body: "Gäster i närliggande kontor kan lägga sin beställning i förväg, betala direkt och hämta utan kö.",
       },
       {
         title: "Inget WiFi krävs i trucken",
@@ -291,7 +291,7 @@ export const RESTAURANT_TYPES: Record<string, RestaurantTypeContent> = {
     name: "lunchställe",
     pluralName: "lunchställen",
     intro:
-      "Servera är en QR-meny för svenska lunchställen. Gästen scannar koden på bordet, väljer dagens lunch eller från ordinarie meny, och beställer på sekunder — perfekt för 11:30–13:00-rusningen där varje minut räknas.",
+      "Servera är en QR-meny för svenska lunchställen. Gästen skannar koden på bordet, väljer dagens lunch eller från ordinarie meny, och beställer på sekunder — perfekt för 11:30–13:00-rusningen där varje minut räknas.",
     context:
       "Lunchställen är en av de mest QR-vänliga restaurangtyperna: korta vistelser, prismedvetna gäster, snabb omsättning. Stresspunkten är de 90 minuterna mitt på dagen när alla kommer samtidigt. Servera är byggd för exakt det.",
     whyServeraFits: [
