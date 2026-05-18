@@ -122,7 +122,7 @@ export const CITIES: Record<string, CityContent> = {
       {
         question: "Vad kostar Servera för en restaurang i Göteborg?",
         answer:
-          "549 kr/mån för Start-planen, 999 kr/mån för Tillväxt. Fasta priser i SEK utan provisioner per beställning. För kedjor och flera enheter — kontakta säljteamet för Företag-offert.",
+          "549 kr/mån för Start-planen, 999 kr/mån för Tillväxt. Fasta priser utan provisioner per beställning. För kedjor och flera enheter — kontakta säljteamet för Företag-offert.",
       },
       ...COMMON_FAQ_END("Göteborg"),
     ],
@@ -147,7 +147,7 @@ export const CITIES: Record<string, CityContent> = {
       },
       {
         title: "Lägre kostnad än internationella plattformar",
-        body: "Servera har fast SEK-pris utan provisioner. För Malmö-restauranger som ofta har lägre kuvertpriser än Stockholm är skillnaden i totalkostnad märkbar.",
+        body: "Servera har fast pris utan provisioner. För Malmö-restauranger som ofta har lägre kuvertpriser än Stockholm är skillnaden i totalkostnad märkbar.",
       },
       {
         title: "Snabb setup för säsongsvariation",

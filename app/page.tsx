@@ -91,10 +91,8 @@ function Nav() {
 
   return (
     <header
-      className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? "bg-stone-50/80 backdrop-blur-md border-b border-stone-200/80"
-          : "bg-transparent"
+      className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 bg-stone-50 ${
+        scrolled ? "border-b border-stone-200/80" : ""
       }`}
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
