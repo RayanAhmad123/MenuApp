@@ -40,7 +40,31 @@ export function AnalyticsClient({ restaurantId, summary, initialDays }: Props) {
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
   const [itemDetail, setItemDetail] = useState<ItemDeepStat | null>(null)
   const [loadingItem, setLoadingItem] = useState(false)
-  const [insightsDismissed, setInsightsDismissed] = useState(false)
+  const [dismissedInsights, setDismissedInsights] = useState<Set<string>>(() => {
+    if (typeof window === "undefined") return new Set()
+    try {
+      const raw = window.localStorage.getItem(`menuapp:insights-dismissed:${restaurantId}`)
+      return new Set(raw ? (JSON.parse(raw) as string[]) : [])
+    } catch {
+      return new Set()
+    }
+  })
+
+  function dismissInsight(id: string) {
+    setDismissedInsights(prev => {
+      const next = new Set(prev)
+      next.add(id)
+      try {
+        window.localStorage.setItem(
+          `menuapp:insights-dismissed:${restaurantId}`,
+          JSON.stringify(Array.from(next)),
+        )
+      } catch {
+        // localStorage unavailable (private mode) — dismissal stays session-only
+      }
+      return next
+    })
+  }
 
   function changeRange(newDays: number) {
     setDays(newDays)
@@ -85,6 +109,7 @@ export function AnalyticsClient({ restaurantId, summary, initialDays }: Props) {
 
   // Insights engine
   const insights = useMemo(() => buildInsights(summary), [summary])
+  const visibleInsights = insights.filter(i => !dismissedInsights.has(i.id))
 
   return (
     <div className="p-8 space-y-6">
@@ -110,30 +135,50 @@ export function AnalyticsClient({ restaurantId, summary, initialDays }: Props) {
       </div>
 
       {/* Insight cards */}
-      {insights.length > 0 && !insightsDismissed && (
+      {visibleInsights.length > 0 && (
         <Card className="border-amber-200 bg-amber-50/50">
           <CardContent className="p-5">
             <div className="flex items-center gap-2 mb-3">
               <Lightbulb className="h-4 w-4 text-amber-600" />
               <h3 className="font-semibold text-stone-800 text-sm">Föreslagna åtgärder</h3>
-              <button
-                onClick={() => setInsightsDismissed(true)}
-                aria-label="Dölj föreslagna åtgärder"
-                className="ml-auto text-stone-400 hover:text-stone-700 transition-colors"
-              >
-                <X className="h-4 w-4" />
-              </button>
+              <span className="text-xs text-stone-400">Sorterade efter uppskattad effekt</span>
             </div>
             <div className="grid md:grid-cols-2 gap-3">
-              {insights.map((ins, i) => (
-                <div key={i} className="flex gap-3 text-sm">
-                  <span className="text-lg leading-none mt-0.5">{ins.emoji}</span>
-                  <div>
-                    <p className="text-stone-800 font-medium">{ins.title}</p>
-                    <p className="text-stone-600 text-xs mt-0.5">{ins.body}</p>
+              {visibleInsights.map(ins => {
+                const impact = formatImpact(ins.impactCents)
+                return (
+                  <div
+                    key={ins.id}
+                    className={`relative flex gap-3 text-sm rounded-lg border p-3 ${INSIGHT_TONE[ins.tone]}`}
+                  >
+                    <span className="text-lg leading-none mt-0.5">{ins.emoji}</span>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-stone-800 font-medium pr-5">{ins.title}</p>
+                      <p className="text-stone-600 text-xs mt-0.5">{ins.body}</p>
+                      {impact && (
+                        <span
+                          className={`inline-block mt-1.5 text-[11px] font-semibold px-1.5 py-0.5 rounded ${
+                            ins.tone === "warning"
+                              ? "bg-red-100 text-red-700"
+                              : "bg-emerald-100 text-emerald-700"
+                          }`}
+                        >
+                          {ins.tone === "warning"
+                            ? `≈ ${impact}/mån i risk`
+                            : `≈ +${impact}/mån`}
+                        </span>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => dismissInsight(ins.id)}
+                      aria-label="Dölj förslag"
+                      className="absolute top-2 right-2 text-stone-300 hover:text-stone-600 transition-colors"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </CardContent>
         </Card>
@@ -620,74 +665,206 @@ function formatHour(h: number) {
   return `${String(h).padStart(2, "0")}:00`
 }
 
-// Lightweight insights engine — data-driven, not ML.
-function buildInsights(s: AnalyticsSummary): Array<{ emoji: string; title: string; body: string }> {
-  const out: Array<{ emoji: string; title: string; body: string }> = []
+type InsightTone = "warning" | "neutral" | "positive"
+type Insight = {
+  id: string
+  emoji: string
+  title: string
+  body: string
+  impactCents: number // estimated monthly kr impact; 0 = not quantified
+  tone: InsightTone
+}
 
-  // Unsold items
-  const unsold = s.items.filter(i => i.quantitySold === 0)
-  if (unsold.length > 0 && s.totalItemsSold > 0) {
+const INSIGHT_TONE: Record<InsightTone, string> = {
+  warning: "border-red-200 bg-red-50/60",
+  neutral: "border-stone-200 bg-white",
+  positive: "border-emerald-200 bg-emerald-50/60",
+}
+
+const WEEKDAYS_FULL = ["söndagar", "måndagar", "tisdagar", "onsdagar", "torsdagar", "fredagar", "lördagar"]
+
+// Round a cents impact to the nearest 100 kr. Returns null below 100 kr so we
+// never show a falsely precise figure for a negligible amount.
+function formatImpact(cents: number): string | null {
+  const rounded = Math.round(cents / 10000) * 10000
+  if (rounded < 10000) return null
+  return formatPrice(rounded)
+}
+
+// Rule-based insights engine — data-driven, not ML. Each rule carries a
+// sample-size guard so thin data doesn't produce noise, and an estimated
+// monthly kr impact used to rank the cards by what matters most.
+function buildInsights(s: AnalyticsSummary): Insight[] {
+  const out: Insight[] = []
+  const periodDays = Math.max(1, s.periodDays)
+  const toMonthly = (cents: number) => Math.round((cents * 30) / periodDays)
+
+  // Revenue trend: compare the daily run-rate of the first vs second half of
+  // the range. Needs >= 8 days so each half has real signal.
+  const n = s.daily.length
+  if (n >= 8) {
+    const mid = Math.floor(n / 2)
+    const firstDays = mid
+    const secondDays = n - mid
+    const firstRev = s.daily.slice(0, mid).reduce((a, d) => a + d.revenueCents, 0)
+    const secondRev = s.daily.slice(mid).reduce((a, d) => a + d.revenueCents, 0)
+    if (firstRev > 0 && firstDays > 0 && secondDays > 0) {
+      const firstRate = firstRev / firstDays
+      const secondRate = secondRev / secondDays
+      const deltaPct = ((secondRate - firstRate) / firstRate) * 100
+      if (deltaPct <= -15) {
+        out.push({
+          id: "trend-down",
+          emoji: "📉",
+          title: `Intäkterna sjunker — ${Math.abs(Math.round(deltaPct))} % lägre takt`,
+          body: "Senare delen av perioden ligger klart under den tidigare. Se över meny, bemanning och öppettider.",
+          impactCents: Math.round((firstRate - secondRate) * 30),
+          tone: "warning",
+        })
+      } else if (deltaPct >= 20) {
+        out.push({
+          id: "trend-up",
+          emoji: "🚀",
+          title: `Intäkterna ökar — ${Math.round(deltaPct)} % högre takt`,
+          body: "Senaste delen av perioden växer. Vad gjorde ni annorlunda? Gör mer av det.",
+          impactCents: Math.round((secondRate - firstRate) * 30),
+          tone: "positive",
+        })
+      }
+    }
+  }
+
+  // Cancellations — guard on order volume so the rate is stable.
+  if (s.cancelRate > 0.1 && s.totalOrders >= 20) {
+    const cancelledPerPeriod = (s.cancelRate / (1 - s.cancelRate)) * s.totalOrders
     out.push({
-      emoji: "🗑️",
-      title: `${unsold.length} ${unsold.length === 1 ? "rätt" : "rätter"} utan sälj`,
-      body: `Överväg att ta bort eller skriva om beskrivningar för: ${unsold.slice(0, 3).map(i => i.name).join(", ")}${unsold.length > 3 ? "…" : ""}`,
+      id: "cancel",
+      emoji: "⚠️",
+      title: `${Math.round(s.cancelRate * 100)} % av beställningarna avbryts`,
+      body: "Över 10 %. Kolla väntetider i köket, misslyckade betalningar och slutsålda rätter.",
+      impactCents: toMonthly(Math.round(cancelledPerPeriod * s.avgOrderCents)),
+      tone: "warning",
     })
   }
 
-  // Plowhorses → price-raise candidates
-  const plowhorses = s.matrix.filter(m => m.quadrant === "plowhorse" && m.quantitySold > 0)
+  // Plowhorses → price-raise candidates. Needs >= 10 sales to be a safe bet.
+  const plowhorses = s.matrix.filter(m => m.quadrant === "plowhorse" && m.quantitySold >= 10)
   if (plowhorses.length > 0) {
-    const top = plowhorses.sort((a, b) => b.quantitySold - a.quantitySold)[0]
+    const top = [...plowhorses].sort((a, b) => b.quantitySold - a.quantitySold)[0]
     out.push({
+      id: `priceup-${top.itemId}`,
       emoji: "📈",
       title: `Prishöjningskandidat: ${top.name}`,
-      body: `Säljer bra (${top.quantitySold}× på ${s.periodDays} d) men tunn marginal. En prishöjning på 5–8 % påverkar sällan volymen.`,
+      body: `Säljer bra (${top.quantitySold}× på ${periodDays} d) men tunn marginal. +6 % i pris påverkar sällan volymen.`,
+      impactCents: toMonthly(Math.round(top.priceCents * 0.06 * top.quantitySold)),
+      tone: "neutral",
     })
   }
 
-  // Puzzles → visibility candidates
-  const puzzles = s.matrix.filter(m => m.quadrant === "puzzle" && m.quantitySold > 0)
+  // Puzzles → visibility candidates. Impact = upside of a ~50 % volume lift.
+  const puzzles = s.matrix.filter(m => m.quadrant === "puzzle" && m.quantitySold >= 3)
   if (puzzles.length > 0) {
-    const top = puzzles.sort((a, b) => b.revenueCents - a.revenueCents)[0]
+    const top = [...puzzles].sort((a, b) => b.profitScore - a.profitScore)[0]
+    const profitPerPeriod = s.hasCostData ? (top.marginCents ?? 0) : top.revenueCents
     out.push({
+      id: `puzzle-${top.itemId}`,
       emoji: "🧩",
       title: `Dold pärla: ${top.name}`,
-      body: `Hög vinst, låg efterfrågan. Flytta upp på menyn, lägg till bild, eller markera som "Kockens val".`,
+      body: `Hög ${s.hasCostData ? "marginal" : "intäkt"}, låg efterfrågan. Flytta upp på menyn, lägg till bild eller märk som "Kockens val".`,
+      impactCents: toMonthly(Math.round(profitPerPeriod * 0.5)),
+      tone: "neutral",
     })
   }
 
-  // Dead hour slot
+  // Unsold items.
+  const unsold = s.items.filter(i => i.quantitySold === 0)
+  if (unsold.length > 0 && s.totalItemsSold >= 20) {
+    out.push({
+      id: "unsold",
+      emoji: "🗑️",
+      title: `${unsold.length} ${unsold.length === 1 ? "rätt" : "rätter"} utan sälj`,
+      body: `Ingen beställde dessa under perioden: ${unsold.slice(0, 3).map(i => i.name).join(", ")}${unsold.length > 3 ? "…" : ""}. Skriv om beskrivningen, byt bild eller ta bort dem.`,
+      impactCents: 0,
+      tone: "neutral",
+    })
+  }
+
+  // Dead hour slot → happy hour. Needs a real peak, not just a 1-vs-3 fluke.
   const hoursWithAny = s.hourly.filter(h => h.orders > 0)
-  if (hoursWithAny.length >= 3) {
+  if (hoursWithAny.length >= 4 && s.totalOrders >= 20) {
     const sorted = [...hoursWithAny].sort((a, b) => b.orders - a.orders)
     const peak = sorted[0]
     const quiet = sorted[sorted.length - 1]
-    if (peak.orders >= 3 * quiet.orders) {
+    if (peak.orders >= 6 && quiet.orders >= 1 && peak.orders >= 3 * quiet.orders) {
       out.push({
+        id: "happy-hour",
         emoji: "⏰",
         title: `Kör happy hour kl. ${formatHour(quiet.hour)}`,
         body: `${formatHour(peak.hour)} har ${Math.round(peak.orders / quiet.orders)}× fler beställningar. Fyll gapet med ett tidsbegränsat erbjudande.`,
+        impactCents: 0,
+        tone: "neutral",
       })
     }
   }
 
-  // Cancellation warning
-  if (s.cancelRate > 0.1) {
+  // Weakest weekday — only meaningful once each weekday has recurred.
+  if (periodDays >= 28) {
+    const byWeekday = new Array(7).fill(0)
+    for (const c of s.weekdayHour) byWeekday[c.weekday] += c.orders
+    const total = byWeekday.reduce((a, b) => a + b, 0)
+    if (total >= 20) {
+      let busiest = 0
+      let weakest = 0
+      for (let w = 1; w < 7; w++) {
+        if (byWeekday[w] > byWeekday[busiest]) busiest = w
+        if (byWeekday[w] < byWeekday[weakest]) weakest = w
+      }
+      if (busiest !== weakest && byWeekday[busiest] > 0 && byWeekday[weakest] <= 0.4 * byWeekday[busiest]) {
+        out.push({
+          id: "weekday-gap",
+          emoji: "📅",
+          title: `${WEEKDAYS_FULL[weakest][0].toUpperCase()}${WEEKDAYS_FULL[weakest].slice(1)} är er svagaste dag`,
+          body: `${WEEKDAYS_FULL[weakest]} drar bara ${Math.round((byWeekday[weakest] / byWeekday[busiest]) * 100)} % av ${WEEKDAYS_FULL[busiest]}s beställningar. Testa ett veckodagserbjudande.`,
+          impactCents: 0,
+          tone: "neutral",
+        })
+      }
+    }
+  }
+
+  // Star performer — positive reinforcement, protect what works.
+  const stars = s.matrix.filter(m => m.quadrant === "star" && m.quantitySold >= 10)
+  if (stars.length > 0) {
+    const top = [...stars].sort((a, b) => b.revenueCents - a.revenueCents)[0]
     out.push({
-      emoji: "⚠️",
-      title: `${(s.cancelRate * 100).toFixed(0)} % av beställningarna avbrutna`,
-      body: `Det är över 10 %. Kolla väntetider i köket, misslyckade betalningar och slutsålda rätter.`,
+      id: `star-${top.itemId}`,
+      emoji: "⭐",
+      title: `Stjärnrätt: ${top.name}`,
+      body: `Både populär och lönsam (${top.quantitySold}× på ${periodDays} d). Håll kvaliteten jämn och låt den synas — den drar in gäster.`,
+      impactCents: 0,
+      tone: "positive",
     })
   }
 
-  // Cost data nudge
+  // Cost data nudge — onboarding hint, lowest priority.
   if (!s.hasCostData && s.totalItemsSold > 0) {
     out.push({
+      id: "cost-data",
       emoji: "💰",
       title: "Lås upp riktig marginalanalys",
       body: "Ange matkostnad per rätt i menyn för att se riktig vinst — inte bara intäkter — i teknikmatrisen.",
+      impactCents: 0,
+      tone: "neutral",
     })
   }
 
-  return out.slice(0, 4)
+  // Rank by estimated kr impact; quantified actions first, then ties broken so
+  // warnings outrank neutral tips, which outrank positive reinforcement.
+  const toneOrder: Record<InsightTone, number> = { warning: 0, neutral: 1, positive: 2 }
+  return out
+    .sort((a, b) => {
+      if (b.impactCents !== a.impactCents) return b.impactCents - a.impactCents
+      return toneOrder[a.tone] - toneOrder[b.tone]
+    })
+    .slice(0, 4)
 }
