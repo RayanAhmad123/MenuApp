@@ -43,12 +43,12 @@ const HUB_FAQ = [
   {
     question: "Vad är en digital meny?",
     answer:
-      "En digital meny är en restaurangmeny som visas på en skärm — oftast i gästens egen mobil via en QR-kod på bordet. Gästen scannar koden, ser menyn med bilder, allergener och pris, och kan i vissa system även beställa direkt utan att vänta in en servitör. Servera är en sådan plattform, byggd specifikt för svenska restauranger.",
+      "En digital meny är en restaurangmeny som visas på en skärm — oftast i gästens egen mobil via en QR-kod på bordet. Gästen skannar koden, ser menyn med bilder, allergener och pris, och kan i vissa system även beställa direkt utan att vänta in en servitör. Servera är en sådan plattform, byggd specifikt för svenska restauranger.",
   },
   {
     question: "Hur fungerar en digital meny i praktiken?",
     answer:
-      "Du lägger in dina kategorier och rätter i adminpanelen. Servera genererar en QR-kod per bord. Gästen skannar koden med sin mobilkamera, menyn öppnas i webbläsaren utan app, gästen lägger sin beställning, och köket ser den i realtid på en skärm i köket. Servitören får pings när bordet behöver hjälp.",
+      "Du lägger in dina kategorier och rätter i adminpanelen. Servera genererar en QR-kod per bord. Gästen skannar koden med sin mobilkamera, menyn öppnas i webbläsaren utan app, gästen lägger sin beställning, och köket ser den på en skärm. Servitören får en notis när ett bord behöver hjälp.",
   },
   {
     question: "Vad kostar en digital meny i Sverige?",
@@ -68,7 +68,7 @@ const HUB_FAQ = [
   {
     question: "Behöver gästen ladda ned en app?",
     answer:
-      "Nej. Servera-menyn öppnas direkt i mobilens webbläsare när gästen scannar QR-koden. Inget app-krav, ingen registrering, inga inloggningar — det är standard för moderna QR-menyer i Sverige.",
+      "Nej. Servera-menyn öppnas direkt i mobilens webbläsare när gästen skannar QR-koden. Inget app-krav, ingen registrering, inga inloggningar — det är standard för moderna QR-menyer i Sverige.",
   },
   {
     question: "Fungerar digital meny utan internet?",
@@ -147,7 +147,7 @@ export default function DigitalMenuHubPage() {
         <div className="max-w-3xl mx-auto px-4 sm:px-6 space-y-6">
           <p className="text-stone-700 text-lg leading-[1.7]">
             En digital meny är en restaurangmeny som visas i gästens egen mobil
-            — gästen scannar en QR-kod på bordet, ser menyn med bilder och
+            — gästen skannar en QR-kod på bordet, ser menyn med bilder och
             allergener, och kan beställa direkt. För svenska restauranger har
             digital meny gått från experiment till standard sedan 2020. Den här
             guiden hjälper dig välja rätt plattform och komma igång.
@@ -248,7 +248,7 @@ export default function DigitalMenuHubPage() {
                 QR-kod per bord — utan app
               </h3>
               <p className="text-stone-600 text-sm leading-relaxed">
-                Gästen ska kunna scanna och se menyn direkt i webbläsaren. Inga
+                Gästen ska kunna skanna och se menyn direkt i webbläsaren. Inga
                 appar, inga inloggningar, ingen registrering. Allt detta är
                 standard i Servera.
               </p>
@@ -278,9 +278,9 @@ export default function DigitalMenuHubPage() {
                 Kockvy och servitörsvy ingår
               </h3>
               <p className="text-stone-600 text-sm leading-relaxed">
-                En tablet i köket räcker. Beställningar pushas i realtid utan
-                att skrivas ut, och servitörer ser pings från bord direkt — utan
-                extra hårdvarukostnad.
+                En surfplatta i köket räcker. Beställningar skickas direkt utan
+                att skrivas ut, och servitören får en notis från bordet med en
+                gång — utan extra hårdvarukostnad.
               </p>
             </div>
             <div className="rounded-2xl border border-stone-200 bg-stone-50 p-6">

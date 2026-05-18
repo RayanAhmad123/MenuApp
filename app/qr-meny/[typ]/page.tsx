@@ -80,8 +80,8 @@ export default function RestaurantTypePage({
             QR-meny för {t.pluralName}
           </h1>
           <p className="text-stone-600 text-lg leading-relaxed">
-            Digital meny och mobilbeställning byggd för {t.pluralName} — gäster
-            scannar, beställer och betalar från sin egen mobil.
+            Digital meny och mobilbeställning byggd för {t.pluralName} — gästen
+            skannar, beställer och betalar från sin egen mobil.
           </p>
         </div>
       </section>
