@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useForm, ValidationError } from "@formspree/react"
 import ScrollStory from "@/components/ScrollStory"
+import { CookieSettingsLink } from "@/components/cookie-consent"
 import { JsonLd } from "@/components/seo/JsonLd"
 import {
   organizationSchema,
@@ -1050,6 +1051,19 @@ function Footer() {
             <ul className="space-y-2.5">
               <li>
                 <PrivacyPolicyDialog />
+              </li>
+              <li>
+                <Link
+                  href="/cookies"
+                  className="text-stone-400 text-sm hover:text-amber-400 transition-colors"
+                >
+                  Cookiepolicy
+                </Link>
+              </li>
+              <li>
+                <CookieSettingsLink className="text-stone-400 text-sm hover:text-amber-400 transition-colors">
+                  Cookie-inställningar
+                </CookieSettingsLink>
               </li>
               <li>
                 <a

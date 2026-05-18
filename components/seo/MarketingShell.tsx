@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { CookieSettingsLink } from "@/components/cookie-consent"
 
 interface MarketingShellProps {
   children: React.ReactNode
@@ -207,8 +208,22 @@ export function MarketingShell({ children }: MarketingShellProps) {
               </ul>
             </div>
           </div>
-          <div className="border-t border-stone-800 pt-6 text-xs text-stone-500">
-            © {new Date().getFullYear()} Servera — en del av Triad Solutions.
+          <div className="flex flex-col gap-3 border-t border-stone-800 pt-6 text-xs text-stone-500 sm:flex-row sm:items-center sm:justify-between">
+            <span>
+              © {new Date().getFullYear()} Servera — en del av Triad
+              Solutions.
+            </span>
+            <div className="flex items-center gap-4">
+              <Link
+                href="/cookies"
+                className="hover:text-stone-300 transition-colors"
+              >
+                Cookiepolicy
+              </Link>
+              <CookieSettingsLink className="hover:text-stone-300 transition-colors">
+                Cookie-inställningar
+              </CookieSettingsLink>
+            </div>
           </div>
         </div>
       </footer>
