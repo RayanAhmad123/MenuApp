@@ -3,8 +3,8 @@ import { Inter, Playfair_Display } from "next/font/google"
 import "./globals.css"
 import { Providers } from "@/components/providers"
 import { Toaster } from "@/components/ui/toaster"
-import { Analytics } from "@vercel/analytics/next"
-import { TriadAnalytics } from "@/components/triad-analytics"
+import { CookieConsentProvider } from "@/components/cookie-consent"
+import { ConsentedAnalytics } from "@/components/consented-analytics"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -113,12 +113,13 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body>
-        <Providers>
-          {children}
-          <Toaster />
-        </Providers>
-        <Analytics />
-        <TriadAnalytics />
+        <CookieConsentProvider>
+          <Providers>
+            {children}
+            <Toaster />
+          </Providers>
+          <ConsentedAnalytics />
+        </CookieConsentProvider>
       </body>
     </html>
   )
