@@ -161,7 +161,7 @@ export default function CityPage({
               href="/priser"
               className="text-amber-700 hover:text-amber-800 underline-offset-4 hover:underline text-sm font-medium"
             >
-              Se priser i SEK →
+              Se priser →
             </Link>
           </div>
         </div>

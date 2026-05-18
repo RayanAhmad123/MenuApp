@@ -40,7 +40,7 @@ const STEPS = [
   {
     n: "1",
     title: "Skapa konto och lägg in din meny",
-    body: "Du börjar med att skapa ett konto för din restaurang. I adminpanelen lägger du in dina kategorier (förrätter, huvudrätter, dryck, dessert), rätter med bilder och pris i SEK, samt allergeninformation och kostmärkningar (vegan, vegetariskt, glutenfritt). En standardmeny tar oftast under en timme att lägga in.",
+    body: "Du börjar med att skapa ett konto för din restaurang. I adminpanelen lägger du in dina kategorier (förrätter, huvudrätter, dryck, dessert), rätter med bilder och pris, samt allergeninformation och kostmärkningar (vegan, vegetariskt, glutenfritt). En standardmeny tar oftast under en timme att lägga in.",
     extra:
       "Du behöver inget kassasystem för att starta. Servera fungerar parallellt med ditt befintliga flöde — bordsbeställning sker via Servera, kassan hanterar betalning och bokföring som vanligt.",
   },

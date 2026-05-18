@@ -19,7 +19,7 @@ const PAGE_URL = `${SITE_URL}/jamfor`
 export const metadata: Metadata = {
   title: "Jämför QR-meny för restauranger — Servera vs Meny-QR, Qopla, WEIQ",
   description:
-    "Ärliga jämförelser mellan Servera och andra svenska QR-meny- och beställningsplattformar. Pris i SEK, provisioner, kockvy, hårdvara och kassasystem-integration — sida vid sida.",
+    "Ärliga jämförelser mellan Servera och andra svenska QR-meny- och beställningsplattformar. Pris, provisioner, kockvy, hårdvara och kassasystem-integration — sida vid sida.",
   alternates: { canonical: PAGE_URL },
   openGraph: {
     type: "website",
@@ -47,7 +47,7 @@ const HUB_FAQ = [
   {
     question: "Tar Servera provision per beställning?",
     answer:
-      "Nej. Servera har fast månadskostnad i svenska kronor — 549 kr/mån (Start) eller 999 kr/mån (Tillväxt). Inga provisioner, inga dolda transaktionsavgifter. På restauranger med högre kuvertvolym blir totalkostnaden ofta lägre än på plattformar som tar 1–5 % per order.",
+      "Nej. Servera har fast månadskostnad — 549 kr/mån (Start) eller 999 kr/mån (Tillväxt). Inga provisioner, inga dolda transaktionsavgifter. På restauranger med högre kuvertvolym blir totalkostnaden ofta lägre än på plattformar som tar 1–5 % per order.",
   },
   {
     question: "Vilka är Serveras främsta konkurrenter i Sverige?",
@@ -231,7 +231,7 @@ export default function ComparisonHubPage() {
               href="/priser"
               className="text-amber-700 hover:text-amber-800 underline-offset-4 hover:underline text-sm font-medium"
             >
-              Se Serveras priser i SEK →
+              Se Serveras priser →
             </Link>
           </div>
         </div>

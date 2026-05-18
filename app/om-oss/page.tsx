@@ -100,7 +100,7 @@ export default function OmOssPage() {
           <p className="text-stone-600 text-lg leading-relaxed">
             Servera är en svensk plattform för digital meny och QR-beställning,
             byggd och driven av {PUBLISHER_NAME}. Vi finns för att svenska
-            restauranger ska få ett ärligt alternativ — fast SEK-pris, lokal
+            restauranger ska få ett ärligt alternativ — fast pris, lokal
             support och en produkt som löser det den faktiskt ska lösa.
           </p>
         </div>
@@ -122,8 +122,8 @@ export default function OmOssPage() {
           </p>
           <p className="text-stone-700 text-base leading-[1.7]">
             Vi byggde Servera för att fylla gapet däremellan: en fokuserad QR-
-            meny och bordsbeställning för svenska restauranger, med fast pris i
-            SEK, svensk support och en produkt som du kan börja använda samma
+            meny och bordsbeställning för svenska restauranger, med fast pris,
+            svensk support och en produkt som du kan börja använda samma
             dag du registrerar dig.
           </p>
         </div>
@@ -139,7 +139,7 @@ export default function OmOssPage() {
           <div className="grid sm:grid-cols-2 gap-5">
             <div className="rounded-2xl border border-stone-200 bg-stone-50 p-6">
               <h3 className="font-serif text-xl text-stone-950 font-semibold mb-2">
-                Fast pris i SEK
+                Fast pris
               </h3>
               <p className="text-stone-600 text-sm leading-relaxed">
                 Inga provisioner per beställning, inga dolda transaktionsavgifter.
@@ -162,7 +162,7 @@ export default function OmOssPage() {
                 Byggt för svenska behov
               </h3>
               <p className="text-stone-600 text-sm leading-relaxed">
-                SEK med korrekt formatering, svenska allergenstandarder, Stripe
+                Priser med korrekt formatering, svenska allergenstandarder, Stripe
                 med svenska betalmetoder, integrationsstöd för kassasystem som
                 används i Sverige. Inte en internationell produkt med svensk
                 översättning — utan en svensk produkt.

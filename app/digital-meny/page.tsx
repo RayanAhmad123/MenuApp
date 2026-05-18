@@ -53,7 +53,7 @@ const HUB_FAQ = [
   {
     question: "Vad kostar en digital meny i Sverige?",
     answer:
-      "Servera börjar på 549 kr/mån (Start-planen, upp till 20 bord) eller 999 kr/mån (Tillväxt-planen, obegränsat antal bord). Alla priser är i svenska kronor utan provisioner per beställning. Internationella plattformar tar ofta 1–5 % per order — på högre kuvertvolymer blir det dyrare än ett fast SEK-pris.",
+      "Servera börjar på 549 kr/mån (Start-planen, upp till 20 bord) eller 999 kr/mån (Tillväxt-planen, obegränsat antal bord). Alla priser är fasta utan provisioner per beställning. Internationella plattformar tar ofta 1–5 % per order — på högre kuvertvolymer blir det dyrare än ett fast månadspris.",
   },
   {
     question: "Behöver jag byta kassasystem för att använda digital meny?",
@@ -165,7 +165,7 @@ export default function DigitalMenuHubPage() {
               href="/priser"
               className="text-amber-700 hover:text-amber-800 underline-offset-4 hover:underline"
             >
-              priser i SEK
+              priser
             </Link>
             .
           </p>
@@ -285,7 +285,7 @@ export default function DigitalMenuHubPage() {
             </div>
             <div className="rounded-2xl border border-stone-200 bg-stone-50 p-6">
               <h3 className="font-serif text-lg text-stone-950 font-semibold mb-2">
-                Fast SEK-pris — inga provisioner per beställning
+                Fast pris — inga provisioner per beställning
               </h3>
               <p className="text-stone-600 text-sm leading-relaxed">
                 Behåll varje krona du tjänar. Serveras priser är 549 kr/mån

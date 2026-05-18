@@ -22,7 +22,7 @@ const PAGE_URL = `${SITE_URL}/qr-meny`
 export const metadata: Metadata = {
   title: "QR-meny för restaurang — så fungerar det 2026 | Servera",
   description:
-    "QR-meny för svenska restauranger: hur det fungerar, vad det kostar, för vilka restaurangtyper det passar bäst, och varför Servera är ett ärligt SEK-prisat alternativ utan provisioner.",
+    "QR-meny för svenska restauranger: hur det fungerar, vad det kostar, för vilka restaurangtyper det passar bäst, och varför Servera är ett ärligt prisat alternativ utan provisioner.",
   alternates: { canonical: PAGE_URL },
   openGraph: {
     type: "website",
@@ -31,13 +31,13 @@ export const metadata: Metadata = {
     siteName: "Servera",
     title: "QR-meny för restaurang — så fungerar det",
     description:
-      "QR-meny för svenska pizzerior, sushiställen, caféer, barer, food trucks och lunchställen. Fast SEK-pris, inga provisioner.",
+      "QR-meny för svenska pizzerior, sushiställen, caféer, barer, food trucks och lunchställen. Fast pris, inga provisioner.",
   },
   twitter: {
     card: "summary_large_image",
     title: "QR-meny för restaurang — så fungerar det",
     description:
-      "QR-meny per restaurangtyp. Fast SEK-pris, inga provisioner.",
+      "QR-meny per restaurangtyp. Fast pris, inga provisioner.",
   },
 }
 
@@ -45,7 +45,7 @@ const HUB_FAQ = [
   {
     question: "Vad är en QR-meny?",
     answer:
-      "En QR-meny är en restaurangmeny som visas i gästens egen mobil när hen scannar en QR-kod på bordet. Inga appar, inga inloggningar — menyn öppnas direkt i webbläsaren. Servera är en sådan plattform, byggd för svenska restauranger med fast månadskostnad i SEK utan provisioner per order.",
+      "En QR-meny är en restaurangmeny som visas i gästens egen mobil när hen scannar en QR-kod på bordet. Inga appar, inga inloggningar — menyn öppnas direkt i webbläsaren. Servera är en sådan plattform, byggd för svenska restauranger med fast månadskostnad utan provisioner per order.",
   },
   {
     question: "Hur fungerar en QR-meny från bordet?",
@@ -65,7 +65,7 @@ const HUB_FAQ = [
   {
     question: "Vad kostar en QR-meny i Sverige?",
     answer:
-      "Servera börjar på 549 kr/mån (Start, upp till 20 bord) eller 999 kr/mån (Tillväxt, obegränsat antal bord). Inga provisioner per beställning — du behåller hela ordervärdet. För restauranger med högre kuvertvolymer blir fast SEK-pris ofta lägre än internationella plattformar med procentavgift.",
+      "Servera börjar på 549 kr/mån (Start, upp till 20 bord) eller 999 kr/mån (Tillväxt, obegränsat antal bord). Inga provisioner per beställning — du behåller hela ordervärdet. För restauranger med högre kuvertvolymer blir fast pris ofta lägre än internationella plattformar med procentavgift.",
   },
   {
     question: "Hur snabbt kan jag komma igång med en QR-meny?",
@@ -125,7 +125,7 @@ export default function QrMenuHubPage() {
           <p className="text-stone-600 text-lg leading-relaxed">
             QR-meny är beställning från bordet via gästens egen mobil. Den här
             guiden förklarar hur det fungerar, vad det kostar i Sverige, och
-            varför Servera är ett ärligt SEK-prisat alternativ utan
+            varför Servera är ett ärligt prisat alternativ utan
             provisioner.
           </p>
         </div>
@@ -153,7 +153,7 @@ export default function QrMenuHubPage() {
               href="/priser"
               className="text-amber-700 hover:text-amber-800 underline-offset-4 hover:underline"
             >
-              Se priser i SEK
+              Se priser
             </Link>
             .
           </p>
@@ -211,7 +211,7 @@ export default function QrMenuHubPage() {
                 </h3>
                 <p className="text-stone-600 text-sm leading-relaxed">
                   Skapa kategorier (förrätter, huvudrätter, dryck), lägg till
-                  rätter med bilder, priser i SEK och allergeninformation. Det
+                  rätter med bilder, priser och allergeninformation. Det
                   tar i regel under en timme för en standardmeny.
                 </p>
               </div>
