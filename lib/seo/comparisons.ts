@@ -40,8 +40,8 @@ export const COMPARISONS: Record<string, ComparisonContent> = {
         body: "Servera levereras med en dedikerad kockvy och en servitörsvy. Beställningar skickas direkt utan att skrivas ut, och servitören ser med en gång när ett bord behöver hjälp. Det krävs ingen extra hårdvara — en surfplatta i köket räcker.",
       },
       {
-        title: "Fast SEK-pris, inga provisioner",
-        body: "Servera kostar 549 kr/mån (Start) eller 999 kr/mån (Tillväxt) — fasta priser i svenska kronor utan provisioner per beställning. Du behåller varje krona från varje order.",
+        title: "Fast pris, inga provisioner",
+        body: "Servera kostar 549 kr/mån (Start) eller 999 kr/mån (Tillväxt) — fasta priser utan provisioner per beställning. Du behåller varje krona från varje order.",
       },
       {
         title: "Allergener och kostmärkning byggt in",
@@ -74,12 +74,12 @@ export const COMPARISONS: Record<string, ComparisonContent> = {
       {
         question: "Vad är skillnaden mellan Servera och Meny-QR?",
         answer:
-          "Båda är svenska QR-menyplattformar som låter gäster beställa från bordet. Servera fokuserar på en komplett upplevelse med köks- och servitörsvy som ingår, fasta priser i SEK utan provisioner, och realtidsuppdatering av menyn. För en exakt funktionsjämförelse rekommenderar vi att du bokar en demo med båda och själv testar.",
+          "Båda är svenska QR-menyplattformar som låter gäster beställa från bordet. Servera fokuserar på en komplett upplevelse med köks- och servitörsvy som ingår, fasta priser utan provisioner, och realtidsuppdatering av menyn. För en exakt funktionsjämförelse rekommenderar vi att du bokar en demo med båda och själv testar.",
       },
       {
         question: "Tar Servera provision per beställning?",
         answer:
-          "Nej. Servera har fast månadskostnad i svenska kronor — 549 kr eller 999 kr beroende på plan, eller offert för Företag-kunder. Inga provisioner, inga dolda avgifter.",
+          "Nej. Servera har fast månadskostnad — 549 kr eller 999 kr beroende på plan, eller offert för Företag-kunder. Inga provisioner, inga dolda avgifter.",
       },
       {
         question: "Kan jag byta från Meny-QR till Servera?",
@@ -142,7 +142,7 @@ export const COMPARISONS: Record<string, ComparisonContent> = {
     ],
     metaTitle: "Servera vs Meny-QR — jämförelse av QR-meny för restauranger",
     metaDescription:
-      "Jämför Servera och Meny-QR: pris i SEK, provisioner, kockvy, allergener och kassasystem-integration. Ärlig guide för svenska restauranger som väljer QR-meny 2026.",
+      "Jämför Servera och Meny-QR: pris, provisioner, kockvy, allergener och kassasystem-integration. Ärlig guide för svenska restauranger som väljer QR-meny 2026.",
   },
   "servera-vs-qopla": {
     slug: "servera-vs-qopla",
@@ -278,8 +278,8 @@ export const COMPARISONS: Record<string, ComparisonContent> = {
         body: "Onlinebetalning via Stripe är inbyggt. Du väljer själv om gästen betalar vid beställning eller traditionellt till servitör.",
       },
       {
-        title: "Fast SEK-pris från 549 kr/mån",
-        body: "Servera har genomskinliga priser i svenska kronor utan provision per beställning. Inga dolda kostnader för terminaler eller transaktionsavgifter utöver Stripes egen.",
+        title: "Fast pris från 549 kr/mån",
+        body: "Servera har genomskinliga priser utan provision per beställning. Inga dolda kostnader för terminaler eller transaktionsavgifter utöver Stripes egen.",
       },
       {
         title: "Snabb onboarding",
@@ -323,7 +323,7 @@ export const COMPARISONS: Record<string, ComparisonContent> = {
       {
         question: "Hur ser totalpris ut jämfört med terminaler?",
         answer:
-          "Servera kostar 549 kr/mån eller 999 kr/mån (fast SEK-pris). Lägg till Stripes transaktionsavgift om du aktiverar onlinebetalning. Inga hårdvarukostnader. Terminallösningar har vanligtvis månadsavgift för terminaler plus transaktionsavgifter.",
+          "Servera kostar 549 kr/mån eller 999 kr/mån (fast pris). Lägg till Stripes transaktionsavgift om du aktiverar onlinebetalning. Inga hårdvarukostnader. Terminallösningar har vanligtvis månadsavgift för terminaler plus transaktionsavgifter.",
       },
       {
         question: "Kan jag köra både webb-baserad QR och terminaler parallellt?",
@@ -430,7 +430,7 @@ COMPARISONS["servera-vs-caspeco"] = {
     {
       question: "Vad är skillnaden i kostnad?",
       answer:
-        "Servera kostar 549 kr/mån (Start) eller 999 kr/mån (Tillväxt) i fast SEK utan provisioner. Caspeco/Trivec är ett bredare system där priset beror på vilka moduler och tillägg du behöver — typiskt en betydligt högre totalkostnad eftersom du betalar för fler funktioner.",
+        "Servera kostar 549 kr/mån (Start) eller 999 kr/mån (Tillväxt) till fast pris utan provisioner. Caspeco/Trivec är ett bredare system där priset beror på vilka moduler och tillägg du behöver — typiskt en betydligt högre totalkostnad eftersom du betalar för fler funktioner.",
     },
     {
       question: "Hur snabbt kommer jag igång?",
@@ -497,14 +497,14 @@ COMPARISONS["servera-vs-flipdish"] = {
   hero: {
     eyebrow: "Jämförelse",
     h1: "Servera vs Flipdish — svensk QR-meny eller internationell beställningsplattform?",
-    sub: "Flipdish är en irländsk plattform med stort scope. Servera är byggd specifikt för svenska restauranger med fast SEK-pris. Här är vad det innebär för dig.",
+    sub: "Flipdish är en irländsk plattform med stort scope. Servera är byggd specifikt för svenska restauranger med fast pris. Här är vad det innebär för dig.",
   },
   intro:
-    "Flipdish och Servera är båda inom restaurangbeställning men de har olika fokus. Flipdish är en irländsk plattform som täcker takeaway-portaler, hemleverans, QR-meny och kioskorder — bred och internationell. Servera är fokuserad på svenska restauranger som vill ha en ren QR-meny och bordsbeställning, med fast pris i SEK och support på svensk arbetstid. Den här sidan hjälper dig avgöra vilken modell som passar din verksamhet.",
+    "Flipdish och Servera är båda inom restaurangbeställning men de har olika fokus. Flipdish är en irländsk plattform som täcker takeaway-portaler, hemleverans, QR-meny och kioskorder — bred och internationell. Servera är fokuserad på svenska restauranger som vill ha en ren QR-meny och bordsbeställning, med fast pris och support på svensk arbetstid. Den här sidan hjälper dig avgöra vilken modell som passar din verksamhet.",
   serveraStrengths: [
     {
-      title: "Fast SEK-pris — inga provisioner per beställning",
-      body: "Servera kostar 549 kr/mån eller 999 kr/mån i fast SEK utan provision per order. Många internationella plattformar (inklusive Flipdish historiskt) tar 1–5 % per beställning, vilket på en restaurang med 500 000 kr/månad i omsättning kan betyda 5 000–25 000 kr extra utöver abonnemanget.",
+      title: "Fast pris — inga provisioner per beställning",
+      body: "Servera kostar 549 kr/mån eller 999 kr/mån till fast pris utan provision per order. Många internationella plattformar (inklusive Flipdish historiskt) tar 1–5 % per beställning, vilket på en restaurang med 500 000 kr/månad i omsättning kan betyda 5 000–25 000 kr extra utöver abonnemanget.",
     },
     {
       title: "Svensk support på svensk arbetstid",
@@ -512,7 +512,7 @@ COMPARISONS["servera-vs-flipdish"] = {
     },
     {
       title: "Lokalanpassat för svenska behov",
-      body: "Allt är byggt för svenska restauranger: SEK med korrekt tusentalsavgränsare, svenska allergenstandarder, Stripe-koppling med svenska betalmetoder, integration med kassasystem som finns i Sverige.",
+      body: "Allt är byggt för svenska restauranger: priser med korrekt tusentalsavgränsare, svenska allergenstandarder, Stripe-koppling med svenska betalmetoder, integration med kassasystem som finns i Sverige.",
     },
     {
       title: "Smalare scope, lägre tröskel",
@@ -526,7 +526,7 @@ COMPARISONS["servera-vs-flipdish"] = {
     },
     {
       heading: "Räkna in provisioner i totalkostnaden",
-      body: "Procentavgifter per beställning skalar med din försäljning. Fast SEK-pris gör inte det. På högre kuvertvolymer blir Servera ofta lägre totalkostnad även om abonnemanget vid första anblick ser likvärdigt ut.",
+      body: "Procentavgifter per beställning skalar med din försäljning. Fast pris gör inte det. På högre kuvertvolymer blir Servera ofta lägre totalkostnad även om abonnemanget vid första anblick ser likvärdigt ut.",
     },
     {
       heading: "Hur viktig är svensk support och svenskt språk?",
@@ -541,12 +541,12 @@ COMPARISONS["servera-vs-flipdish"] = {
     {
       question: "Vad är skillnaden mellan Servera och Flipdish?",
       answer:
-        "Flipdish är en irländsk bred beställningsplattform som täcker takeaway-portaler, hemleverans och QR-meny. Servera är en svensk fokuserad QR-meny och bordsbeställning med fast SEK-pris utan provisioner. Servera är enklare och billigare för restauranger där in-house är huvudfokus.",
+        "Flipdish är en irländsk bred beställningsplattform som täcker takeaway-portaler, hemleverans och QR-meny. Servera är en svensk fokuserad QR-meny och bordsbeställning med fast pris utan provisioner. Servera är enklare och billigare för restauranger där in-house är huvudfokus.",
     },
     {
       question: "Tar Servera provision per beställning?",
       answer:
-        "Nej. Servera har fast månadskostnad i svenska kronor. Inga provisioner per order, inga dolda transaktionsavgifter (utöver Stripes egna kortavgifter om du aktiverar onlinebetalning).",
+        "Nej. Servera har fast månadskostnad. Inga provisioner per order, inga dolda transaktionsavgifter (utöver Stripes egna kortavgifter om du aktiverar onlinebetalning).",
     },
     {
       question: "Kan jag byta från Flipdish till Servera?",
@@ -614,14 +614,14 @@ COMPARISONS["servera-vs-yumzi"] = {
   hero: {
     eyebrow: "Jämförelse",
     h1: "Servera vs Yumzi — två QR-menyplattformar, två olika fokus",
-    sub: "Yumzi är en internationell QR-meny med starkt fokus på flerspråkighet. Servera är byggd specifikt för svenska restauranger med fast SEK-pris och svensk support.",
+    sub: "Yumzi är en internationell QR-meny med starkt fokus på flerspråkighet. Servera är byggd specifikt för svenska restauranger med fast pris och svensk support.",
   },
   intro:
-    "Servera och Yumzi är båda inom QR-meny för restauranger, men de skiljer sig i lokal närvaro och hur de prissätter. Yumzi är en internationell aktör med stark flerspråkighet och en globalt fokuserad produkt. Servera är byggd specifikt för svenska restauranger — fast pris i SEK, svensk support, svensk lagring av data och funktioner som matchar svenska allergen- och momsregler. Den här sidan hjälper dig välja vilket fokus som passar din verksamhet bäst.",
+    "Servera och Yumzi är båda inom QR-meny för restauranger, men de skiljer sig i lokal närvaro och hur de prissätter. Yumzi är en internationell aktör med stark flerspråkighet och en globalt fokuserad produkt. Servera är byggd specifikt för svenska restauranger — fast pris, svensk support, svensk lagring av data och funktioner som matchar svenska allergen- och momsregler. Den här sidan hjälper dig välja vilket fokus som passar din verksamhet bäst.",
   serveraStrengths: [
     {
-      title: "Fast SEK-pris och svensk faktura",
-      body: "Servera kostar 549 kr/mån eller 999 kr/mån i fast SEK. Faktura med svensk moms från Triad Solutions. Inga valutaväxlingar, inga oväntade prishöjningar från utländska valutaförändringar.",
+      title: "Fast pris och svensk faktura",
+      body: "Servera kostar 549 kr/mån eller 999 kr/mån till fast pris. Faktura med svensk moms från Triad Solutions. Inga valutaväxlingar, inga oväntade prishöjningar från utländska valutaförändringar.",
     },
     {
       title: "Svensk support — utan tidszons-fördröjning",
@@ -658,7 +658,7 @@ COMPARISONS["servera-vs-yumzi"] = {
     {
       question: "Vad är skillnaden mellan Servera och Yumzi?",
       answer:
-        "Servera är en svensk QR-menyplattform med fast SEK-pris, svensk support och svenska faktureringsvillkor. Yumzi är en internationell aktör med starkt fokus på flerspråkighet. Båda löser QR-meny från bordet, men leverantörsstruktur, support och prisvaluta skiljer.",
+        "Servera är en svensk QR-menyplattform med fast pris, svensk support och svenska faktureringsvillkor. Yumzi är en internationell aktör med starkt fokus på flerspråkighet. Båda löser QR-meny från bordet, men leverantörsstruktur, support och prisvaluta skiljer.",
     },
     {
       question: "Är båda gratis att testa?",
@@ -673,7 +673,7 @@ COMPARISONS["servera-vs-yumzi"] = {
     {
       question: "Vilken plattform passar bäst för en svensk restaurang?",
       answer:
-        "För restauranger som vill ha lokal support, fast SEK-pris och svenska faktureringsvillkor är Servera ofta enklare. För starkt internationellt orienterade verksamheter med extrem flerspråkighet kan en bredare internationell plattform vara likvärdig.",
+        "För restauranger som vill ha lokal support, fast pris och svenska faktureringsvillkor är Servera ofta enklare. För starkt internationellt orienterade verksamheter med extrem flerspråkighet kan en bredare internationell plattform vara likvärdig.",
     },
     {
       question: "Hur snabbt kommer jag igång?",

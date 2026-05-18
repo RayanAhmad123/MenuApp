@@ -14,7 +14,7 @@ const PAGE_URL = `${SITE_URL}/priser`
 export const metadata: Metadata = {
   title: "Priser för digital meny — Servera",
   description:
-    "Se priser för Servera: digital meny och QR-beställning för restauranger. Från 549 kr/mån. Inga dolda avgifter, inga provisioner per beställning. Fast månadskostnad i SEK.",
+    "Se priser för Servera: digital meny och QR-beställning för restauranger. Från 549 kr/mån. Inga dolda avgifter, inga provisioner per beställning. Fast månadskostnad.",
   alternates: { canonical: PAGE_URL },
   openGraph: {
     type: "website",
@@ -113,7 +113,7 @@ const PRICING_FAQ = [
   {
     question: "Vad kostar Servera?",
     answer:
-      "Servera börjar på 549 kr/mån för Start-planen, 999 kr/mån för Tillväxt-planen, och offert för Företag. Alla priser är i svenska kronor (SEK), inga dolda avgifter och inga provisioner per beställning.",
+      "Servera börjar på 549 kr/mån för Start-planen, 999 kr/mån för Tillväxt-planen, och offert för Företag. Alla priser är fasta, inga dolda avgifter och inga provisioner per beställning.",
   },
   {
     question: "Tar ni provision per beställning?",
@@ -190,7 +190,7 @@ export default function PriserPage() {
             Priser
           </div>
           <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-stone-950 font-bold tracking-tight leading-[1.05] mb-5">
-            Enkla, ärliga priser i svenska kronor.
+            Enkla, ärliga priser.
           </h1>
           <p className="text-stone-600 text-lg leading-relaxed">
             Inga dolda avgifter. Inga provisioner per beställning. En fast

@@ -147,7 +147,7 @@ export const CITIES: Record<string, CityContent> = {
       },
       {
         title: "Lägre kostnad än internationella plattformar",
-        body: "Servera har ett fast pris i kronor utan provision. Malmö-restauranger har ofta lägre kuvertpriser än Stockholm, och då blir skillnaden i totalkostnad tydlig.",
+        body: "Servera har fast pris utan provision. Malmö-restauranger har ofta lägre kuvertpriser än Stockholm, och då blir skillnaden i totalkostnad tydlig.",
       },
       {
         title: "Snabb uppstart inför säsongen",
