@@ -79,7 +79,7 @@ export default function ScrollStory() {
       <div className="sticky top-0 h-screen flex items-center overflow-hidden pt-16 lg:pt-0">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[700px] bg-amber-500/8 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 max-w-6xl mx-auto w-full px-4 sm:px-6 grid lg:grid-cols-2 gap-5 sm:gap-8 lg:gap-16 items-center">
+        <div className="relative z-10 max-w-6xl mx-auto w-full px-4 sm:px-6 grid lg:grid-cols-2 gap-3 sm:gap-8 lg:gap-16 items-center">
           {/* Phone column */}
           <div className="order-1 lg:order-2 flex justify-center">
             <Phone active={active} progress={progress} />
@@ -106,7 +106,7 @@ export default function ScrollStory() {
           </div>
 
           {/* Copy column */}
-          <div className="order-3 lg:order-1 relative min-h-[140px] sm:min-h-[180px] lg:min-h-[320px] text-center lg:text-left">
+          <div className="order-3 lg:order-1 relative min-h-[110px] sm:min-h-[180px] lg:min-h-[320px] text-center lg:text-left">
             {STEPS.map((s, i) => (
               <div
                 key={i}
@@ -162,7 +162,7 @@ export default function ScrollStory() {
 function Phone({ active, progress }: { active: number; progress: number }) {
   const Screens = [ScreenScan, ScreenMenu, ScreenCart, ScreenSend, ScreenDone]
   return (
-    <div className="relative w-[180px] sm:w-[220px] lg:w-[300px]">
+    <div className="relative w-[230px] sm:w-[260px] lg:w-[300px]">
       <div className="absolute -inset-6 bg-amber-500/15 blur-3xl rounded-full pointer-events-none" />
 
       <div className="relative rounded-[2.25rem] sm:rounded-[2.75rem] lg:rounded-[3rem] bg-stone-950 p-1.5 sm:p-2 shadow-2xl shadow-stone-900/30 ring-1 ring-stone-800/60">
