@@ -90,8 +90,8 @@ export function RestaurantsClient({ restaurants: initial }: Props) {
   }
 
   return (
-    <div className="p-8">
-      <div className="flex items-center justify-between mb-8">
+    <div className="p-4 sm:p-6 lg:p-8">
+      <div className="flex items-center justify-between gap-3 mb-6 sm:mb-8 flex-wrap">
         <div>
           <h1 className="text-2xl font-serif font-semibold text-stone-900">Restauranger</h1>
           <p className="text-stone-500 text-sm mt-1">{restaurants.length} restauranger totalt</p>
@@ -158,7 +158,8 @@ export function RestaurantsClient({ restaurants: initial }: Props) {
 
       {/* Table */}
       <div className="bg-white border border-stone-200 rounded-xl overflow-hidden shadow-sm">
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto">
+        <table className="w-full min-w-[640px] text-sm">
           <thead>
             <tr className="border-b border-stone-100 text-stone-500 text-xs uppercase tracking-wide">
               <th className="text-left px-6 py-3 font-medium">Restaurang</th>
@@ -236,6 +237,7 @@ export function RestaurantsClient({ restaurants: initial }: Props) {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   )

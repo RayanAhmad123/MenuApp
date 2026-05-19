@@ -27,8 +27,8 @@ export default async function OrdersPage() {
     .limit(100)
 
   return (
-    <div className="p-8">
-      <h1 className="font-serif text-3xl text-stone-800 font-semibold mb-6">Beställningar</h1>
+    <div className="p-4 sm:p-6 lg:p-8">
+      <h1 className="font-serif text-2xl sm:text-3xl text-stone-800 font-semibold mb-6">Beställningar</h1>
       <OrdersClient
         orders={orders ?? []}
         restaurantId={ctx.restaurant.id}

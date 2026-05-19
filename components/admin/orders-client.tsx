@@ -91,7 +91,7 @@ export function OrdersClient({
   }
 
   return (
-    <div className="flex gap-6">
+    <div className="flex flex-col lg:flex-row gap-6">
       {/* Orders list */}
       <div className="flex-1 min-w-0">
         {/* Search + date range */}
@@ -189,8 +189,8 @@ export function OrdersClient({
 
       {/* Order detail */}
       {selected && (
-        <div className="w-80 flex-shrink-0">
-          <Card className="border-stone-200 sticky top-8">
+        <div className="w-full lg:w-80 flex-shrink-0">
+          <Card className="border-stone-200 lg:sticky lg:top-8">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4 gap-2 flex-wrap">
                 <h2 className="font-serif text-lg text-stone-800">Bord {selected.table_number}</h2>
