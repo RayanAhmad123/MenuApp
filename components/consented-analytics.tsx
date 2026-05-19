@@ -2,6 +2,7 @@
 
 import { Analytics } from "@vercel/analytics/next"
 import { TriadAnalytics } from "@/components/triad-analytics"
+import { GoogleAnalytics } from "@/components/google-analytics"
 import { useCookieConsent } from "@/components/cookie-consent"
 
 export function ConsentedAnalytics() {
@@ -13,6 +14,7 @@ export function ConsentedAnalytics() {
     <>
       <Analytics />
       <TriadAnalytics />
+      <GoogleAnalytics />
     </>
   )
 }
