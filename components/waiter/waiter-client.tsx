@@ -90,6 +90,7 @@ export function StaffClient({
   const [viewTable, setViewTable] = useState<number | null>(null)
   const [selectedItemIds, setSelectedItemIds] = useState<Set<string>>(new Set())
   const [markingPaid, setMarkingPaid] = useState(false)
+  const [showBilling, setShowBilling] = useState(false)
   const { toast } = useToast()
   const supabase = useMemo(() => createClient(), [])
 
@@ -272,20 +273,56 @@ export function StaffClient({
 
   const hasActivity = pings.length > 0 || pendingOrders.length > 0 || activeOrders.length > 0
 
+  // Shared billing list — rendered in the desktop sidebar and the mobile drawer.
+  const billingList = tableSummaries.length === 0 ? (
+    <p className="text-xs text-stone-400 text-center py-8 px-4">Inga aktiva bord idag.</p>
+  ) : (
+    <div className="divide-y divide-stone-100">
+      {tableSummaries.map(({ table_number, totalCents, paidCents, orders }) => (
+        <button
+          key={table_number}
+          onClick={() => { setViewTable(table_number); setSelectedItemIds(new Set()); setShowBilling(false) }}
+          className="w-full flex items-center justify-between px-4 py-3 hover:bg-stone-50 transition-colors text-left"
+        >
+          <div>
+            <p className="font-semibold text-stone-800 text-sm">Bord {table_number}</p>
+            <p className="text-xs text-stone-500 mt-0.5">{orders.length} beställning{orders.length !== 1 ? "ar" : ""}</p>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="text-right">
+              <p className="text-sm font-semibold text-stone-800">{formatPrice(totalCents)}</p>
+              {paidCents > 0 && <p className="text-xs text-emerald-600">{formatPrice(paidCents)} betalt</p>}
+            </div>
+            <ChevronRight className="h-4 w-4 text-stone-300 flex-shrink-0" />
+          </div>
+        </button>
+      ))}
+    </div>
+  )
+
   // ── Render ─────────────────────────────────────────────────────────────────
 
   return (
     <div className="min-h-screen bg-stone-50 flex flex-col">
       {/* Header */}
-      <div className="bg-stone-900 text-stone-50 px-6 py-4 flex items-center gap-3 flex-shrink-0">
-        <div className="w-9 h-9 rounded-xl bg-amber-500 flex items-center justify-center">
+      <div className="bg-stone-900 text-stone-50 px-4 sm:px-6 py-3 sm:py-4 flex items-center gap-3 flex-shrink-0">
+        <div className="w-9 h-9 rounded-xl bg-amber-500 flex items-center justify-center flex-shrink-0">
           <ChefHat className="h-4 w-4 text-stone-900" />
         </div>
-        <div>
-          <h1 className="font-serif text-lg font-semibold">Personalsvy</h1>
-          <p className="text-xs text-stone-400">Hej, {staffName}</p>
+        <div className="min-w-0">
+          <h1 className="font-serif text-lg font-semibold leading-tight">Personalsvy</h1>
+          <p className="text-xs text-stone-400 truncate">Hej, {staffName}</p>
         </div>
-        <div className="ml-auto flex items-center gap-3">
+        <div className="ml-auto flex items-center gap-2 flex-wrap justify-end">
+          {paymentEnabled && (
+            <button
+              onClick={() => setShowBilling(true)}
+              className="lg:hidden inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-stone-800 text-stone-200 text-xs font-medium hover:bg-stone-700 transition-colors"
+            >
+              <CreditCard className="h-3.5 w-3.5" />
+              Notor
+            </button>
+          )}
           {pendingOrders.length > 0 && (
             <span className="px-2.5 py-1 bg-indigo-500 text-white text-xs font-bold rounded-full animate-pulse">{pendingOrders.length} ny{pendingOrders.length !== 1 ? "a" : ""}</span>
           )}
@@ -461,42 +498,52 @@ export function StaffClient({
           )}
         </div>
 
-        {/* Billing sidebar — only when payment feature is enabled */}
+        {/* Billing sidebar — desktop only */}
         {paymentEnabled && (
-          <div className="w-56 border-l border-stone-200 bg-white flex flex-col overflow-hidden flex-shrink-0">
+          <div className="hidden lg:flex w-56 border-l border-stone-200 bg-white flex-col overflow-hidden flex-shrink-0">
             <div className="px-4 py-3 border-b border-stone-100">
               <h2 className="text-xs font-semibold text-stone-500 uppercase tracking-wide">Bord & Notor</h2>
             </div>
             <div className="flex-1 overflow-y-auto">
-              {tableSummaries.length === 0 ? (
-                <p className="text-xs text-stone-400 text-center py-8 px-4">Inga aktiva bord idag.</p>
-              ) : (
-                <div className="divide-y divide-stone-100">
-                  {tableSummaries.map(({ table_number, totalCents, paidCents, orders }) => (
-                    <button
-                      key={table_number}
-                      onClick={() => { setViewTable(table_number); setSelectedItemIds(new Set()) }}
-                      className="w-full flex items-center justify-between px-4 py-3 hover:bg-stone-50 transition-colors text-left"
-                    >
-                      <div>
-                        <p className="font-semibold text-stone-800 text-sm">Bord {table_number}</p>
-                        <p className="text-xs text-stone-500 mt-0.5">{orders.length} beställning{orders.length !== 1 ? "ar" : ""}</p>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <div className="text-right">
-                          <p className="text-sm font-semibold text-stone-800">{formatPrice(totalCents)}</p>
-                          {paidCents > 0 && <p className="text-xs text-emerald-600">{formatPrice(paidCents)} betalt</p>}
-                        </div>
-                        <ChevronRight className="h-4 w-4 text-stone-300 flex-shrink-0" />
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              )}
+              {billingList}
             </div>
           </div>
         )}
       </div>
+
+      {/* Billing drawer — mobile only */}
+      {paymentEnabled && (
+        <div
+          className={`lg:hidden fixed inset-0 z-50 transition-opacity duration-200 ${
+            showBilling ? "opacity-100" : "opacity-0 pointer-events-none"
+          }`}
+        >
+          <div
+            className="absolute inset-0 bg-black/50"
+            onClick={() => setShowBilling(false)}
+            aria-hidden="true"
+          />
+          <div
+            className={`absolute inset-y-0 right-0 w-72 max-w-[85vw] bg-white flex flex-col shadow-xl transition-transform duration-200 ${
+              showBilling ? "translate-x-0" : "translate-x-full"
+            }`}
+          >
+            <div className="px-4 py-3 border-b border-stone-100 flex items-center justify-between">
+              <h2 className="text-xs font-semibold text-stone-500 uppercase tracking-wide">Bord & Notor</h2>
+              <button
+                onClick={() => setShowBilling(false)}
+                aria-label="Stäng"
+                className="w-9 h-9 -mr-2 flex items-center justify-center rounded-lg text-stone-400 hover:bg-stone-100 transition-colors"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto">
+              {billingList}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Billing modal */}
       <Dialog open={viewTable !== null} onOpenChange={open => { if (!open) { setViewTable(null); setSelectedItemIds(new Set()) } }}>

@@ -20,9 +20,9 @@ export default async function QrCodesPage() {
     .order("table_number")
 
   return (
-    <div className="p-8 print:p-0">
-      <div className="mb-8 print:hidden">
-        <h1 className="font-serif text-3xl text-stone-800 font-semibold">QR-koder</h1>
+    <div className="p-4 sm:p-6 lg:p-8 print:p-0">
+      <div className="mb-6 sm:mb-8 print:hidden">
+        <h1 className="font-serif text-2xl sm:text-3xl text-stone-800 font-semibold">QR-koder</h1>
         <p className="text-stone-500 mt-1">
           Skapa och ladda ner QR-koder för varje bord. Gästerna skannar dem för att öppna menyn.
         </p>

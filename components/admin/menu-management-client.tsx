@@ -268,7 +268,7 @@ export function MenuManagementClient({ restaurantId, categories: initCats, menuI
   return (
     <div className="space-y-4">
       {/* Add category row */}
-      <div className="flex gap-2">
+      <div className="flex gap-2 flex-wrap">
         <Input
           placeholder="Namn på ny kategori…"
           value={newCatName}

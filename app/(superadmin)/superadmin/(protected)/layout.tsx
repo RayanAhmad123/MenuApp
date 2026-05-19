@@ -22,7 +22,7 @@ export default async function SuperadminLayout({ children }: { children: React.R
   return (
     <div className="flex h-screen bg-stone-50">
       <SuperadminSidebar adminName={`${superadmin.first_name} ${superadmin.last_name}`} />
-      <main className="flex-1 overflow-auto">
+      <main className="flex-1 overflow-auto pt-14 lg:pt-0">
         {children}
       </main>
     </div>

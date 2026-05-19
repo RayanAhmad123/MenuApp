@@ -10,8 +10,8 @@ export default async function SettingsPage() {
   const ctx = await getCurrentRestaurant()
   if (!ctx) return redirect("/admin/login")
   return (
-    <div className="p-8 max-w-2xl">
-      <h1 className="font-serif text-3xl text-stone-800 font-semibold mb-6">Inställningar</h1>
+    <div className="p-4 sm:p-6 lg:p-8 max-w-2xl">
+      <h1 className="font-serif text-2xl sm:text-3xl text-stone-800 font-semibold mb-6">Inställningar</h1>
       <SettingsClient restaurant={ctx.restaurant} />
     </div>
   )

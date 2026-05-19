@@ -37,10 +37,10 @@ export default async function MenuPage() {
   const maxItemQty = Math.max(0, ...Object.values(itemStats).map(s => s.quantitySold))
 
   return (
-    <div className="p-8">
-      <div className="mb-8 flex items-start justify-between gap-4 flex-wrap">
+    <div className="p-4 sm:p-6 lg:p-8">
+      <div className="mb-6 sm:mb-8 flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="font-serif text-3xl text-stone-800 font-semibold">Meny</h1>
+          <h1 className="font-serif text-2xl sm:text-3xl text-stone-800 font-semibold">Meny</h1>
           <p className="text-stone-500 mt-1">Inbäddade popularitetssignaler — klicka på en rätts diagramikon för 30-dagarsstatistik.</p>
         </div>
         <Link

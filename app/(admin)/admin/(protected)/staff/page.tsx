@@ -19,8 +19,8 @@ export default async function StaffPage() {
     .order("created_at")
 
   return (
-    <div className="p-8">
-      <h1 className="font-serif text-3xl text-stone-800 font-semibold mb-6">Personal</h1>
+    <div className="p-4 sm:p-6 lg:p-8">
+      <h1 className="font-serif text-2xl sm:text-3xl text-stone-800 font-semibold mb-6">Personal</h1>
       <StaffClient staff={staff ?? []} restaurantId={ctx.restaurant.id} />
     </div>
   )

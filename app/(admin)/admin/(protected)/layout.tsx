@@ -70,7 +70,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         staffName={`${staffDataAny.first_name} ${staffDataAny.last_name}`}
         role={staffDataAny.role}
       />
-      <main className="flex-1 overflow-auto">
+      <main className="flex-1 overflow-auto pt-14 lg:pt-0">
         {children}
       </main>
     </div>

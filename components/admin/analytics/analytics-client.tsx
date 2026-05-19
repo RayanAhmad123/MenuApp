@@ -112,10 +112,10 @@ export function AnalyticsClient({ restaurantId, summary, initialDays }: Props) {
   const visibleInsights = insights.filter(i => !dismissedInsights.has(i.id))
 
   return (
-    <div className="p-8 space-y-6">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6">
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
-          <h1 className="font-serif text-3xl text-stone-800 font-semibold">Analys</h1>
+          <h1 className="font-serif text-2xl sm:text-3xl text-stone-800 font-semibold">Analys</h1>
           <p className="text-stone-500 mt-1">Insikter per rätt, topptimmar och menyteknik — det smarta sättet att driva en meny.</p>
         </div>
         <div className="flex items-center gap-1 bg-stone-100 rounded-lg p-1">
@@ -219,7 +219,7 @@ export function AnalyticsClient({ restaurantId, summary, initialDays }: Props) {
       </div>
 
       <Tabs defaultValue="overview">
-        <TabsList className="bg-stone-100 h-auto p-1">
+        <TabsList className="bg-stone-100 h-auto p-1 flex flex-wrap justify-start">
           <TabsTrigger value="overview">Översikt</TabsTrigger>
           <TabsTrigger value="menu-engineering">Menyteknik</TabsTrigger>
           <TabsTrigger value="items">Rätter</TabsTrigger>

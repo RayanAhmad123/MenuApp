@@ -85,9 +85,9 @@ export default async function DashboardPage() {
   ]
 
   return (
-    <div className="p-8">
-      <div className="mb-8">
-        <h1 className="font-serif text-3xl text-stone-800 font-semibold">
+    <div className="p-4 sm:p-6 lg:p-8">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="font-serif text-2xl sm:text-3xl text-stone-800 font-semibold">
           Hej, {ctx.staffName.split(" ")[0]}
         </h1>
         <p className="text-stone-500 mt-1">Så här ser dagen ut på {ctx.restaurant.name}.</p>
