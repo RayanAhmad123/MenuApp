@@ -9,7 +9,7 @@ export default function SuperadminLoginPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.svg" alt="Servera" className="h-16 w-auto mx-auto mb-3" />
+          <img src="/logo.png" alt="Servera" className="h-16 w-auto mx-auto mb-3" />
           <h1 className="font-serif text-2xl text-stone-50 font-semibold mb-1">Superadmin</h1>
           <p className="text-stone-400">Plattformsadministration</p>
         </div>
