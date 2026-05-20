@@ -170,7 +170,7 @@ export default function PriserPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo.png" alt="Servera" className="h-9 w-auto" />
+            <img src="/logo.png" alt="Servera" className="h-12 w-auto" />
             <span className="font-serif text-xl text-stone-950 font-bold tracking-tight">
               Servera
             </span>
