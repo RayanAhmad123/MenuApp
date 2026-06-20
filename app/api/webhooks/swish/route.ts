@@ -31,23 +31,27 @@ export async function POST(req: NextRequest) {
   const supabase = await createAdminSupabaseClient()
 
   if (status === "PAID") {
-    await supabase
+    const { error } = await supabase
       .from("orders")
-      .update({
-        payment_status: "paid",
-        status: "confirmed",
-      })
+      .update({ payment_status: "paid", status: "confirmed" })
       .eq("id", orderId)
+
+    if (error) {
+      console.error("Swish webhook: failed to mark order paid", orderId, error.message)
+      return NextResponse.json({ error: "Database update failed" }, { status: 500 })
+    }
   } else if (status === "ERROR" || status === "DECLINED" || status === "CANCELLED") {
-    // "failed" is not a DB enum value — keep as "unpaid" so the order
-    // remains visible, but mark status as cancelled so staff can see it.
-    await supabase
+    const { error } = await supabase
       .from("orders")
       .update({ status: "cancelled" })
       .eq("id", orderId)
+
+    if (error) {
+      console.error("Swish webhook: failed to cancel order", orderId, error.message)
+      return NextResponse.json({ error: "Database update failed" }, { status: 500 })
+    }
   }
   // CREATED status — no action needed
 
-  // Swish expects a 200 OK response
   return NextResponse.json({ received: true }, { status: 200 })
 }

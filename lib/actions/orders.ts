@@ -67,7 +67,7 @@ export async function placeOrder(data: z.infer<typeof PlaceOrderSchema>) {
       restaurant_id: restaurantId,
       table_number: tableNumber,
       session_id: sessionId,
-      total_cents: totalCents,
+      total_cents: totalCents + (tipCents ?? 0),
       status: "pending",
       payment_status: "unpaid",
       stripe_payment_intent_id: stripePaymentIntentId,
