@@ -2,11 +2,12 @@
 import { useMemo, useState } from "react"
 import { formatPrice, formatDate } from "@/lib/utils"
 import { updateOrderStatus, markOrdersPaid } from "@/lib/actions/orders"
+import { exportOrdersCSV } from "@/lib/actions/export"
 import { useToast } from "@/hooks/use-toast"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Search } from "lucide-react"
+import { Search, Download } from "lucide-react"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -44,6 +45,7 @@ export function OrdersClient({
   const [tableSearch, setTableSearch] = useState("")
   const [dateFrom, setDateFrom] = useState("")
   const [dateTo, setDateTo] = useState("")
+  const [exporting, setExporting] = useState(false)
   const { toast } = useToast()
 
   const filtered = useMemo(() => {
@@ -69,6 +71,30 @@ export function OrdersClient({
       setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status } : o))
       if (selected?.id === orderId) setSelected(prev => prev ? { ...prev, status } : null)
       toast({ title: "Beställningsstatus uppdaterad" })
+    }
+  }
+
+  async function handleExportCSV() {
+    setExporting(true)
+    try {
+      const { csv, error } = await exportOrdersCSV(restaurantId, dateFrom || undefined, dateTo || undefined)
+      if (error || !csv) {
+        toast({ title: "Export misslyckades", description: error ?? "Okänt fel", variant: "destructive" })
+        return
+      }
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      const today = new Date().toISOString().slice(0, 10)
+      a.href = url
+      a.download = `orders-${today}.csv`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+      toast({ title: "Rapport exporterad" })
+    } finally {
+      setExporting(false)
     }
   }
 
@@ -130,6 +156,16 @@ export function OrdersClient({
               Rensa
             </button>
           )}
+          <Button
+            variant="outline"
+            size="sm"
+            className="ml-auto h-9 gap-1.5 text-xs"
+            onClick={handleExportCSV}
+            disabled={exporting}
+          >
+            <Download className="h-3.5 w-3.5" />
+            {exporting ? "Exporterar…" : "Exportera CSV"}
+          </Button>
         </div>
 
         {/* Filter tabs */}

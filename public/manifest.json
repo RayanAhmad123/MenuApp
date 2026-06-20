@@ -1,0 +1,12 @@
+{
+  "name": "Servera — Digital Meny",
+  "short_name": "Servera",
+  "description": "Beställ mat direkt från bordet",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#16a34a",
+  "icons": [
+    { "src": "/logo.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

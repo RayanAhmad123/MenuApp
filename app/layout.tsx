@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next"
 import { Inter, Playfair_Display } from "next/font/google"
+import Script from "next/script"
 import "./globals.css"
 import { Providers } from "@/components/providers"
 import { Toaster } from "@/components/ui/toaster"
@@ -87,6 +88,7 @@ export const metadata: Metadata = {
     icon: "/icon.svg",
     apple: "/logo.png",
   },
+  manifest: "/manifest.json",
   formatDetection: {
     telephone: false,
   },
@@ -113,6 +115,13 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body>
+        <Script id="sw-register" strategy="afterInteractive">
+          {`
+            if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.register('/sw.js')
+            }
+          `}
+        </Script>
         <CookieConsentProvider>
           <Providers>
             {children}
