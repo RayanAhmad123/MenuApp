@@ -32,11 +32,26 @@ export async function exportOrdersCSV(
     query = query.lte("created_at", `${toDate}T23:59:59.999`)
   }
 
-  const { data: orders, error } = await query
+  const { data, error } = await query
 
   if (error) {
     return { csv: null, error: error.message }
   }
+
+  type OrderRow = {
+    id: string
+    created_at: string
+    table_number: number
+    status: string
+    payment_status: string
+    total_cents: number
+    order_items: Array<{
+      quantity: number
+      menu_items: { name: string } | null
+    }>
+  }
+
+  const orders = (data ?? []) as OrderRow[]
 
   const PAYMENT_LABELS: Record<string, string> = {
     paid: "Betald",
@@ -56,7 +71,7 @@ export async function exportOrdersCSV(
 
   const header = ["Datum", "Bord", "Status", "Betalning", "Artiklar", "Totalt (SEK)"]
 
-  const rows = (orders ?? []).map(order => {
+  const rows = orders.map(order => {
     const date = new Date(order.created_at).toLocaleString("sv-SE", {
       year: "numeric",
       month: "2-digit",
@@ -65,10 +80,8 @@ export async function exportOrdersCSV(
       minute: "2-digit",
     })
 
-    const items = (order.order_items ?? [])
-      .map((oi: { quantity: number; menu_items: { name: string } | null }) =>
-        `${oi.quantity}x ${oi.menu_items?.name ?? "?"}`
-      )
+    const items = order.order_items
+      .map(oi => `${oi.quantity}x ${oi.menu_items?.name ?? "?"}`)
       .join("; ")
 
     const totalSEK = (order.total_cents / 100).toFixed(2).replace(".", ",")
