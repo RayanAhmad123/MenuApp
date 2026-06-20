@@ -400,7 +400,7 @@ function UpsellPrompt({
 
   return (
     <div className="bg-stone-900 border border-stone-800 rounded-xl p-4 space-y-3">
-      <h3 className="font-serif text-stone-100 text-base">Glöm inte dessert eller dryck! 🍹</h3>
+      <h3 className="font-serif text-stone-100 text-base">Vill du lägga till något mer?</h3>
       <div className="flex flex-wrap gap-2">
         {suggestions.map(s => (
           <button
