@@ -57,6 +57,7 @@ export default function OrderStatusPage() {
 
   useEffect(() => {
     fetchRef.current = fetchOrder
+  }, [fetchOrder])
 
   // Fetch google_place_id for the restaurant once order is known
   useEffect(() => {
@@ -67,13 +68,10 @@ export default function OrderStatusPage() {
       .eq("id", order.restaurant_id)
       .single()
       .then(({ data }) => {
-        if (data && (data as { google_place_id?: string | null }).google_place_id) {
-          setGooglePlaceId((data as { google_place_id?: string | null }).google_place_id ?? null)
-        }
+        const placeId = (data as { google_place_id?: string | null } | null)?.google_place_id ?? null
+        setGooglePlaceId(placeId)
       })
   }, [order?.restaurant_id, supabase])
-
-  }, [fetchOrder])
 
   // Restore the ping cooldown from localStorage so it survives navigation between
   // the menu and the order status page.
