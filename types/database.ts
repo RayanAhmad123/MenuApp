@@ -49,6 +49,7 @@ export type Database = {
           payment_enabled: boolean
           yellow_threshold_minutes: number
           red_threshold_minutes: number
+          google_place_id: string | null
           created_at: string
         }
         Insert: {
@@ -63,6 +64,7 @@ export type Database = {
           payment_enabled?: boolean
           yellow_threshold_minutes?: number
           red_threshold_minutes?: number
+          google_place_id?: string | null
           created_at?: string
         }
         Update: {
@@ -77,6 +79,7 @@ export type Database = {
           payment_enabled?: boolean
           yellow_threshold_minutes?: number
           red_threshold_minutes?: number
+          google_place_id?: string | null
           created_at?: string
         }
         Relationships: []

@@ -25,6 +25,8 @@ export function SettingsClient({ restaurant }: { restaurant: Restaurant }) {
   const [yellowThreshold, setYellowThreshold] = useState(restaurant.yellow_threshold_minutes)
   const [redThreshold, setRedThreshold] = useState(restaurant.red_threshold_minutes)
   const [savingThresholds, setSavingThresholds] = useState(false)
+  const [googlePlaceId, setGooglePlaceId] = useState((restaurant as Restaurant & { google_place_id?: string | null }).google_place_id ?? "")
+  const [savingGoogle, setSavingGoogle] = useState(false)
 
   const { register, handleSubmit, formState: { isSubmitting } } = useForm<z.infer<typeof SettingsSchema>>({
     resolver: zodResolver(SettingsSchema),
@@ -79,6 +81,57 @@ export function SettingsClient({ restaurant }: { restaurant: Restaurant }) {
               {isSubmitting ? "Sparar..." : "Spara ändringar"}
             </Button>
           </form>
+        </CardContent>
+      </Card>
+
+      <Card className="border-stone-200">
+        <CardHeader>
+          <CardTitle className="text-stone-800">Google Recensioner</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-stone-600">
+            Klistret in ditt Google Place ID så visas en direktlänk till Google Recensioner efter att kunder har betalat. Hitta ditt Place ID på{" "}
+            <a href="https://developers.google.com/maps/documentation/javascript/examples/places-placeid-finder" target="_blank" rel="noopener noreferrer" className="text-amber-600 underline">
+              Google Place ID Finder
+            </a>.
+          </p>
+          <div className="space-y-1.5">
+            <Label>Google Place ID</Label>
+            <Input
+              value={googlePlaceId}
+              onChange={e => setGooglePlaceId(e.target.value)}
+              placeholder="ChIJN1t_tDeuEmsRUsoyG83frY4"
+            />
+          </div>
+          {googlePlaceId && (
+            <p className="text-xs text-stone-500">
+              Förhandsgranskning:{" "}
+              <a
+                href={`https://search.google.com/local/writereview?placeid=${googlePlaceId}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-amber-600 underline font-mono break-all"
+              >
+                {`https://search.google.com/local/writereview?placeid=${googlePlaceId}`}
+              </a>
+            </p>
+          )}
+          <Button
+            variant="amber"
+            disabled={savingGoogle}
+            onClick={async () => {
+              setSavingGoogle(true)
+              const { error } = await updateRestaurant(restaurant.id, { googlePlaceId: googlePlaceId || null })
+              setSavingGoogle(false)
+              if (error) {
+                toast({ title: "Kunde inte spara Google Place ID", variant: "destructive" })
+              } else {
+                toast({ title: "Google Place ID sparat" })
+              }
+            }}
+          >
+            {savingGoogle ? "Sparar..." : "Spara Google Place ID"}
+          </Button>
         </CardContent>
       </Card>
 

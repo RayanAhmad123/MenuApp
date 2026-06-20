@@ -36,6 +36,7 @@ export default function OrderStatusPage() {
   const [pingCooldownUntil, setPingCooldownUntil] = useState<number>(0)
   const [now, setNow] = useState(() => Date.now())
   const [callingWaiter, setCallingWaiter] = useState(false)
+  const [googlePlaceId, setGooglePlaceId] = useState<string | null>(null)
   const supabase = useMemo(() => createClient(), [])
   const { toast } = useToast()
   const pingStorageKey = `menuapp-last-ping-${subdomain}-${tableNumber}`
@@ -56,6 +57,22 @@ export default function OrderStatusPage() {
 
   useEffect(() => {
     fetchRef.current = fetchOrder
+
+  // Fetch google_place_id for the restaurant once order is known
+  useEffect(() => {
+    if (!order?.restaurant_id) return
+    supabase
+      .from("restaurants")
+      .select("google_place_id")
+      .eq("id", order.restaurant_id)
+      .single()
+      .then(({ data }) => {
+        if (data && (data as { google_place_id?: string | null }).google_place_id) {
+          setGooglePlaceId((data as { google_place_id?: string | null }).google_place_id ?? null)
+        }
+      })
+  }, [order?.restaurant_id, supabase])
+
   }, [fetchOrder])
 
   // Restore the ping cooldown from localStorage so it survives navigation between
@@ -333,7 +350,7 @@ export default function OrderStatusPage() {
         </div>
 
         {/* Google review prompt */}
-        <ReviewPrompt googlePlaceId={order.restaurant_id ? null : null} />
+        <ReviewPrompt googlePlaceId={googlePlaceId} />
 
         {/* Actions */}
         <div className="space-y-2">

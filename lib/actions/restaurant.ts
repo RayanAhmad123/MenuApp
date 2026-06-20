@@ -13,6 +13,7 @@ const RestaurantUpdateSchema = z.object({
   paymentEnabled: z.boolean().optional(),
   yellowThreshold: z.number().int().positive().optional(),
   redThreshold: z.number().int().positive().optional(),
+  googlePlaceId: z.string().optional().nullable(),
 })
 
 export async function updateRestaurant(restaurantId: string, data: z.infer<typeof RestaurantUpdateSchema>) {
@@ -27,6 +28,7 @@ export async function updateRestaurant(restaurantId: string, data: z.infer<typeo
   if (parsed.data.paymentEnabled !== undefined) update.payment_enabled = parsed.data.paymentEnabled
   if (parsed.data.yellowThreshold !== undefined) update.yellow_threshold_minutes = parsed.data.yellowThreshold
   if (parsed.data.redThreshold !== undefined) update.red_threshold_minutes = parsed.data.redThreshold
+  if (parsed.data.googlePlaceId !== undefined) update.google_place_id = parsed.data.googlePlaceId
 
   const { error } = await supabase.from("restaurants").update(update).eq("id", restaurantId)
   revalidatePath("/admin/settings")
