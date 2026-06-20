@@ -23,7 +23,7 @@ const TIP_OPTIONS = [
 
 export default function CartPage() {
   const params = useParams()
-  const { items, removeItem, updateQuantity, totalCents, itemCount, sessionId, clearCart } = useCart()
+  const { items, addItem, removeItem, updateQuantity, totalCents, itemCount, sessionId, clearCart } = useCart()
   const [specialNotes, setSpecialNotes] = useState("")
   const [clientSecret, setClientSecret] = useState<string | null>(null)
   const [orderId, setOrderId] = useState<string | null>(null)
@@ -206,7 +206,7 @@ export default function CartPage() {
 
             {/* Upsell prompt — shown when fewer than 4 items */}
             {itemCount < 4 && (
-              <UpsellPrompt />
+              <UpsellPrompt subdomain={subdomain} cartItemIds={items.map(i => i.menuItemId)} addItem={addItem} />
             )}
 
             {/* Special notes */}
@@ -349,35 +349,75 @@ export default function CartPage() {
   )
 }
 
-function UpsellPrompt() {
+type UpsellItem = {
+  id: string
+  name: string
+  price_cents: number
+  image_url: string | null
+}
+
+function UpsellPrompt({
+  subdomain,
+  cartItemIds,
+  addItem,
+}: {
+  subdomain: string
+  cartItemIds: string[]
+  addItem: (item: Omit<import("@/types/database").CartItem, "cartItemId">) => void
+}) {
+  const [suggestions, setSuggestions] = useState<UpsellItem[]>([])
+  const [added, setAdded] = useState<Set<string>>(new Set())
   const { toast } = useToast()
 
-  const suggestions = [
-    { label: "Lemonad", price: "35 kr" },
-    { label: "Kaffe", price: "29 kr" },
-    { label: "Dagens dessert", price: "59 kr" },
-  ]
+  useEffect(() => {
+    async function load() {
+      try {
+        const res = await fetch(`/api/upsell?subdomain=${encodeURIComponent(subdomain)}`)
+        if (!res.ok) return
+        const data = await res.json() as UpsellItem[]
+        setSuggestions(data.filter(i => !cartItemIds.includes(i.id)).slice(0, 3))
+      } catch {}
+    }
+    load()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subdomain])
 
-  function handleSuggestionClick(name: string) {
-    toast({ title: `Kontakta servitören för att lägga till ${name}.` })
+  if (suggestions.length === 0) return null
+
+  function handleAdd(item: UpsellItem) {
+    addItem({
+      menuItemId: item.id,
+      name: item.name,
+      priceCents: item.price_cents,
+      quantity: 1,
+      imageUrl: item.image_url,
+      specialRequests: "",
+      selectedModifiers: [],
+    })
+    setAdded(prev => new Set(prev).add(item.id))
+    toast({ title: `${item.name} tillagd i varukorgen` })
   }
 
   return (
     <div className="bg-stone-900 border border-stone-800 rounded-xl p-4 space-y-3">
-      <h3 className="font-serif text-stone-100 text-base">Du kanske också vill ha? 🍹</h3>
+      <h3 className="font-serif text-stone-100 text-base">Glöm inte dessert eller dryck! 🍹</h3>
       <div className="flex flex-wrap gap-2">
         {suggestions.map(s => (
           <button
-            key={s.label}
-            onClick={() => handleSuggestionClick(s.label)}
-            className="flex items-center gap-1.5 bg-stone-800 border border-stone-700 hover:border-amber-600 rounded-full px-3 py-1.5 text-sm text-stone-300 transition-all"
+            key={s.id}
+            onClick={() => !added.has(s.id) && handleAdd(s)}
+            disabled={added.has(s.id)}
+            className={`flex items-center gap-1.5 border rounded-full px-3 py-1.5 text-sm transition-all ${
+              added.has(s.id)
+                ? "bg-amber-900/30 border-amber-700 text-amber-400 cursor-default"
+                : "bg-stone-800 border-stone-700 hover:border-amber-600 text-stone-300"
+            }`}
           >
-            <span className="text-amber-400 font-bold">+</span>
-            {s.label} <span className="text-stone-500">{s.price}</span>
+            <span className="text-amber-400 font-bold">{added.has(s.id) ? "✓" : "+"}</span>
+            {s.name} <span className="text-stone-500">{(s.price_cents / 100).toFixed(0)} kr</span>
           </button>
         ))}
       </div>
-      <p className="text-xs text-stone-500">Klicka för att fråga servitören om tillägget.</p>
     </div>
   )
 }
