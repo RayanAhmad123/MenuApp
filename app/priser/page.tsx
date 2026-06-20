@@ -65,7 +65,7 @@ const TIERS: Tier[] = [
       "E-postsupport",
     ],
     highlight: false,
-    cta: "Kom igång",
+    cta: "Starta gratis provperiod →",
   },
   {
     name: "Tillväxt",
@@ -85,7 +85,7 @@ const TIERS: Tier[] = [
       "Prioriterad support",
     ],
     highlight: true,
-    cta: "Boka demo",
+    cta: "Starta gratis provperiod →",
   },
   {
     name: "Företag",
@@ -252,6 +252,15 @@ export default function PriserPage() {
                   >
                     {t.desc}
                   </p>
+                  {t.priceSEK !== null && (
+                    <p
+                      className={`text-xs mt-2 font-medium ${
+                        t.highlight ? "text-amber-400/80" : "text-stone-400"
+                      }`}
+                    >
+                      30 dagar gratis · Inget kreditkort krävs
+                    </p>
+                  )}
                 </div>
 
                 <ul className="space-y-2.5 mb-7 flex-1">
@@ -285,6 +294,25 @@ export default function PriserPage() {
                 </Link>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-8 border-b border-stone-200 bg-white">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-12 text-stone-600">
+            <div className="flex items-center gap-2.5">
+              <CheckCircle2 className="h-5 w-5 text-amber-500 shrink-0" />
+              <span className="text-sm font-medium">Avbryt när som helst</span>
+            </div>
+            <div className="flex items-center gap-2.5">
+              <CheckCircle2 className="h-5 w-5 text-amber-500 shrink-0" />
+              <span className="text-sm font-medium">Ingen bindningstid</span>
+            </div>
+            <div className="flex items-center gap-2.5">
+              <CheckCircle2 className="h-5 w-5 text-amber-500 shrink-0" />
+              <span className="text-sm font-medium">Kom igång på 5 minuter</span>
+            </div>
           </div>
         </div>
       </section>

@@ -3,7 +3,7 @@ import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
-import { ArrowLeft, Trash2, ShoppingBag } from "lucide-react"
+import { ArrowLeft, Trash2, ShoppingBag, CreditCard, Smartphone } from "lucide-react"
 import { loadStripe } from "@stripe/stripe-js"
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js"
 import { Button } from "@/components/ui/button"
@@ -14,6 +14,13 @@ import { useToast } from "@/hooks/use-toast"
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
 
+const TIP_OPTIONS = [
+  { label: "Ingen", value: 0 },
+  { label: "10%", value: 0.1 },
+  { label: "15%", value: 0.15 },
+  { label: "Annat", value: -1 },
+]
+
 export default function CartPage() {
   const params = useParams()
   const { items, removeItem, updateQuantity, totalCents, itemCount, sessionId, clearCart } = useCart()
@@ -21,14 +28,34 @@ export default function CartPage() {
   const [clientSecret, setClientSecret] = useState<string | null>(null)
   const [orderId, setOrderId] = useState<string | null>(null)
   const [isPlacingOrder, setIsPlacingOrder] = useState(false)
-  // Flag set the moment a no-payment order is placed so we don't render the
-  // empty-cart screen between clearCart() and the router push completing.
   const [redirecting, setRedirecting] = useState(false)
+
+  // Tip state
+  const [selectedTipOption, setSelectedTipOption] = useState<number>(0) // index
+  const [customTipAmount, setCustomTipAmount] = useState<string>("")
+
+  // Payment method
+  const [paymentMethod, setPaymentMethod] = useState<"card" | "swish">("card")
+  const [swishPhone, setSwishPhone] = useState("")
+
   const { toast } = useToast()
   const router = useRouter()
 
   const subdomain = params.subdomain as string
   const tableNumber = parseInt(params.tableNumber as string, 10)
+
+  // Tip calculation
+  const tipCents = (() => {
+    const opt = TIP_OPTIONS[selectedTipOption]
+    if (opt.value === 0) return 0
+    if (opt.value === -1) {
+      const parsed = parseFloat(customTipAmount)
+      return isNaN(parsed) ? 0 : Math.round(parsed * 100)
+    }
+    return Math.round(totalCents * opt.value)
+  })()
+
+  const grandTotalCents = totalCents + tipCents
 
   async function handlePlaceOrder() {
     if (items.length === 0) return
@@ -47,6 +74,7 @@ export default function CartPage() {
         paymentEnabled: restaurant.payment_enabled,
         items,
         specialNotes,
+        tipCents,
       })
       if (result.error) {
         toast({ title: result.error ?? "Något gick fel", variant: "destructive" })
@@ -63,9 +91,6 @@ export default function CartPage() {
         }
       }
       if (!restaurant.payment_enabled) {
-        // No payment needed — go straight to order confirmation. Mark
-        // `redirecting` first so the empty-cart fallback doesn't briefly render
-        // between clearCart() (which empties items) and the router push.
         setRedirecting(true)
         clearCart()
         router.push(`/${subdomain}/table/${tableNumber}/order/${result.orderId}`)
@@ -179,6 +204,11 @@ export default function CartPage() {
               ))}
             </div>
 
+            {/* Upsell prompt — shown when fewer than 4 items */}
+            {itemCount < 4 && (
+              <UpsellPrompt />
+            )}
+
             {/* Special notes */}
             <div className="bg-stone-900 border border-stone-800 rounded-xl p-4">
               <label className="text-sm text-stone-400 block mb-2">Anteckningar till köket</label>
@@ -191,15 +221,63 @@ export default function CartPage() {
               />
             </div>
 
+            {/* Tip selection */}
+            <div className="bg-stone-900 border border-stone-800 rounded-xl p-4 space-y-3">
+              <h3 className="font-serif text-stone-100 text-base">Lägg till dricks?</h3>
+              <div className="flex gap-2">
+                {TIP_OPTIONS.map((opt, idx) => (
+                  <button
+                    key={opt.label}
+                    onClick={() => setSelectedTipOption(idx)}
+                    className={`flex-1 py-2 px-2 rounded-full text-sm font-medium border transition-all ${
+                      selectedTipOption === idx
+                        ? "bg-amber-500 border-amber-500 text-stone-900"
+                        : "bg-stone-800 border-stone-700 text-stone-300 hover:border-amber-600"
+                    }`}
+                  >
+                    {opt.label}
+                    {opt.value > 0 && selectedTipOption === idx && (
+                      <span className="block text-xs mt-0.5 font-normal">
+                        {formatPrice(Math.round(totalCents * opt.value))}
+                      </span>
+                    )}
+                  </button>
+                ))}
+              </div>
+              {selectedTipOption === 3 && (
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={customTipAmount}
+                    onChange={e => setCustomTipAmount(e.target.value)}
+                    placeholder="0"
+                    className="flex-1 bg-stone-800 border border-stone-700 rounded-lg px-3 py-2 text-sm text-stone-200 placeholder-stone-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                  />
+                  <span className="text-stone-400 text-sm">kr</span>
+                </div>
+              )}
+              {tipCents > 0 && (
+                <p className="text-xs text-amber-400">Dricks: {formatPrice(tipCents)}</p>
+              )}
+            </div>
+
             {/* Total */}
             <div className="bg-stone-900 border border-stone-800 rounded-xl p-4 space-y-2">
               <div className="flex justify-between text-stone-400 text-sm">
                 <span>Delsumma</span>
                 <span>{formatPrice(totalCents)}</span>
               </div>
+              {tipCents > 0 && (
+                <div className="flex justify-between text-stone-400 text-sm">
+                  <span>Dricks</span>
+                  <span>{formatPrice(tipCents)}</span>
+                </div>
+              )}
               <div className="flex justify-between text-stone-200 font-semibold border-t border-stone-700 pt-2">
                 <span>Totalt</span>
-                <span className="text-amber-400 text-lg">{formatPrice(totalCents)}</span>
+                <span className="text-amber-400 text-lg">{formatPrice(grandTotalCents)}</span>
               </div>
             </div>
 
@@ -210,7 +288,7 @@ export default function CartPage() {
               onClick={handlePlaceOrder}
               disabled={isPlacingOrder}
             >
-              {isPlacingOrder ? "Bearbetar..." : `Beställ · ${formatPrice(totalCents)}`}
+              {isPlacingOrder ? "Bearbetar..." : `Beställ · ${formatPrice(grandTotalCents)}`}
             </Button>
 
             <Link
@@ -221,16 +299,150 @@ export default function CartPage() {
             </Link>
           </>
         ) : (
-          <Elements stripe={stripePromise} options={{ clientSecret, appearance: { theme: "night" } }}>
-            <CheckoutForm
-              orderId={orderId!}
-              subdomain={subdomain}
-              tableNumber={tableNumber}
-            />
-          </Elements>
+          <>
+            {/* Payment method toggle */}
+            <div className="bg-stone-900 border border-stone-800 rounded-xl p-1 flex gap-1">
+              <button
+                onClick={() => setPaymentMethod("card")}
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                  paymentMethod === "card"
+                    ? "bg-amber-500 text-stone-900"
+                    : "text-stone-400 hover:text-stone-200"
+                }`}
+              >
+                <CreditCard className="h-4 w-4" />
+                Kortbetalning
+              </button>
+              <button
+                onClick={() => setPaymentMethod("swish")}
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                  paymentMethod === "swish"
+                    ? "bg-amber-500 text-stone-900"
+                    : "text-stone-400 hover:text-stone-200"
+                }`}
+              >
+                <Smartphone className="h-4 w-4" />
+                Swish
+              </button>
+            </div>
+
+            {paymentMethod === "card" ? (
+              <Elements stripe={stripePromise} options={{ clientSecret, appearance: { theme: "night" } }}>
+                <CheckoutForm
+                  orderId={orderId!}
+                  subdomain={subdomain}
+                  tableNumber={tableNumber}
+                />
+              </Elements>
+            ) : (
+              <SwishPaymentForm
+                orderId={orderId!}
+                swishPhone={swishPhone}
+                setSwishPhone={setSwishPhone}
+                grandTotalCents={grandTotalCents}
+              />
+            )}
+          </>
         )}
       </main>
     </div>
+  )
+}
+
+function UpsellPrompt() {
+  const { toast } = useToast()
+
+  const suggestions = [
+    { label: "Lemonad", price: "35 kr" },
+    { label: "Kaffe", price: "29 kr" },
+    { label: "Dagens dessert", price: "59 kr" },
+  ]
+
+  function handleSuggestionClick(name: string) {
+    toast({ title: `Kontakta servitören för att lägga till ${name}.` })
+  }
+
+  return (
+    <div className="bg-stone-900 border border-stone-800 rounded-xl p-4 space-y-3">
+      <h3 className="font-serif text-stone-100 text-base">Du kanske också vill ha? 🍹</h3>
+      <div className="flex flex-wrap gap-2">
+        {suggestions.map(s => (
+          <button
+            key={s.label}
+            onClick={() => handleSuggestionClick(s.label)}
+            className="flex items-center gap-1.5 bg-stone-800 border border-stone-700 hover:border-amber-600 rounded-full px-3 py-1.5 text-sm text-stone-300 transition-all"
+          >
+            <span className="text-amber-400 font-bold">+</span>
+            {s.label} <span className="text-stone-500">{s.price}</span>
+          </button>
+        ))}
+      </div>
+      <p className="text-xs text-stone-500">Klicka för att fråga servitören om tillägget.</p>
+    </div>
+  )
+}
+
+function SwishPaymentForm({
+  orderId,
+  swishPhone,
+  setSwishPhone,
+  grandTotalCents,
+}: {
+  orderId: string
+  swishPhone: string
+  setSwishPhone: (v: string) => void
+  grandTotalCents: number
+}) {
+  const { toast } = useToast()
+  function handleSwishSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    toast({
+      title: "Swish inte aktiverat",
+      description: "Kontakta restaurangen för att aktivera Swish-betalning.",
+      variant: "destructive",
+    })
+  }
+
+  return (
+    <form onSubmit={handleSwishSubmit} className="space-y-4">
+      <div className="bg-stone-900 border border-stone-800 rounded-xl p-6 text-center space-y-4">
+        {/* Swish logo placeholder */}
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#4B2EA2]/20 border border-[#4B2EA2]/40 mx-auto">
+          <span className="text-2xl font-bold text-[#7B4FD4]">S</span>
+        </div>
+        <div>
+          <h2 className="font-serif text-stone-100 text-lg">Betala med Swish</h2>
+          <p className="text-stone-400 text-sm mt-1">
+            Swish-betalning kräver att restaurangen har aktiverat Swish i inställningarna.
+          </p>
+        </div>
+        <div className="bg-amber-950/40 border border-amber-800/40 rounded-lg px-4 py-3">
+          <p className="text-amber-400 text-sm">
+            Swish är för närvarande inte tillgängligt. Välj kortbetalning eller kontakta restaurangen.
+          </p>
+        </div>
+        <div className="text-left space-y-1">
+          <label className="text-sm text-stone-400 block">Ditt Swish-nummer (valfritt)</label>
+          <input
+            type="tel"
+            value={swishPhone}
+            onChange={e => setSwishPhone(e.target.value)}
+            placeholder="07X XXX XX XX"
+            className="w-full bg-stone-800 border border-stone-700 rounded-lg px-3 py-2 text-sm text-stone-200 placeholder-stone-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+          />
+        </div>
+        <p className="text-xs text-stone-500">Belopp: {formatPrice(grandTotalCents)}</p>
+      </div>
+      <Button
+        type="submit"
+        variant="amber"
+        size="xl"
+        className="w-full opacity-60 cursor-not-allowed"
+        disabled
+      >
+        Swish inte tillgängligt
+      </Button>
+    </form>
   )
 }
 

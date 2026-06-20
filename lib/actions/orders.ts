@@ -24,6 +24,7 @@ const PlaceOrderSchema = z.object({
     })),
   })),
   specialNotes: z.string().optional(),
+  tipCents: z.number().int().nonnegative().optional().default(0),
 })
 
 export async function placeOrder(data: z.infer<typeof PlaceOrderSchema>) {
@@ -32,7 +33,7 @@ export async function placeOrder(data: z.infer<typeof PlaceOrderSchema>) {
     return { error: "Invalid order data", orderId: null, clientSecret: null }
   }
 
-  const { restaurantId, tableNumber, sessionId, paymentEnabled, items, specialNotes } = parsed.data
+  const { restaurantId, tableNumber, sessionId, paymentEnabled, items, specialNotes, tipCents } = parsed.data
 
   const totalCents = items.reduce((sum, item) => {
     const modTotal = item.selectedModifiers.reduce((s, m) => s + m.priceAdjustmentCents, 0)
@@ -47,10 +48,10 @@ export async function placeOrder(data: z.infer<typeof PlaceOrderSchema>) {
   if (paymentEnabled) {
     try {
       const paymentIntent = await stripe.paymentIntents.create({
-        amount: totalCents,
+        amount: totalCents + (tipCents ?? 0),
         currency: "sek",
         automatic_payment_methods: { enabled: true },
-        metadata: { restaurantId, tableNumber: String(tableNumber), sessionId },
+        metadata: { restaurantId, tableNumber: String(tableNumber), sessionId, tip_cents: String(tipCents ?? 0) },
       })
       stripePaymentIntentId = paymentIntent.id
       clientSecret = paymentIntent.client_secret

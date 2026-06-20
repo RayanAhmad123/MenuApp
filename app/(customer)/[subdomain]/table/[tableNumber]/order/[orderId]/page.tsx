@@ -332,6 +332,9 @@ export default function OrderStatusPage() {
           </div>
         </div>
 
+        {/* Google review prompt */}
+        <ReviewPrompt googlePlaceId={order.restaurant_id ? null : null} />
+
         {/* Actions */}
         <div className="space-y-2">
           <Link href={`/${subdomain}/table/${tableNumber}`}>
@@ -355,6 +358,88 @@ export default function OrderStatusPage() {
           </Button>
         </div>
       </main>
+    </div>
+  )
+}
+
+function ReviewPrompt({ googlePlaceId }: { googlePlaceId: string | null }) {
+  const [rating, setRating] = useState<number | null>(null)
+  const [hovered, setHovered] = useState<number | null>(null)
+  const [feedback, setFeedback] = useState("")
+  const [submitted, setSubmitted] = useState(false)
+  const { toast } = useToast()
+
+  function handleSubmitFeedback(e: React.FormEvent) {
+    e.preventDefault()
+    setSubmitted(true)
+    toast({ title: "Tack för din feedback!", description: "Vi jobbar ständigt på att förbättra oss." })
+  }
+
+  const displayRating = hovered ?? rating
+
+  return (
+    <div className="bg-stone-900 border border-stone-800 rounded-2xl p-6 space-y-4">
+      <h3 className="font-serif text-stone-100 text-lg">Betygsätt din upplevelse</h3>
+      <div className="flex gap-2 justify-center">
+        {[1, 2, 3, 4, 5].map(star => (
+          <button
+            key={star}
+            onClick={() => setRating(star)}
+            onMouseEnter={() => setHovered(star)}
+            onMouseLeave={() => setHovered(null)}
+            className="text-3xl transition-transform hover:scale-110 focus:outline-none"
+          >
+            <span className={displayRating !== null && star <= displayRating ? "text-amber-400" : "text-stone-600"}>
+              ★
+            </span>
+          </button>
+        ))}
+      </div>
+
+      {rating !== null && !submitted && (
+        <>
+          {rating >= 4 ? (
+            <div className="text-center space-y-3">
+              <p className="text-stone-300 text-sm">Fantastiskt! Hjälp oss genom att skriva en recension på Google.</p>
+              {googlePlaceId ? (
+                <a
+                  href={`https://search.google.com/local/writereview?placeid=${googlePlaceId}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Button variant="amber" className="w-full">
+                    Skriv en recension på Google →
+                  </Button>
+                </a>
+              ) : (
+                <div className="bg-amber-950/40 border border-amber-800/40 rounded-lg px-4 py-3">
+                  <p className="text-amber-400 text-sm">Tack för ditt betyg! 🌟</p>
+                </div>
+              )}
+            </div>
+          ) : (
+            <form onSubmit={handleSubmitFeedback} className="space-y-3">
+              <p className="text-stone-400 text-sm">Berätta vad vi kan förbättra</p>
+              <textarea
+                value={feedback}
+                onChange={e => setFeedback(e.target.value)}
+                placeholder="Din feedback hjälper oss att bli bättre..."
+                rows={3}
+                className="w-full bg-stone-800 border border-stone-700 rounded-lg px-3 py-2 text-sm text-stone-200 placeholder-stone-500 focus:outline-none focus:ring-1 focus:ring-amber-500 resize-none"
+              />
+              <Button type="submit" variant="amber" className="w-full">
+                Skicka feedback
+              </Button>
+            </form>
+          )}
+        </>
+      )}
+
+      {submitted && (
+        <div className="text-center py-2">
+          <p className="text-emerald-400 text-sm">Tack! Vi uppskattar din feedback. 💚</p>
+        </div>
+      )}
     </div>
   )
 }
