@@ -1,6 +1,6 @@
 "use client"
 import Image from "next/image"
-import { X, TrendingUp, ShoppingBag, Award, Link2, Receipt, Percent, Inbox } from "lucide-react"
+import { TrendingUp, ShoppingBag, Award, Link2, Receipt, Percent, Inbox } from "lucide-react"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { formatPrice } from "@/lib/utils"
 import type { ItemDeepStat } from "@/lib/actions/analytics"
@@ -18,13 +18,6 @@ export function ItemStatsDrawer({ open, loading, detail, onClose }: Props) {
   return (
     <Dialog open={open} onOpenChange={v => !v && onClose()}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto p-0">
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-stone-400 hover:text-stone-700 z-10"
-        >
-          <X className="h-5 w-5" />
-        </button>
-
         {loading && (
           <div className="p-16 text-center text-stone-400">Loading item insights…</div>
         )}
