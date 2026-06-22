@@ -6,6 +6,7 @@ import { Providers } from "@/components/providers"
 import { Toaster } from "@/components/ui/toaster"
 import { CookieConsentProvider } from "@/components/cookie-consent"
 import { ConsentedAnalytics } from "@/components/consented-analytics"
+import { RecoveryRedirect } from "@/components/auth/recovery-redirect"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -124,6 +125,7 @@ export default function RootLayout({
         </Script>
         <CookieConsentProvider>
           <Providers>
+            <RecoveryRedirect />
             {children}
             <Toaster />
           </Providers>
