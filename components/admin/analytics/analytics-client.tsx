@@ -5,13 +5,14 @@ import Image from "next/image"
 import {
   TrendingUp, TrendingDown, ShoppingBag, Clock, Users,
   Award, AlertTriangle, Sparkles, Target, ArrowUpRight, Info,
-  Lightbulb, X,
+  Lightbulb, X, ScanLine,
 } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { formatPrice } from "@/lib/utils"
 import type { AnalyticsSummary, ItemDeepStat } from "@/lib/actions/analytics"
+import type { ScanStats } from "@/lib/actions/scans"
 import { LineChart, BarChart, Heatmap, QuadrantMatrix, Donut, SparklineChart } from "./charts"
 import { ItemStatsDrawer } from "./item-stats-drawer"
 import { getItemDeepStats } from "@/lib/actions/analytics"
@@ -30,10 +31,11 @@ const QUADRANT_LABELS = {
 interface Props {
   restaurantId: string
   summary: AnalyticsSummary
+  scanStats: ScanStats
   initialDays: number
 }
 
-export function AnalyticsClient({ restaurantId, summary, initialDays }: Props) {
+export function AnalyticsClient({ restaurantId, summary, scanStats, initialDays }: Props) {
   const router = useRouter()
   const [days, setDays] = useState(initialDays)
   const [pending, startTransition] = useTransition()
@@ -376,6 +378,59 @@ export function AnalyticsClient({ restaurantId, summary, initialDays }: Props) {
               </CardContent>
             </Card>
           </div>
+
+          {/* QR scans per table */}
+          <Card className="border-stone-200">
+            <CardHeader>
+              <CardTitle className="text-stone-800 text-lg flex items-center gap-2">
+                <ScanLine className="h-4 w-4 text-amber-600" />
+                QR-skanningar per bord
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {(() => {
+                const totalScans = scanStats.totalScans
+                if (totalScans === 0) {
+                  return <EmptyState message="Inga skanningar ännu i den valda perioden." />
+                }
+                const conversion = totalScans > 0 ? (summary.totalOrders / totalScans) * 100 : 0
+                const maxScans = Math.max(...scanStats.perTable.map(t => t.scans), 1)
+                const sorted = [...scanStats.perTable].sort((a, b) => b.scans - a.scans)
+                return (
+                  <div className="space-y-5">
+                    <div className="flex flex-wrap gap-x-10 gap-y-3">
+                      <div>
+                        <p className="font-serif text-2xl font-semibold text-stone-800">{totalScans}</p>
+                        <p className="text-xs text-stone-500">skanningar totalt</p>
+                      </div>
+                      <div>
+                        <p className="font-serif text-2xl font-semibold text-stone-800">{scanStats.perTable.length}</p>
+                        <p className="text-xs text-stone-500">bord med skanningar</p>
+                      </div>
+                      <div>
+                        <p className="font-serif text-2xl font-semibold text-stone-800">{conversion.toFixed(0)}%</p>
+                        <p className="text-xs text-stone-500">skanning → beställning</p>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      {sorted.map(t => (
+                        <div key={t.tableNumber} className="flex items-center gap-3">
+                          <span className="w-16 shrink-0 text-sm text-stone-600">Bord {t.tableNumber}</span>
+                          <div className="flex-1 h-2.5 bg-stone-100 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-amber-500 rounded-full"
+                              style={{ width: `${(t.scans / maxScans) * 100}%` }}
+                            />
+                          </div>
+                          <span className="w-10 shrink-0 text-right text-sm font-medium text-stone-800">{t.scans}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })()}
+            </CardContent>
+          </Card>
         </TabsContent>
 
         {/* MENU ENGINEERING */}

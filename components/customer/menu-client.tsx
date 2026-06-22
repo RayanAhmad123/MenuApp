@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { useCart } from "@/hooks/use-cart"
 import { formatPrice } from "@/lib/utils"
 import { createTablePing } from "@/lib/actions/orders"
+import { recordTableScan } from "@/lib/actions/scans"
 import { createClient } from "@/lib/supabase/client"
 import { useToast } from "@/hooks/use-toast"
 import type { Category, MenuItem } from "@/types/database"
@@ -40,12 +41,26 @@ export function CustomerMenuClient({ restaurant, subdomain, categories, menuItem
   const [activeOrderId, setActiveOrderId] = useState<string | null>(null)
   const [pingCooldownUntil, setPingCooldownUntil] = useState<number>(0)
   const [now, setNow] = useState(() => Date.now())
-  const { items, addItem, itemCount } = useCart()
+  const { items, addItem, itemCount, sessionId } = useCart()
   const { toast } = useToast()
 
   const filteredItems = menuItems.filter(item => item.category_id === activeCategory)
   const storageKey = `menuapp-active-order-${subdomain}-${tableNumber}`
   const pingStorageKey = `menuapp-last-ping-${subdomain}-${tableNumber}`
+  const scanStorageKey = `menuapp-scan-${subdomain}-${tableNumber}`
+
+  // Record a QR scan once per browsing session per table. sessionStorage is
+  // cleared when the session ends, so refreshes within a visit don't re-count.
+  useEffect(() => {
+    if (!sessionId) return
+    try {
+      if (sessionStorage.getItem(scanStorageKey)) return
+      sessionStorage.setItem(scanStorageKey, "1")
+    } catch {
+      // sessionStorage unavailable (private mode) — fall through and record once
+    }
+    void recordTableScan({ restaurantId: restaurant.id, tableNumber, sessionId })
+  }, [sessionId, scanStorageKey, restaurant.id, tableNumber])
   const cooldownRemaining = Math.max(0, Math.ceil((pingCooldownUntil - now) / 1000))
 
   useEffect(() => {

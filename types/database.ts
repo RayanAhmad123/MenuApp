@@ -469,6 +469,30 @@ export type Database = {
         }
         Relationships: []
       }
+      qr_scans: {
+        Row: {
+          id: string
+          restaurant_id: string
+          table_number: number
+          session_id: string | null
+          scanned_at: string
+        }
+        Insert: {
+          id?: string
+          restaurant_id: string
+          table_number: number
+          session_id?: string | null
+          scanned_at?: string
+        }
+        Update: {
+          id?: string
+          restaurant_id?: string
+          table_number?: number
+          session_id?: string | null
+          scanned_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: Record<string, never>
     Functions: Record<string, never>
