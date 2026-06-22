@@ -173,60 +173,126 @@ function Hero() {
       />
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[900px] h-[560px] bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="relative max-w-5xl mx-auto px-4 sm:px-6 py-20 text-center">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-stone-200 rounded-full text-stone-700 text-xs font-medium mb-8 shadow-sm">
-          <span className="relative flex h-1.5 w-1.5">
-            <span className="absolute inline-flex h-full w-full rounded-full bg-amber-500 opacity-60 animate-ping" />
-            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-500" />
-          </span>
-          QR-beställning för moderna restauranger
-        </div>
+      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-20 w-full">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          {/* ── Left: copy ── */}
+          <div className="text-center lg:text-left">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-stone-200 rounded-full text-stone-700 text-xs font-medium mb-8 shadow-sm">
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="absolute inline-flex h-full w-full rounded-full bg-amber-500 opacity-60 animate-ping" />
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-500" />
+              </span>
+              QR-beställning för moderna restauranger
+            </div>
 
-        <h1 className="font-serif text-[2.75rem] sm:text-6xl lg:text-7xl xl:text-8xl text-stone-950 font-bold leading-[0.95] tracking-tight mb-6">
-          Menyn i fickan.
-          <br />
-          <span className="italic text-amber-500 font-semibold">Köket</span> i
-          realtid.
-        </h1>
+            <h1 className="font-serif text-[2.75rem] sm:text-6xl lg:text-6xl xl:text-7xl text-stone-950 font-bold leading-[0.95] tracking-tight mb-6">
+              Menyn i fickan.
+              <br />
+              <span className="italic text-amber-500 font-semibold">
+                Köket
+              </span>{" "}
+              i realtid.
+            </h1>
 
-        <p className="text-stone-600 text-lg sm:text-xl leading-relaxed max-w-2xl mx-auto mb-10">
-          Gästen skannar en QR-kod och beställer från sin mobil. Beställningen
-          går direkt till kökets skärm — inga skrivare, inget ropande, inga
-          förseningar.
-        </p>
+            <p className="text-stone-600 text-lg sm:text-xl leading-relaxed max-w-2xl mx-auto lg:mx-0 mb-10">
+              Gästen skannar en QR-kod och beställer från sin mobil.
+              Beställningen går direkt till kökets skärm — inga skrivare, inget
+              ropande, inga förseningar.
+            </p>
 
-        <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
-          <a
-            href="#contact"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-stone-950 text-white font-semibold rounded-full hover:bg-stone-800 transition-colors text-sm"
-          >
-            Boka en demo <ArrowRight className="h-4 w-4" />
-          </a>
-          <a
-            href="#how-it-works"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-white border border-stone-200 text-stone-950 font-semibold rounded-full hover:border-stone-300 transition-colors text-sm shadow-sm"
-          >
-            Se hur det fungerar
-          </a>
-        </div>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start items-center">
+              <a
+                href="#contact"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-stone-950 text-white font-semibold rounded-full hover:bg-stone-800 transition-colors text-sm"
+              >
+                Boka en demo <ArrowRight className="h-4 w-4" />
+              </a>
+              <a
+                href="#how-it-works"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-white border border-stone-200 text-stone-950 font-semibold rounded-full hover:border-stone-300 transition-colors text-sm shadow-sm"
+              >
+                Se hur det fungerar
+              </a>
+            </div>
 
-        {/* Scroll cue */}
-        <div className="mt-14 sm:mt-20 lg:mt-24 flex flex-col items-center gap-3 text-stone-400">
-          <span className="text-[10px] uppercase tracking-[0.25em] font-semibold">
-            Scrolla
-          </span>
-          <div className="relative w-px h-12 bg-stone-200 overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-4 bg-gradient-to-b from-amber-500 to-transparent animate-[scrollcue_1.8s_ease-in-out_infinite]" />
+            {/* Stats */}
+            <div className="mt-12 pt-8 border-t border-stone-200 grid grid-cols-3 gap-6 max-w-md mx-auto lg:mx-0">
+              {[
+                { value: "+18%", label: "snittordervärde" },
+                { value: "~9 h", label: "sparad tid / vecka" },
+                { value: "140+", label: "restauranger live" },
+              ].map((s) => (
+                <div key={s.label}>
+                  <div className="font-serif text-2xl sm:text-3xl font-bold text-stone-950">
+                    {s.value}
+                  </div>
+                  <div className="text-stone-500 text-xs sm:text-sm mt-1">
+                    {s.label}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ── Right: live demo card ── */}
+          <div className="flex flex-col items-center">
+            <div className="w-full max-w-md bg-white border border-stone-200 rounded-3xl p-7 sm:p-9 shadow-xl shadow-stone-300/40">
+              <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-stone-500 mb-5">
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-60 animate-ping" />
+                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
+                </span>
+                Live demo
+              </div>
+
+              <h2 className="font-serif text-3xl sm:text-4xl font-bold text-stone-950 mb-3">
+                Prova menyn nu.
+              </h2>
+              <p className="text-stone-600 leading-relaxed mb-7">
+                Skanna med din mobilkamera och upplev gästflödet på 10 sekunder —
+                ingen app, ingen registrering.
+              </p>
+
+              <div className="flex items-center gap-6">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/qr-code.png"
+                  alt="QR-kod till demomenyn"
+                  className="h-36 w-36 sm:h-40 sm:w-40 shrink-0 rounded-2xl border border-stone-200 bg-white p-2"
+                />
+
+                <ol className="space-y-4">
+                  {[
+                    "Öppna kameran",
+                    "Rikta mot koden",
+                    "Beställ direkt",
+                  ].map((step, i) => (
+                    <li
+                      key={step}
+                      className="flex items-center gap-3 text-sm text-stone-700"
+                    >
+                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-700 text-xs font-bold">
+                        {i + 1}
+                      </span>
+                      {step}
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            </div>
+
+            <p className="mt-5 text-sm text-stone-500">
+              eller —{" "}
+              <a
+                href="#how-it-works"
+                className="underline underline-offset-4 text-stone-700 hover:text-stone-950 transition-colors"
+              >
+                öppna demon i webbläsaren
+              </a>
+            </p>
           </div>
         </div>
       </div>
-
-      <style>{`
-        @keyframes scrollcue {
-          0% { transform: translateY(-100%); }
-          100% { transform: translateY(300%); }
-        }
-      `}</style>
     </section>
   )
 }
