@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { redirect } from "next/navigation"
 import { getCurrentRestaurant } from "@/lib/actions/restaurant"
 import { createServerSupabaseClient } from "@/lib/supabase/server"
+import { getTableScanStats } from "@/lib/actions/scans"
 import { QrCodesClient } from "@/components/admin/qr-codes-client"
 
 export const metadata: Metadata = { title: "QR-koder" }
@@ -19,6 +20,11 @@ export default async function QrCodesPage() {
     .eq("restaurant_id", ctx.restaurant.id)
     .order("table_number")
 
+  const scanStats = await getTableScanStats(ctx.restaurant.id)
+  const scanCounts = Object.fromEntries(
+    scanStats.perTable.map(t => [t.tableNumber, t.scans]),
+  ) as Record<number, number>
+
   return (
     <div className="p-4 sm:p-6 lg:p-8 print:p-0">
       <div className="mb-6 sm:mb-8 print:hidden">
@@ -31,6 +37,7 @@ export default async function QrCodesPage() {
         restaurantId={ctx.restaurant.id}
         restaurantSubdomain={ctx.restaurant.subdomain}
         initialQrCodes={qrCodes ?? []}
+        scanCounts={scanCounts}
       />
     </div>
   )

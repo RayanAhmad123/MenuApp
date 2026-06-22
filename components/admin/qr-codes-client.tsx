@@ -1,7 +1,7 @@
 "use client"
 import { useState, useEffect } from "react"
 import QRCode from "qrcode"
-import { Download, Plus, Trash2, QrCode, Printer } from "lucide-react"
+import { Download, Plus, Trash2, QrCode, Printer, ScanLine } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -24,9 +24,10 @@ interface Props {
   restaurantId: string
   restaurantSubdomain: string
   initialQrCodes: QrCodeType[]
+  scanCounts?: Record<number, number>
 }
 
-export function QrCodesClient({ restaurantId, restaurantSubdomain, initialQrCodes }: Props) {
+export function QrCodesClient({ restaurantId, restaurantSubdomain, initialQrCodes, scanCounts = {} }: Props) {
   const [qrCodes, setQrCodes] = useState(initialQrCodes)
   const [tableCount, setTableCount] = useState("")
   const [generating, setGenerating] = useState(false)
@@ -138,11 +139,19 @@ export function QrCodesClient({ restaurantId, restaurantSubdomain, initialQrCode
   return (
     <div className="space-y-6">
       {/* Current count */}
-      <div className="flex items-baseline gap-3 print:hidden">
-        <span className="font-serif text-2xl font-semibold text-stone-800">{qrCodes.length}</span>
-        <span className="text-sm text-stone-500">
-          {qrCodes.length === 1 ? "bord registrerat" : "bord registrerade"}
-        </span>
+      <div className="flex flex-wrap items-baseline gap-x-6 gap-y-2 print:hidden">
+        <div className="flex items-baseline gap-2">
+          <span className="font-serif text-2xl font-semibold text-stone-800">{qrCodes.length}</span>
+          <span className="text-sm text-stone-500">
+            {qrCodes.length === 1 ? "bord registrerat" : "bord registrerade"}
+          </span>
+        </div>
+        <div className="flex items-baseline gap-2">
+          <span className="font-serif text-2xl font-semibold text-stone-800">
+            {Object.values(scanCounts).reduce((sum, n) => sum + n, 0)}
+          </span>
+          <span className="text-sm text-stone-500">skanningar totalt</span>
+        </div>
       </div>
 
       {/* Generate controls */}
@@ -209,6 +218,14 @@ export function QrCodesClient({ restaurantId, restaurantSubdomain, initialQrCode
                   </div>
                 )}
                 <p className="text-sm font-semibold text-stone-700">Bord {qr.table_number}</p>
+                <div
+                  className="flex items-center gap-1 text-xs text-stone-500 print:hidden"
+                  title="Antal skanningar (unika sessioner)"
+                >
+                  <ScanLine className="h-3.5 w-3.5 text-amber-500" />
+                  <span className="font-medium text-stone-700">{scanCounts[qr.table_number] ?? 0}</span>
+                  skanningar
+                </div>
                 <div className="flex gap-1 w-full print:hidden">
                   <Button
                     variant="outline"
