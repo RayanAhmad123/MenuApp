@@ -43,8 +43,14 @@ export async function updateSession(request: NextRequest, rewriteUrl?: URL | nul
 
   const pathname = request.nextUrl.pathname
 
+  // Auth pages that must stay reachable without an existing session.
+  const isPublicAuthPath = (base: string) =>
+    pathname === `${base}/login` ||
+    pathname === `${base}/forgot-password` ||
+    pathname === `${base}/reset-password`
+
   // Protect admin routes
-  if (pathname.startsWith("/admin") && !pathname.startsWith("/admin/login")) {
+  if (pathname.startsWith("/admin") && !isPublicAuthPath("/admin")) {
     if (!user) {
       const url = request.nextUrl.clone()
       url.pathname = "/admin/login"
@@ -71,7 +77,7 @@ export async function updateSession(request: NextRequest, rewriteUrl?: URL | nul
   }
 
   // Protect superadmin routes
-  if (pathname.startsWith("/superadmin") && !pathname.startsWith("/superadmin/login")) {
+  if (pathname.startsWith("/superadmin") && !isPublicAuthPath("/superadmin")) {
     if (!user) {
       const url = request.nextUrl.clone()
       url.pathname = "/superadmin/login"

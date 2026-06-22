@@ -2,12 +2,13 @@
 import { useState } from "react"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
+import { getMyTenantDashboardUrl } from "@/lib/actions/auth"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
 
-export function LoginForm() {
+export function CentralLoginForm() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
@@ -20,10 +21,24 @@ export function LoginForm() {
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) {
       toast({ title: "Inloggning misslyckades", description: error.message, variant: "destructive" })
-    } else {
-      window.location.href = "/admin/dashboard"
+      setLoading(false)
+      return
     }
-    setLoading(false)
+    // The session cookie is now set on .triadsolutions.se (shared across every
+    // subdomain). Resolve which restaurant this admin belongs to and forward
+    // them to that subdomain's dashboard.
+    const dest = await getMyTenantDashboardUrl()
+    if (!dest) {
+      toast({
+        title: "Inget konto kopplat till en restaurang",
+        description: "Kontakta support om detta inte stämmer.",
+        variant: "destructive",
+      })
+      await supabase.auth.signOut()
+      setLoading(false)
+      return
+    }
+    window.location.href = dest
   }
 
   return (
@@ -56,7 +71,7 @@ export function LoginForm() {
         {loading ? "Loggar in…" : "Logga in"}
       </Button>
       <div className="text-center">
-        <Link href="/admin/forgot-password" className="text-stone-400 text-sm hover:text-amber-500">
+        <Link href="/forgot-password" className="text-stone-400 text-sm hover:text-amber-500">
           Glömt lösenordet?
         </Link>
       </div>

@@ -1,5 +1,6 @@
 "use client"
 import { useState } from "react"
+import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -59,6 +60,11 @@ export function SuperadminLoginForm() {
       >
         {loading ? "Loggar in…" : "Logga in"}
       </Button>
+      <div className="text-center">
+        <Link href="/superadmin/forgot-password" className="text-stone-400 text-sm hover:text-violet-400">
+          Glömt lösenordet?
+        </Link>
+      </div>
     </form>
   )
 }
