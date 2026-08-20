@@ -18,9 +18,9 @@ import { RESTAURANT_TYPES, RESTAURANT_TYPE_SLUGS } from "@/lib/seo/restaurant-ty
 const PAGE_URL = `${SITE_URL}/digital-meny`
 
 export const metadata: Metadata = {
-  title: "Digital meny för restaurang — kompletta guiden 2026 | Servera",
+  title: "Digital meny för restaurang – utan menyskärmar",
   description:
-    "Allt om digital meny för svenska restauranger: hur det fungerar, vad det kostar, vilka funktioner du behöver, och var Servera passar bäst. Stadssidor, restaurangtyper och prisjämförelse.",
+    "Digital meny direkt i gästens mobil – inga skärmar, ingen app. Jämför lösningar, se vad det kostar och vilka funktioner du faktiskt behöver.",
   alternates: { canonical: PAGE_URL },
   openGraph: {
     type: "website",

@@ -15,9 +15,9 @@ import {
 const PAGE_URL = `${SITE_URL}/sa-fungerar-det`
 
 export const metadata: Metadata = {
-  title: "Så fungerar Servera — digital meny och QR-beställning steg för steg",
+  title: "Så fungerar Servera – från meny till order på 30 min",
   description:
-    "Lär dig steg för steg hur Servera fungerar för svenska restauranger: från att skapa konto och lägga in menyn till QR-koder, gästflöde, kockvy och betalning. Igång under 30 minuter.",
+    "Steg för steg: skapa konto, lägg in menyn, skriv ut QR-koderna. Gästen beställer i mobilen och köket ser ordern direkt. Igång på en halvtimme.",
   alternates: { canonical: PAGE_URL },
   openGraph: {
     type: "website",

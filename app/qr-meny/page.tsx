@@ -20,9 +20,9 @@ import {
 const PAGE_URL = `${SITE_URL}/qr-meny`
 
 export const metadata: Metadata = {
-  title: "QR-meny för restaurang — så fungerar det 2026 | Servera",
+  title: "QR-meny för restaurang – så fungerar det",
   description:
-    "QR-meny för svenska restauranger: hur det fungerar, vad det kostar, för vilka restaurangtyper det passar bäst, och varför Servera är ett ärligt prisat alternativ utan provisioner.",
+    "Så fungerar en QR-meny: uppsättning, koder vid bordet, betalning och kökets vy. Vad det kostar i Sverige och vilka restauranger det passar bäst.",
   alternates: { canonical: PAGE_URL },
   openGraph: {
     type: "website",

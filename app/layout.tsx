@@ -29,10 +29,10 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
     template: "%s | Servera",
-    default: "Servera — Digital meny & QR-beställning för restauranger",
+    default: "QR-meny för restaurang – digital meny utan app | Servera",
   },
   description:
-    "Servera är en svensk plattform för digital meny, QR-beställning och kontaktlös betalning. Skapa en QR-meny på minuter, uppdatera priser i realtid och öka ordervärdet med smartare gästupplevelse.",
+    "Skapa en QR-meny på 30 minuter. Gästen skannar, beställer och betalar i mobilen – helt utan app. Fast pris från 549 kr/mån, inga provisioner.",
   applicationName: "Servera",
   keywords: [
     "digital meny",

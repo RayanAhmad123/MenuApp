@@ -17,9 +17,9 @@ import { COMPARISONS, COMPARISON_SLUGS } from "@/lib/seo/comparisons"
 const PAGE_URL = `${SITE_URL}/jamfor`
 
 export const metadata: Metadata = {
-  title: "Jämför QR-meny för restauranger — Servera vs Meny-QR, Qopla, WEIQ",
+  title: "Jämför QR-meny i Sverige – Servera mot 6 alternativ",
   description:
-    "Ärliga jämförelser mellan Servera och andra svenska QR-meny- och beställningsplattformar. Pris, provisioner, kockvy, hårdvara och kassasystem-integration — sida vid sida.",
+    "Ärlig jämförelse av svenska QR-meny- och beställningssystem: pris, provision, kockvy, hårdvara och kassaintegration – sida vid sida i en tabell.",
   alternates: { canonical: PAGE_URL },
   openGraph: {
     type: "website",

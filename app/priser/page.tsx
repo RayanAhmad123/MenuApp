@@ -12,9 +12,9 @@ import {
 const PAGE_URL = `${SITE_URL}/priser`
 
 export const metadata: Metadata = {
-  title: "Priser för digital meny — Servera",
+  title: "Pris för QR-meny – från 549 kr/mån utan provision",
   description:
-    "Se priser för Servera: digital meny och QR-beställning för restauranger. Från 549 kr/mån. Inga dolda avgifter, inga provisioner per beställning. Fast månadskostnad.",
+    "Fast månadspris från 549 kr. Inga provisioner per beställning, inga dolda avgifter, ingen bindningstid. Se exakt vad som ingår i varje plan.",
   alternates: { canonical: PAGE_URL },
   openGraph: {
     type: "website",

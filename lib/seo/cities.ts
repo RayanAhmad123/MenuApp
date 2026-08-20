@@ -78,7 +78,7 @@ export const CITIES: Record<string, CityContent> = {
       },
       ...COMMON_FAQ_END("Stockholm"),
     ],
-    metaTitle: "Digital meny för restauranger i Stockholm — Servera",
+    metaTitle: "Digital meny för restauranger i Stockholm",
     metaDescription:
       "QR-meny och mobilbeställning för restauranger i Stockholm. Flerspråkig meny, snabba uppdateringar, allergeninformation. Från 549 kr/mån. Boka demo med Servera.",
   },
@@ -126,7 +126,7 @@ export const CITIES: Record<string, CityContent> = {
       },
       ...COMMON_FAQ_END("Göteborg"),
     ],
-    metaTitle: "Digital meny för restauranger i Göteborg — Servera",
+    metaTitle: "Digital meny för restauranger i Göteborg",
     metaDescription:
       "QR-meny för restauranger i Göteborg: Linnéstaden, Avenyn, Vasaplatsen. Flerspråkig, snabba uppdateringar, från 549 kr/mån. Boka kostnadsfri demo med Servera.",
   },
@@ -174,7 +174,7 @@ export const CITIES: Record<string, CityContent> = {
       },
       ...COMMON_FAQ_END("Malmö"),
     ],
-    metaTitle: "Digital meny för restauranger i Malmö — Servera",
+    metaTitle: "Digital meny för restauranger i Malmö",
     metaDescription:
       "QR-meny och mobilbeställning för restauranger i Malmö: Lilla Torg, Davidshallstorg, Möllevången. Flerspråkig meny, från 549 kr/mån. Boka demo.",
   },
@@ -222,7 +222,7 @@ export const CITIES: Record<string, CityContent> = {
       },
       ...COMMON_FAQ_END("Uppsala"),
     ],
-    metaTitle: "Digital meny för restauranger i Uppsala — Servera",
+    metaTitle: "Digital meny för restauranger i Uppsala",
     metaDescription:
       "QR-meny för Uppsala-restauranger: Stora torget, nationerna, Fyrisån. Snabb uppdatering av dagens lunch, tydlig allergeninformation. Från 549 kr/mån.",
   },
@@ -271,7 +271,7 @@ export const CITIES: Record<string, CityContent> = {
       },
       ...COMMON_FAQ_END("Linköping"),
     ],
-    metaTitle: "Digital meny för restauranger i Linköping — Servera",
+    metaTitle: "Digital meny för restauranger i Linköping",
     metaDescription:
       "QR-meny och mobilbeställning för Linköpings restauranger: Stora torget, Trädgårdstorget, Stångån. Flerspråkig, från 549 kr/mån. Boka demo med Servera.",
   },
@@ -319,7 +319,7 @@ export const CITIES: Record<string, CityContent> = {
       },
       ...COMMON_FAQ_END("Västerås"),
     ],
-    metaTitle: "Digital meny för restauranger i Västerås — Servera",
+    metaTitle: "Digital meny för restauranger i Västerås",
     metaDescription:
       "QR-meny för Västerås-restauranger: Stora torget, Mälarhamnen, kontorsdistrikt. Säsongsanpassning, flerspråkig meny, från 549 kr/mån. Boka demo.",
   },
@@ -367,7 +367,7 @@ export const CITIES: Record<string, CityContent> = {
       },
       ...COMMON_FAQ_END("Örebro"),
     ],
-    metaTitle: "Digital meny för restauranger i Örebro — Servera",
+    metaTitle: "Digital meny för restauranger i Örebro",
     metaDescription:
       "QR-meny och mobilbeställning för Örebro-restauranger: Järntorget, Stortorget, universitetet. Snabba uppdateringar, från 549 kr/mån. Boka demo.",
   },
@@ -415,7 +415,7 @@ export const CITIES: Record<string, CityContent> = {
       },
       ...COMMON_FAQ_END("Helsingborg"),
     ],
-    metaTitle: "Digital meny för restauranger i Helsingborg — Servera",
+    metaTitle: "Digital meny för restauranger i Helsingborg",
     metaDescription:
       "QR-meny för Helsingborg-restauranger: Stortorget, hamnen, Sundstorget. Meny på danska, svenska och engelska. Från 549 kr/mån. Boka demo med Servera.",
   },
@@ -463,7 +463,7 @@ export const CITIES: Record<string, CityContent> = {
       },
       ...COMMON_FAQ_END("Norrköping"),
     ],
-    metaTitle: "Digital meny för restauranger i Norrköping — Servera",
+    metaTitle: "Digital meny för restauranger i Norrköping",
     metaDescription:
       "QR-meny och mobilbeställning för Norrköpings restauranger: Knäppingsborg, Industrilandskapet, Tyska torget. Flerspråkig, från 549 kr/mån. Boka demo.",
   },
@@ -511,7 +511,7 @@ export const CITIES: Record<string, CityContent> = {
       },
       ...COMMON_FAQ_END("Jönköping"),
     ],
-    metaTitle: "Digital meny för restauranger i Jönköping — Servera",
+    metaTitle: "Digital meny för restauranger i Jönköping",
     metaDescription:
       "QR-meny för Jönköpings restauranger: Tändsticksområdet, Östra Storgatan, Munksjön. Säsongsanpassning, flerspråkig meny, från 549 kr/mån. Boka demo.",
   },
@@ -559,7 +559,7 @@ export const CITIES: Record<string, CityContent> = {
       },
       ...COMMON_FAQ_END("Umeå"),
     ],
-    metaTitle: "Digital meny för restauranger i Umeå — Servera",
+    metaTitle: "Digital meny för restauranger i Umeå",
     metaDescription:
       "QR-meny och mobilbeställning för Umeå-restauranger: Rådhustorget, Renmarkstorget, campus. Snabba uppdateringar, från 549 kr/mån. Boka demo med Servera.",
   },
@@ -607,7 +607,7 @@ export const CITIES: Record<string, CityContent> = {
       },
       ...COMMON_FAQ_END("Lund"),
     ],
-    metaTitle: "Digital meny för restauranger i Lund — Servera",
+    metaTitle: "Digital meny för restauranger i Lund",
     metaDescription:
       "QR-meny för Lunds restauranger: Mårtenstorget, Stortorget, universitetet. Flerspråkig meny för internationella gäster, från 549 kr/mån. Boka demo.",
   },
@@ -655,7 +655,7 @@ export const CITIES: Record<string, CityContent> = {
       },
       ...COMMON_FAQ_END("Borås"),
     ],
-    metaTitle: "Digital meny för restauranger i Borås — Servera",
+    metaTitle: "Digital meny för restauranger i Borås",
     metaDescription:
       "QR-meny och mobilbeställning för Borås restauranger: Stora torget, Lilla Brogatan, Sandwalls plats. Snabba uppdateringar, från 549 kr/mån. Boka demo.",
   },
@@ -703,7 +703,7 @@ export const CITIES: Record<string, CityContent> = {
       },
       ...COMMON_FAQ_END("Sundsvall"),
     ],
-    metaTitle: "Digital meny för restauranger i Sundsvall — Servera",
+    metaTitle: "Digital meny för restauranger i Sundsvall",
     metaDescription:
       "QR-meny och mobilbeställning för Sundsvalls restauranger: Storgatan, Stora torget, Esplanaden. Flerspråkig meny, från 549 kr/mån. Boka demo.",
   },
@@ -751,7 +751,7 @@ export const CITIES: Record<string, CityContent> = {
       },
       ...COMMON_FAQ_END("Eskilstuna"),
     ],
-    metaTitle: "Digital meny för restauranger i Eskilstuna — Servera",
+    metaTitle: "Digital meny för restauranger i Eskilstuna",
     metaDescription:
       "QR-meny och mobilbeställning för Eskilstunas restauranger: Fristadstorget, Kungsgatan, Munktellstaden. Flerspråkig meny, från 549 kr/mån. Boka demo.",
   },
@@ -799,7 +799,7 @@ export const CITIES: Record<string, CityContent> = {
       },
       ...COMMON_FAQ_END("Gävle"),
     ],
-    metaTitle: "Digital meny för restauranger i Gävle — Servera",
+    metaTitle: "Digital meny för restauranger i Gävle",
     metaDescription:
       "QR-meny och mobilbeställning för Gävles restauranger: Stortorget, Drottninggatan, hamnen. Snabba uppdateringar, från 549 kr/mån. Boka demo med Servera.",
   },
@@ -847,7 +847,7 @@ export const CITIES: Record<string, CityContent> = {
       },
       ...COMMON_FAQ_END("Halmstad"),
     ],
-    metaTitle: "Digital meny för restauranger i Halmstad — Servera",
+    metaTitle: "Digital meny för restauranger i Halmstad",
     metaDescription:
       "QR-meny för Halmstads restauranger: Stora torg, Storgatan, Tylösand. Säsongsanpassning, flerspråkig meny, från 549 kr/mån. Boka demo med Servera.",
   },
@@ -895,7 +895,7 @@ export const CITIES: Record<string, CityContent> = {
       },
       ...COMMON_FAQ_END("Växjö"),
     ],
-    metaTitle: "Digital meny för restauranger i Växjö — Servera",
+    metaTitle: "Digital meny för restauranger i Växjö",
     metaDescription:
       "QR-meny och mobilbeställning för Växjös restauranger: Stortorget, Storgatan, universitetet. Flerspråkig meny, från 549 kr/mån. Boka demo med Servera.",
   },
@@ -943,7 +943,7 @@ export const CITIES: Record<string, CityContent> = {
       },
       ...COMMON_FAQ_END("Karlstad"),
     ],
-    metaTitle: "Digital meny för restauranger i Karlstad — Servera",
+    metaTitle: "Digital meny för restauranger i Karlstad",
     metaDescription:
       "QR-meny och mobilbeställning för Karlstads restauranger: Stora torget, Kungsgatan, Inre hamn. Säsongsanpassning, flerspråkig meny, från 549 kr/mån.",
   },

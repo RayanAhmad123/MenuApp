@@ -140,7 +140,7 @@ export const COMPARISONS: Record<string, ComparisonContent> = {
         competitor: "0 kr (Gratis) · 199 kr/mån · 499 kr/mån",
       },
     ],
-    metaTitle: "Servera vs Meny-QR — jämförelse av QR-meny för restauranger",
+    metaTitle: "Meny-QR-alternativ: Servera vs Meny-QR – pris",
     metaDescription:
       "Jämför Servera och Meny-QR: pris, provisioner, kockvy, allergener och kassasystem-integration. Ärlig guide för svenska restauranger som väljer QR-meny 2026.",
   },
@@ -254,7 +254,7 @@ export const COMPARISONS: Record<string, ComparisonContent> = {
         competitor: "Ej publicerade — kontakta Qopla för offert",
       },
     ],
-    metaTitle: "Servera vs Qopla — vilken plattform passar din restaurang?",
+    metaTitle: "Qopla-alternativ: Servera vs Qopla – pris",
     metaDescription:
       "Jämför Servera och Qopla för svenska restauranger: bredd vs fokus, månadspris, kockvy, takeaway-stöd och kassasystem-integration. Boka kostnadsfri demo.",
   },
@@ -364,7 +364,7 @@ export const COMPARISONS: Record<string, ComparisonContent> = {
           "0 kr (Free) · från 250 kr/mån (Easy) · från 750 kr/mån (Pro)",
       },
     ],
-    metaTitle: "Servera vs WEIQ — webb-QR eller terminal? Jämförelse 2026",
+    metaTitle: "WEIQ-alternativ: Servera vs WEIQ – pris",
     metaDescription:
       "Servera är webb-baserad QR-meny utan extra hårdvara. WEIQ kombinerar QR med betalterminaler. Jämför pris, hårdvarukostnad och setup för svenska restauranger.",
   },
@@ -486,7 +486,7 @@ COMPARISONS["servera-vs-caspeco"] = {
       competitor: "Ej publicerade — kontakta Caspeco för offert",
     },
   ],
-  metaTitle: "Servera vs Caspeco — QR-meny eller komplett kassasystem?",
+  metaTitle: "Caspeco-alternativ: Servera vs Caspeco – pris",
   metaDescription:
     "Servera är fokuserad QR-meny från 549 kr/mån. Caspeco är ett brett restaurangsystem efter Trivec-sammanslagningen 2025. Jämför pris, scope och onboarding.",
 }
@@ -603,7 +603,7 @@ COMPARISONS["servera-vs-flipdish"] = {
       competitor: "Dedikerad onboarding med införandeteam",
     },
   ],
-  metaTitle: "Servera vs Flipdish — svensk QR-meny eller internationell plattform?",
+  metaTitle: "Flipdish-alternativ: Servera vs Flipdish – pris",
   metaDescription:
     "Servera är svensk QR-meny från 549 kr/mån utan provisioner. Flipdish är en bred internationell beställningsplattform. Jämför pris, scope och support.",
 }
@@ -724,7 +724,7 @@ COMPARISONS["servera-vs-yumzi"] = {
       competitor: "Från 113 kr/mån (2-årsavtal) · 142 kr/mån (årsvis)",
     },
   ],
-  metaTitle: "Servera vs Yumzi — svensk eller internationell QR-meny?",
+  metaTitle: "Yumzi-alternativ: Servera vs Yumzi – pris",
   metaDescription:
     "Servera är en svensk QR-meny från 549 kr/mån med svensk support och fakturering. Yumzi är en internationell aktör. Jämför fokus, pris och leverantörsstruktur.",
 }

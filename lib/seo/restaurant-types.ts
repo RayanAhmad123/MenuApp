@@ -78,7 +78,7 @@ export const RESTAURANT_TYPES: Record<string, RestaurantTypeContent> = {
       },
       ...COMMON_FAQ("pizzeria", "pizzerior"),
     ],
-    metaTitle: "Digital meny för pizzeria — QR-beställning från bordet | Servera",
+    metaTitle: "QR-meny för pizzeria — beställ från bordet",
     metaDescription:
       "Servera är digital meny och QR-beställning för svenska pizzerior. Modifiers, allergener, halvt-halvt, glutenfri botten. Från 549 kr/mån. Boka demo.",
   },
@@ -131,7 +131,7 @@ export const RESTAURANT_TYPES: Record<string, RestaurantTypeContent> = {
       },
       ...COMMON_FAQ("sushiställe", "sushiställen"),
     ],
-    metaTitle: "Digital meny för sushiställen — QR-beställning | Servera",
+    metaTitle: "QR-meny för sushirestaurang — beställ i mobilen",
     metaDescription:
       "Servera är digital meny för sushiställen i Sverige. Långa menyer, bildrika rätter, allergener (soja, sesam, gluten), lunch-combo. Från 549 kr/mån.",
   },
@@ -182,7 +182,7 @@ export const RESTAURANT_TYPES: Record<string, RestaurantTypeContent> = {
       },
       ...COMMON_FAQ("café", "caféer"),
     ],
-    metaTitle: "Digital meny för caféer — QR-beställning från bordet | Servera",
+    metaTitle: "QR-meny för café — beställ från bordet",
     metaDescription:
       "Servera är digital meny och QR-beställning för svenska caféer. Eliminera kassakön, öka återbeställning, uppdatera meny i realtid. Från 549 kr/mån.",
   },
@@ -233,7 +233,7 @@ export const RESTAURANT_TYPES: Record<string, RestaurantTypeContent> = {
       },
       ...COMMON_FAQ("bar", "barer"),
     ],
-    metaTitle: "Digital meny för barer — QR-beställning av cocktails | Servera",
+    metaTitle: "QR-meny för bar — beställ drinkar i mobilen",
     metaDescription:
       "Servera är QR-meny och mobilbeställning för svenska barer och cocktailbarer. Minska kö vid disken, höj kuvertstorlek, smidig betalning. Från 549 kr/mån.",
   },
@@ -282,7 +282,7 @@ export const RESTAURANT_TYPES: Record<string, RestaurantTypeContent> = {
       },
       ...COMMON_FAQ("food truck", "food trucks"),
     ],
-    metaTitle: "Digital meny för food trucks — QR-beställning utan kö | Servera",
+    metaTitle: "QR-meny för food truck — slipp lunchkön",
     metaDescription:
       "Servera är QR-meny och mobilbeställning för food trucks. Eliminera lunchkön, realtidsstatus, Stripe-betalning, fungerar via 4G/5G. Från 549 kr/mån.",
   },
@@ -334,7 +334,7 @@ export const RESTAURANT_TYPES: Record<string, RestaurantTypeContent> = {
       },
       ...COMMON_FAQ("lunchställe", "lunchställen"),
     ],
-    metaTitle: "Digital meny för lunchställen — snabb QR-beställning | Servera",
+    metaTitle: "QR-meny för lunchställe — snabb beställning",
     metaDescription:
       "Servera är QR-meny och mobilbeställning för svenska lunchställen. Daglig uppdatering av dagens, eliminera kassakö, allergener, från 549 kr/mån.",
   },

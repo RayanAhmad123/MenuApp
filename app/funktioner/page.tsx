@@ -15,9 +15,9 @@ import {
 const PAGE_URL = `${SITE_URL}/funktioner`
 
 export const metadata: Metadata = {
-  title: "Funktioner — digital meny och QR-beställning | Servera",
+  title: "Funktioner – QR-meny, kockvy och betalning",
   description:
-    "Alla funktioner i Servera: QR-meny utan app, kockvy i realtid, allergener och kostmärkning, flerspråkig meny, försäljningsstatistik och Stripe-betalning. För svenska restauranger.",
+    "QR-meny utan app, kockvy i realtid, allergener och kostmärkning, flerspråkig meny, statistik och Stripe-betalning. Alla funktioner förklarade.",
   alternates: { canonical: PAGE_URL },
   openGraph: {
     type: "website",
