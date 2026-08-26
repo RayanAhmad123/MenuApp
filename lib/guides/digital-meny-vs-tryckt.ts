@@ -1,0 +1,67 @@
+import type { Guide } from "./types"
+
+export const guide: Guide = {
+  slug: "digital-meny-vs-tryckt",
+  title: "Digital meny vs tryckt meny — vad passar din restaurang?",
+  metaTitle: "Digital meny vs tryckt meny — ärlig jämförelse 2026",
+  description:
+    "Kostnad, gästupplevelse, allergener och underhåll: en ärlig jämförelse mellan digital meny och tryckt meny för svenska restauranger — och när kombinationen är rätt svar.",
+  datePublished: "2026-08-26",
+  dateModified: "2026-08-26",
+  readingMinutes: 9,
+  category: "Jämförelse",
+  intro: [
+    "Digital meny och tryckt meny löser samma uppgift — att visa gästen vad som finns och vad det kostar — men de beter sig helt olika i drift. Papper har noll teknikberoende och en taktil kvalitetskänsla; digital meny har noll omtryckskostnad och är alltid aktuell.",
+    "Det ärliga svaret på \"vilket är bäst?\" är att det beror på din servering, dina gäster och hur ofta din meny ändras. Här är jämförelsen punkt för punkt, med verkliga siffror — och rekommendationen många landar i: en kombination.",
+  ],
+  tldr: [
+    "Tryckt A4-meny kostar ca 2,40–6 kr per exemplar per tryckning; en helgjuten menytavla eller laminerade kort mer. Varje ändring = nytt tryck.",
+    "Digital meny kostar fast några hundralappar i månaden (t.ex. [549 kr/mån med Servera](/priser)) — men ändringar är gratis och slår igenom direkt.",
+    "Ändrar du menyn oftare än någon gång per kvartal blir digital meny nästan alltid billigare totalt — och med Visitas siffror på 37 % dyrare råvaror sedan 2022 behöver priser kunna justeras oftare än så.",
+    "Allergenkraven gäller båda formaten, men digital meny håller informationen uppdaterad på ett ställe i stället för i en trave gamla kort.",
+    "Bästa uppställningen för många: digital meny som primär + ett litet antal tryckta exemplar för gäster som föredrar papper.",
+  ],
+  blocks: [
+    { t: "h2", id: "kostnad", text: "Vad kostar de — egentligen?" },
+    { t: "p", text: "Tryckkostnaden ser låg ut per exemplar men är en **återkommande** kostnad som triggas av varje ändring. Svenska tryckerier tar ungefär så här för dubbelsidiga A4-menyer på 250 g papper (Papperstrycks listpriser, exkl. moms): 100 st ≈ 600 kr (6 kr/st), 500 st ≈ 1 400 kr (2,80 kr/st), 1 000 st ≈ 2 400 kr (2,40 kr/st). Laminering och tjockare papper kostar mer, liksom vikning." },
+    { t: "p", text: "Räkneexemplet som avgör frågan är ändringsfrekvensen. En restaurang med 60 platser som trycker 150 menyer och byter meny eller priser sex gånger per år lägger i storleksordningen 5 000–7 000 kr/år på tryck — plus tiden att korrekturläsa, beställa, vänta och byta ut. En digital meny på fast månadspris (Servera: 549–999 kr/mån) kostar mer i kronor per år, men tar då också hand om beställningar, allergenfilter, statistik och obegränsade ändringar. Kör du enbart menyvisning finns billigare instegsplaner på marknaden — se [prisjämförelsen](/guider/vad-kostar-digital-meny)." },
+    { t: "callout", title: "Därför ändras menyer oftare nu", text: "Enligt Visitas restaurangrapport ökade restaurangernas råvarukostnader 37 % mellan februari 2022 och början av 2025, medan utpriserna bara ökade 19 %. Marginalpressen gör att priser behöver justeras löpande — och varje justering är gratis i en digital meny men ett omtryck på papper." },
+    { t: "h2", id: "gastupplevelse", text: "Gästupplevelsen — papperets känsla mot mobilens funktion" },
+    { t: "p", text: "Var ärlig mot dig själv om din servering. Papper vinner på: ingen teknik som kan strula, en känsla av omsorg (ett vackert menykort är en del av upplevelsen på en finkrog), och att alla gäster kan använda det — oavsett ålder, mobilvana eller batterinivå." },
+    { t: "p", text: "Digital meny vinner på: bilder på rätterna, always-on-aktualitet (aldrig \"den är slut, tyvärr\" efter att gästen valt), allergenfilter som låter gästen sortera själv, flera språk utan extra kort, och — där det är påslaget — beställning direkt från bordet utan att vänta in personal." },
+    { t: "p", text: "Åldersinvändningen (\"våra gäster är inte mobilvana\") är rimlig men ofta överdriven: QR-skanning blev allmängods i Sverige under pandemin, och kameran i alla moderna mobiler skannar koder direkt utan app. Men den är inte noll — därför rekommendationen om hybrid nedan." },
+    { t: "h2", id: "allergener", text: "Allergener och lagkrav — samma krav, olika underhåll" },
+    { t: "p", text: "Kraven är formatneutrala: allergeninformation för de 14 allergenerna i EU-förordning 1169/2011 ska kunna lämnas oavsett om menyn är på papper eller skärm, och lämnas den muntligt ska det tydligt framgå hur gästen får tag på den (LIVSFS 2014:4). Skillnaden är praktisk: när receptet ändras uppdaterar du den digitala menyn en gång, medan tryckta kort kräver omtryck — eller det som faktiskt händer: gamla kort med fel allergeninformation ligger kvar i rotationen. Det är där risken sitter." },
+    { t: "h2", id: "miljo", text: "Miljö och svinn" },
+    { t: "p", text: "Papper förbrukas: slitna, fläckiga och inaktuella kort slängs och trycks om. En digital meny har sitt fotavtryck i drift av servrar och gästens mobil, men skapar inget löpande pappersavfall. För de flesta restauranger är miljöargumentet sekundärt mot ekonomin — men det är ett äkta plus, och gäster frågar allt oftare." },
+    { t: "h2", id: "nar-papper", text: "När är tryckt meny rätt val?" },
+    { t: "ul", items: [
+      "**Fine dining med fast avsmakningsmeny** — menyn är en del av dukningen och ändras sällan per säsong.",
+      "**Mycket liten meny** — ett fik med åtta rader på en griffeltavla behöver ingen plattform.",
+      "**Målgrupp som uttalat föredrar papper** — och där du testat, inte antagit.",
+    ]},
+    { t: "h2", id: "nar-digital", text: "När är digital meny rätt val?" },
+    { t: "ul", items: [
+      "**Menyn eller priserna ändras månadsvis eller oftare** — lunchställen, säsongskök, ställen i marginalpress.",
+      "**Du vill ta beställningar från bordet** — caféer, barer, food courts, uteserveringar med långa gångavstånd.",
+      "**Internationella gäster** — flera språk utan flera tryck, se [flerspråkig meny](/guider/flersprakig-meny).",
+      "**Stor meny med allergenkomplexitet** — filtrerbarhet slår fotnoter.",
+    ]},
+    { t: "h2", id: "hybrid", text: "Hybriden: digital primär, papper som backup" },
+    { t: "p", text: "Det vanligaste framgångsreceptet är inte antingen-eller: kör den digitala menyn som primär kanal (QR på alla bord) och håll ett litet antal tryckta exemplar bakom disken för gäster som ber om dem. Då får du den digitala menyns ekonomi och aktualitet utan att exkludera någon gäst. Regeln som gör hybriden hållbar: den tryckta reserven ska vara **liten** (10–20 exemplar) och tryckas om när menyn ändras väsentligt — annars återuppstår problemet med inaktuella kort." },
+    { t: "p", text: "Vill du räkna på just din situation — [priser för Servera finns öppet här](/priser), och i [kompletta guiden](/guider/digital-meny-kompletta-guiden) finns checklistan för plattformsval." },
+  ],
+  faq: [
+    { question: "Är digital meny billigare än tryckt meny?", answer: "Det beror på ändringsfrekvensen. Trycker du om menyn oftare än någon gång per kvartal blir digital meny med fast månadspris oftast billigare totalt — och den tar samtidigt hand om allergeninformation, språkversioner och beställningar. Ändras menyn nästan aldrig kan papper vara billigast." },
+    { question: "Vad kostar det att trycka menyer?", answer: "Riktpris hos svenska tryckerier för dubbelsidig A4 på 250 g papper: cirka 600 kr för 100 exemplar (6 kr/st) ned mot 2,40 kr/st vid 1 000 exemplar, exklusive moms. Laminering, tjockare papper och vikning kostar extra — och varje menyändring kräver ett nytt tryck." },
+    { question: "Försvinner känslan med en digital meny?", answer: "På en finkrog kan ett vackert tryckt kort vara en del av upplevelsen, och där kan papper vara rätt. För vardagsservering värderar de flesta gäster aktuell information, bilder och möjligheten att beställa direkt högre än papperskänslan. Hybridupplägget låter dig behålla båda." },
+    { question: "Vad gör jag med gäster som inte vill använda mobilen?", answer: "Ha 10–20 tryckta exemplar som backup och låt personalen erbjuda dem aktivt. Det löser tillgängligheten utan att du förlorar den digitala menyns fördelar för majoriteten." },
+    { question: "Gäller allergenkraven även tryckta menyer?", answer: "Ja. Kraven i EU-förordning 1169/2011 och LIVSFS 2014:4 är formatneutrala — allergeninformation ska kunna lämnas oavsett menyformat. Skillnaden är att en digital meny uppdateras på ett ställe, medan tryckta kort riskerar att ligga kvar med gammal information." },
+  ],
+  sources: [
+    { label: "Papperstryck: priser för tryckta menyer", href: "https://www.papperstryck.se/menyer/" },
+    { label: "Visita: Den svenska restaurangmarknaden — K4 2024 och K1 2025", href: "https://visita.se/app/uploads/2025/06/Restaurangrapport-K4-2024-och-K1-2025.pdf" },
+    { label: "Europaparlamentets och rådets förordning (EU) nr 1169/2011 om livsmedelsinformation", href: "https://eur-lex.europa.eu/legal-content/SV/TXT/?uri=CELEX%3A02011R1169-20180101" },
+    { label: "Livsmedelsverkets föreskrifter om livsmedelsinformation, LIVSFS 2014:4", href: "https://www.livsmedelsverket.se/om-oss/lagstiftning1/gallande-lagstiftning/livsfs-20144" },
+  ],
+}

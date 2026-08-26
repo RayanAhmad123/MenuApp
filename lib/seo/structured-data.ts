@@ -173,6 +173,37 @@ export function faqSchema(items: Array<{ question: string; answer: string }>) {
   }
 }
 
+export function articleSchema(input: {
+  url: string
+  headline: string
+  description: string
+  datePublished: string
+  dateModified: string
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "@id": `${input.url}#article`,
+    mainEntityOfPage: input.url,
+    headline: input.headline,
+    description: input.description,
+    inLanguage: "sv-SE",
+    datePublished: input.datePublished,
+    dateModified: input.dateModified,
+    author: {
+      "@type": "Organization",
+      name: SITE_NAME,
+      url: SITE_URL,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: PUBLISHER_NAME,
+      url: PUBLISHER_URL,
+    },
+    isPartOf: { "@id": `${SITE_URL}/#website` },
+  }
+}
+
 export function breadcrumbSchema(
   items: Array<{ name: string; url: string }>,
 ) {

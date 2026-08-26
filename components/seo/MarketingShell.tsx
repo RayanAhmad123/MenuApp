@@ -89,6 +89,14 @@ export function MarketingShell({ children }: MarketingShellProps) {
               <ul className="space-y-2">
                 <li>
                   <Link
+                    href="/guider"
+                    className="hover:text-stone-300 transition-colors"
+                  >
+                    Alla guider
+                  </Link>
+                </li>
+                <li>
+                  <Link
                     href="/digital-meny"
                     className="hover:text-stone-300 transition-colors"
                   >

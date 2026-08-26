@@ -1,0 +1,75 @@
+import type { Guide } from "./types"
+
+export const guide: Guide = {
+  slug: "vad-kostar-digital-meny",
+  title: "Vad kostar en digital meny? Priser och prismodeller 2026",
+  metaTitle: "Vad kostar en digital meny? Priser i Sverige 2026",
+  description:
+    "Fast månadspris, provision per order eller gratisplan? Så prissätts digitala menyer i Sverige 2026, vad de dolda kostnaderna är och hur du räknar på din restaurang.",
+  datePublished: "2026-08-26",
+  dateModified: "2026-08-26",
+  readingMinutes: 8,
+  category: "Priser",
+  intro: [
+    "En digital meny kostar i Sverige typiskt mellan 0 och 1 500 kr i månaden i fast avgift — eller till synes ingenting, men då med en provision på 1–5 % per beställning. Vilken prismodell som blir billigast för dig avgörs nästan helt av din beställningsvolym.",
+    "Den här guiden går igenom de tre prismodellerna, de dolda kostnaderna leverantörerna sällan lyfter fram, och ger dig ett enkelt sätt att räkna på din egen situation.",
+  ],
+  tldr: [
+    "Tre prismodeller dominerar: fast månadspris (ca 300–1 500 kr/mån), provision per beställning (1–5 % av ordervärdet) och gratisplaner med begränsningar och reklam.",
+    "Provision ser billigt ut men skalar med omsättningen: 3 % på 200 000 kr beställningar/mån är 6 000 kr — mer än de flesta fasta planer kostar.",
+    "[Servera](/priser) kostar 549 kr/mån (Start, ≤20 bord) eller 999 kr/mån (Tillväxt, obegränsat) — fast pris, ingen provision.",
+    "Räkna alltid på totalkostnaden: plattformsavgift + eventuell provision + kortavgifter + QR-material + din egen tid för uppsättning.",
+    "Jämför med alternativkostnaden: omtryck av pappersmenyer kostar från ca 600 kr per tryckning och ändring.",
+  ],
+  blocks: [
+    { t: "h2", id: "prismodeller", text: "Vilka prismodeller finns det?" },
+    { t: "table", head: ["Modell", "Typisk nivå", "Fördel", "Nackdel"], rows: [
+      ["Fast månadspris", "300–1 500 kr/mån", "Förutsägbart; kostnaden växer inte med försäljningen", "Kostar även en stängd månad"],
+      ["Provision per order", "1–5 % av ordervärdet", "Låg tröskel att komma igång", "Blir den största posten vid volym; svår att budgetera"],
+      ["Gratisplan", "0 kr", "Gratis att testa konceptet", "Begränsat antal rätter/funktioner, leverantörens varumärke i din meny, ofta reklam"],
+    ]},
+    { t: "p", text: "Utöver dessa förekommer engångsavgifter för uppsättning (vanligare hos byråbyggda lösningar) och hårdvarupaket med surfplattor för köket — räkna in dem i totalkostnaden om de krävs." },
+    { t: "h2", id: "rakneexempel", text: "Räkneexempel: fast pris mot provision" },
+    { t: "p", text: "Anta att dina gäster beställer för 150 000 kr per månad via menyn. Så här slår modellerna:" },
+    { t: "table", head: ["Modell", "Månadskostnad", "Årskostnad"], rows: [
+      ["Fast 549 kr/mån (Servera Start)", "549 kr", "6 588 kr"],
+      ["Fast 999 kr/mån (Servera Tillväxt)", "999 kr", "11 988 kr"],
+      ["Provision 2 %", "3 000 kr", "36 000 kr"],
+      ["Provision 4 %", "6 000 kr", "72 000 kr"],
+    ]},
+    { t: "p", text: "Brytpunkten är enkel att räkna ut: dela månadsavgiften med provisionssatsen. 999 kr / 2 % = ca 50 000 kr. Beställer dina gäster för mer än så per månad är fast pris billigare — och de flesta restauranger med aktiv bordsbeställning ligger långt över den nivån. Beställer gästerna för mindre, eller använder du menyn enbart för visning, kan en billig eller provisionsfri instegsplan räcka." },
+    { t: "h2", id: "dolda-kostnader", text: "Vilka är de dolda kostnaderna?" },
+    { t: "ul", items: [
+      "**Betalväxelavgifter.** Tar gästen betalt i menyn tillkommer kortinlösen (typiskt 1–2 % + fast öresavgift per transaktion) oavsett plattform. Det är en betalkostnad, inte en menykostnad — men den ska med i kalkylen, och vissa plattformar lägger eget påslag ovanpå.",
+      "**Funktioner bakom dyrare plan.** Flerspråk, statistik eller fler än X rätter ligger ibland i en högre prisnivå. Läs plansidorna noga mot din kravlista.",
+      "**Uppsägningstid och bindningstid.** Månadsvis utan bindning är standard att kräva 2026.",
+      "**Din egen tid.** Uppsättningen tar en eftermiddag ([så här går den till](/guider/hur-skapar-man-digital-meny)) och någon i teamet ska äga menyn löpande. Det är den verkliga \"avgiften\" många glömmer.",
+      "**QR-material.** Bordsställ eller laminerade kort — hundralappar, inte tusenlappar, men det är en post.",
+    ]},
+    { t: "h2", id: "jamfor-papper", text: "Hur står sig kostnaden mot tryckta menyer?" },
+    { t: "p", text: "Referenspunkten många räknar mot: att trycka menyer kostar hos svenska tryckerier från ca 600 kr för 100 dubbelsidiga A4-exemplar (6 kr/st) ned mot 2,40 kr/st vid 1 000 exemplar, exklusive moms — **per tryckning**. Ändrar du menyn sex gånger om året hamnar du snabbt på samma nivå som en fast digital plan, men utan beställningsfunktion, allergenfilter eller statistik. Hela jämförelsen finns i [digital meny vs tryckt meny](/guider/digital-meny-vs-tryckt)." },
+    { t: "callout", title: "Prispress gör ändringar frekventa", text: "Visitas restaurangrapport visar 37 % dyrare råvaror sedan februari 2022 mot bara 19 % högre utpriser — och en volymminskning på 1,5 % under 2024. Att kunna justera priser utan omtryckskostnad är i det läget inte en lyxfunktion utan ett marginalverktyg." },
+    { t: "h2", id: "vad-ingar", text: "Vad ska ingå i priset? Kravlista" },
+    { t: "ul", items: [
+      "Obegränsade menyändringar och prisjusteringar.",
+      "Allergenmärkning per rätt (lagkraven i EU 1169/2011 gäller oavsett format).",
+      "App-fri gästupplevelse i webbläsaren.",
+      "QR-koder per bord utan styckkostnad.",
+      "Statistik över visningar och beställningar.",
+      "Support på svenska utan extra avgift.",
+    ]},
+    { t: "p", text: "Serveras planer — Start 549 kr/mån (upp till 20 bord) och Tillväxt 999 kr/mån (obegränsat antal bord, beställningsfunktion, statistik) — är byggda för att hela listan ovan ska ingå utan tillval. Alla detaljer finns på [prissidan](/priser), och vill du jämföra med andra svenska alternativ har vi samlat jämförelserna [här](/jamfor)." },
+  ],
+  faq: [
+    { question: "Vad kostar en digital meny per månad?", answer: "Typiskt 300–1 500 kr/mån i fast pris i Sverige 2026. Servera kostar 549 kr/mån för upp till 20 bord och 999 kr/mån för obegränsat antal bord, utan provision. Provisionsbaserade alternativ tar i stället 1–5 % per beställning." },
+    { question: "Finns det gratis digitala menyer?", answer: "Ja, flera leverantörer har gratisplaner — men med begränsningar: färre rätter, leverantörens varumärke i menyn, ibland reklam, och sällan beställningsfunktion. De fungerar för att testa konceptet men sällan för skarp drift." },
+    { question: "Är provision eller fast pris billigast?", answer: "Dela månadsavgiften med provisionssatsen för att hitta brytpunkten: vid 999 kr/mån och 2 % provision går brytpunkten vid ca 50 000 kr i beställningar per månad. Ligger du över är fast pris billigare; under kan provision eller gratisplan räcka." },
+    { question: "Tillkommer betalavgifter?", answer: "Ja — om gästen betalar i menyn tillkommer kortinlösenavgifter (typiskt 1–2 % plus öresavgift) oavsett vilken menyplattform du väljer. Kontrollera om plattformen lägger eget påslag ovanpå inlösenavgiften." },
+    { question: "Vad kostar Servera?", answer: "549 kr/mån för Start (upp till 20 bord) och 999 kr/mån för Tillväxt (obegränsat antal bord). Fast pris utan provision per beställning; aktuella detaljer finns alltid på prissidan." },
+  ],
+  sources: [
+    { label: "Servera: priser", href: "https://servera.triadsolutions.se/priser" },
+    { label: "Papperstryck: priser för tryckta menyer", href: "https://www.papperstryck.se/menyer/" },
+    { label: "Visita: Den svenska restaurangmarknaden — K4 2024 och K1 2025", href: "https://visita.se/app/uploads/2025/06/Restaurangrapport-K4-2024-och-K1-2025.pdf" },
+  ],
+}

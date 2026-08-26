@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next"
 import { createPublicSupabaseClient } from "@/lib/supabase/public"
 import { COMPARISON_SLUGS } from "@/lib/seo/comparisons"
+import { GUIDE_SLUGS } from "@/lib/guides"
 import { CITY_SLUGS } from "@/lib/seo/cities"
 import { RESTAURANT_TYPE_SLUGS } from "@/lib/seo/restaurant-types"
 import { tenantUrl } from "@/lib/tenant"
@@ -38,6 +39,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     },
     {
+      url: `${BASE_URL}/guider`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.85,
+    },
+    {
       url: `${BASE_URL}/jamfor`,
       lastModified: now,
       changeFrequency: "monthly",
@@ -68,6 +75,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.3,
     },
   ]
+
+  const guideEntries: MetadataRoute.Sitemap = GUIDE_SLUGS.map((s) => ({
+    url: `${BASE_URL}/guider/${s}`,
+    lastModified: now,
+    changeFrequency: "monthly",
+    priority: 0.8,
+  }))
 
   const comparisonEntries: MetadataRoute.Sitemap = COMPARISON_SLUGS.map((s) => ({
     url: `${BASE_URL}/jamfor/${s}`,
@@ -112,6 +126,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     ...staticEntries,
+    ...guideEntries,
     ...comparisonEntries,
     ...cityEntries,
     ...typeEntries,
